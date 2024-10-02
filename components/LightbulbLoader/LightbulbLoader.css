@@ -1,0 +1,31 @@
+.lightbulb-loader {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+}
+
+.lightbulb-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.lightbulb-glow {
+  fill: #ffcc00; /* Warm yellow light color */
+  color: #ffcc00;
+  -webkit-text-stroke: 1px #053241; /* Outline effect */
+  /*text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); */
+  animation: pulse 1.5s ease-in-out infinite;
+  letter-spacing: 2px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    fill: #ffcc00; /* Lightbulb "on" color */
+    color: #ffcc00;
+  }
+  50% {
+    fill: #fff; /* Lightbulb "off" color */
+    color: #fff;
+  }
+}

@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --hashlists-grey: #053241;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.main-content {
+  height: calc(100vh - 64px);
+}
+
+.elementBox {
+  border: 2px solid #fde2e2;
+  background-color: #fdf2f8;
+  margin: 0 2rem 2rem 2rem;
+  padding: 2rem;
+  align-items: center;
+  border-radius: 1rem;
+  min-width: 320px;
+}
+
+.elementDescription {
+  text-align: center;
+}
+
+select:focus {
+  border-color: var(--hashlists-grey);
+  outline: 1px solid transparent;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 1px var(--hashlists-grey);
+}

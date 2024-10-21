@@ -18,7 +18,7 @@ import {
   useWeb3Modal,
   useWeb3ModalAccount,
 } from '@web3modal/ethers/react';
-import { formatAddress } from '@/utils/utils';
+import { formatAddress, getNetwork } from '@/utils/utils';
 import { useProfile } from '@/contexts/ProfileContext';
 import Link from 'next/link';
 import { supportedNetworks } from '@/constants/supportedNetworks';
@@ -82,7 +82,7 @@ export default function WalletConnectButton() {
   }, [isConnected]);
 
   useEffect(() => {
-    const currentNetwork = supportedNetworks[chainId!];
+    const currentNetwork = getNetwork(chainId!);
     currentNetwork && currentNetwork.icon
       ? setNetworkIcon(currentNetwork.icon)
       : setNetworkIcon('');

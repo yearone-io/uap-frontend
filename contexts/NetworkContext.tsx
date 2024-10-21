@@ -1,17 +1,16 @@
 'use client';
 import React, { createContext, useContext } from 'react';
 import { supportedNetworks } from '@/constants/supportedNetworks';
+import { getNetwork } from '@/utils/utils';
 
 interface NetworkContextType {
-  networkId: number;
   network: (typeof supportedNetworks)[number];
 }
 
 const appNetworkId = Number(process.env.NEXT_PUBLIC_DEFAULT_NETWORK!);
 
 const initialNetworkContextValue: NetworkContextType = {
-  networkId: appNetworkId,
-  network: supportedNetworks[appNetworkId],
+  network: getNetwork(appNetworkId),
 };
 
 const NetworkContext = createContext<NetworkContextType>(
@@ -26,8 +25,7 @@ export function NetworkProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const contextProperties = {
-    networkId: initialNetworkContextValue.networkId,
-    network: supportedNetworks[initialNetworkContextValue.networkId],
+    network: getNetwork(appNetworkId),
   };
   return (
     <NetworkContext.Provider value={contextProperties}>

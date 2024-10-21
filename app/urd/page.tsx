@@ -291,6 +291,12 @@ const UAPConfigPage = () => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
+        <BreadcrumbItem>
+          <WalletNetworkSelectorButton
+            currentNetwork={network.chainId}
+            urlTemplate={() => `/urd`}
+          />
+        </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" mr={2}>
             Configure Assistant
@@ -338,7 +344,10 @@ const UAPConfigPage = () => {
               Change network
             </Button>
             <Text>Or visit the {getNetwork(walletNetworkId).name} site</Text>
-            <WalletNetworkSelectorButton currentNetwork={network.chainId} />
+            <WalletNetworkSelectorButton
+              currentNetwork={network.chainId}
+              urlTemplate={() => '/urd'}
+            />
           </VStack>
         </Flex>
       </>

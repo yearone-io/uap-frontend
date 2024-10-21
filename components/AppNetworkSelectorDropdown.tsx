@@ -1,14 +1,12 @@
-'use client';
 import React from 'react';
 import { supportedNetworks } from '@/constants/supportedNetworks';
 import { Flex, Select, Image } from '@chakra-ui/react';
+import { getNetwork } from '@/utils/utils';
 
 const WalletNetworkSelectorButton = ({
   currentNetwork,
-  urlTemplate,
 }: {
   currentNetwork: number;
-  urlTemplate: (networkId: number) => string;
 }) => {
   return (
     <Flex gap={2} flexDirection={'row'} alignItems={'center'}>
@@ -23,7 +21,7 @@ const WalletNetworkSelectorButton = ({
         defaultValue={currentNetwork}
         fontWeight={600}
         onChange={event =>
-          (window.location.href = urlTemplate(parseInt(event.target.value)))
+          (window.location.href = getNetwork(parseInt(event.target.value)).url)
         }
       >
         {Object.keys(supportedNetworks).map((networkId: string) => {

@@ -13,6 +13,7 @@ import {
   FormControl,
   FormLabel,
   Select,
+  VStack,
 } from '@chakra-ui/react';
 import {
   ethers,
@@ -22,11 +23,11 @@ import {
 } from 'ethers';
 import ERC725 from '@erc725/erc725.js';
 import {
+  useWeb3Modal,
   useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from '@web3modal/ethers/react';
 import { getNetwork } from '@/utils/utils';
-import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 import SignInBox from '@/components/SignInBox';
 import ConfiguredAssistants from '@/components/ConfiguredAssistants';
 import { SiweMessage } from 'siwe';
@@ -41,8 +42,9 @@ import {
 } from '@/utils/configDataKeyValueStore';
 import { ERC725__factory } from '@/types';
 import { useNetwork } from '@/contexts/NetworkContext';
+import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 
-const UAPConfigPage: React.FC<> = () => {
+const UAPConfigPage = () => {
   const toast = useToast({ position: 'bottom-left' });
   const {
     address,
@@ -50,6 +52,7 @@ const UAPConfigPage: React.FC<> = () => {
     isConnected,
   } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
+  const { open } = useWeb3Modal();
   const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [typeId, setTypeId] = useState<string>('');
@@ -277,9 +280,8 @@ const UAPConfigPage: React.FC<> = () => {
     }
   };
 
-  return walletNetworkId && isUserConnected ? (
+  const breadCrumbs = (
     <>
-      {/* Breadcrumb and other components */}
       <Breadcrumb
         separator="/"
         color={'hashlists.orange'}
@@ -289,17 +291,64 @@ const UAPConfigPage: React.FC<> = () => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href={`/profile/${address}`}>
-            {'Profile'}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" mr={2}>
-            Configure Assistant Per Transaction Type
+            Configure Assistant
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
+    </>
+  );
+
+  if (!walletNetworkId || !isUserConnected) {
+    return (
+      <>
+        {breadCrumbs}
+        <Flex
+          height="100%"
+          w="100%"
+          alignContent="center"
+          justifyContent="center"
+          pt={4}
+        >
+          <SignInBox boxText={'Sign in to set UAPTypeConfig'} />
+        </Flex>
+      </>
+    );
+  }
+
+  if (walletNetworkId !== network.chainId) {
+    return (
+      <>
+        {breadCrumbs}
+        <Flex
+          height="100%"
+          w="100%"
+          alignContent="center"
+          justifyContent="center"
+          pt={4}
+        >
+          <VStack>
+            <Text>
+              You're on the {network.name} site but your connected wallet is on{' '}
+              {getNetwork(walletNetworkId).name}
+            </Text>
+            <Text>Please change network</Text>
+            <Button onClick={() => open({ view: 'Networks' })}>
+              Change network
+            </Button>
+            <Text>Or visit the {getNetwork(walletNetworkId).name} site</Text>
+            <WalletNetworkSelectorButton currentNetwork={network.chainId} />
+          </VStack>
+        </Flex>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {/* Breadcrumb and other components */}
+      {breadCrumbs}
       <Flex
         display="flex"
         w={'100%'}
@@ -377,34 +426,6 @@ const UAPConfigPage: React.FC<> = () => {
             Enable Universal Assistants
           </Button>
         </form>
-      </Flex>
-    </>
-  ) : (
-    // Sign-in prompt or other content for when the user is not connected
-    <>
-      <Breadcrumb
-        separator="/"
-        color={'hashlists.orange'}
-        fontFamily={'Tomorrow'}
-        fontWeight={600}
-      >
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">#</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrentPage>
-          <BreadcrumbLink href="" mr={2}>
-            Sign In
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Flex
-        height="100%"
-        w="100%"
-        alignContent="center"
-        justifyContent="center"
-        pt={4}
-      >
-        <SignInBox boxText={'Sign in to set UAPTypeConfig'} />
       </Flex>
     </>
   );

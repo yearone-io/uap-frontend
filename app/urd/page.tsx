@@ -219,7 +219,7 @@ const UAPConfigPage = () => {
       console.log('signer:', signer);
       console.log('upAddress:', upAddress);
       console.log('mainController:', signerAddress);
-      const currentNetwork = getNetwork(walletNetworkId as number);
+      const currentNetwork = getNetwork(walletNetworkId);
       const mappingKey = generateMappingKey('UAPTypeConfig', typeId);
 
       // Define the schema with the dynamic key

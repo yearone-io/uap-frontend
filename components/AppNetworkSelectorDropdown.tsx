@@ -26,7 +26,7 @@ const WalletNetworkSelectorButton = ({
         }}
       >
         {Object.keys(supportedNetworks).map((networkId: string) => {
-          const network = getNetwork(Number(networkId));
+          const network = getNetwork(networkId);
           return (
             <option key={networkId} value={Number(networkId)}>
               {network.name}

@@ -82,13 +82,11 @@ export default function WalletConnectButton() {
   }, [isConnected]);
 
   useEffect(() => {
-    const currentNetwork = getNetwork(chainId!);
-    currentNetwork && currentNetwork.icon
-      ? setNetworkIcon(currentNetwork.icon)
-      : setNetworkIcon('');
-    currentNetwork && currentNetwork.name
-      ? setNetworkName(currentNetwork.name)
-      : setNetworkName('');
+    if (chainId) {
+      const currentNetwork = getNetwork(chainId!);
+      setNetworkIcon(currentNetwork.icon);
+      setNetworkName(currentNetwork.name);
+    }
   }, [chainId]);
 
   return userConnected ? (

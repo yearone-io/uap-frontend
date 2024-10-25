@@ -8,10 +8,10 @@ import {
   Interface,
 } from "ethers";
 import type {
-  Signer,
   AddressLike,
   ContractDeployTransaction,
   ContractRunner,
+  Signer,
 } from "ethers";
 import type { PayableOverrides } from "../common";
 import type { ERC725X, ERC725XInterface } from "../ERC725X";
@@ -306,7 +306,7 @@ type ERC725XConstructorParams =
   | ConstructorParameters<typeof ContractFactory>;
 
 const isSuperArgs = (
-  xs: ERC725XConstructorParams
+  xs: ERC725XConstructorParams,
 ): xs is ConstructorParameters<typeof ContractFactory> => xs.length > 1;
 
 export class ERC725X__factory extends ContractFactory {
@@ -320,13 +320,13 @@ export class ERC725X__factory extends ContractFactory {
 
   override getDeployTransaction(
     initialOwner: AddressLike,
-    overrides?: PayableOverrides & { from?: string }
+    overrides?: PayableOverrides & { from?: string },
   ): Promise<ContractDeployTransaction> {
     return super.getDeployTransaction(initialOwner, overrides || {});
   }
   override deploy(
     initialOwner: AddressLike,
-    overrides?: PayableOverrides & { from?: string }
+    overrides?: PayableOverrides & { from?: string },
   ) {
     return super.deploy(initialOwner, overrides || {}) as Promise<
       ERC725X & {

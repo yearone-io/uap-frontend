@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
-import { BrowserProvider, Eip1193Provider } from 'ethers';
-import { typeIdOptionsMap, typeIdOrder } from '@/constants/assistantTypes';
-import { customDecodeAddresses, generateMappingKey } from '@/utils/configDataKeyValueStore';
+import React, { useEffect, useState } from "react";
+import { Box, Text } from "@chakra-ui/react";
+import { BrowserProvider, Eip1193Provider } from "ethers";
+import { typeIdOptionsMap, typeIdOrder } from "@/constants/assistantTypes";
+import {
+  customDecodeAddresses,
+  generateMappingKey,
+} from "@/utils/configDataKeyValueStore";
 import { ERC725__factory } from "@/types";
 
 type UPTypeConfigDisplayProps = {
@@ -11,9 +14,13 @@ type UPTypeConfigDisplayProps = {
   walletProvider: Eip1193Provider;
 };
 
-const ConfiguredAssistants: React.FC<UPTypeConfigDisplayProps> = ({ upAddress, networkId, walletProvider }) => {
-  const [typeConfigs, setTypeConfigs] = useState<{ [typeId: string]: string[] }>({});
-  const [error, setError] = useState<string>('');
+const ConfiguredAssistants: React.FC<UPTypeConfigDisplayProps> = (
+  { upAddress, networkId, walletProvider },
+) => {
+  const [typeConfigs, setTypeConfigs] = useState<
+    { [typeId: string]: string[] }
+  >({});
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchTypeConfigs = async () => {
@@ -25,22 +32,25 @@ const ConfiguredAssistants: React.FC<UPTypeConfigDisplayProps> = ({ upAddress, n
 
         for (const typeIdValue of typeIdOrder) {
           // Generate mapping key
-          const mappingKey = generateMappingKey('UAPTypeConfig', typeIdValue);
+          const mappingKey = generateMappingKey("UAPTypeConfig", typeIdValue);
 
           // fetch data
           const UP = ERC725__factory.connect(upAddress, signer);
           const encodedResult = await UP.getData(mappingKey);
           const assistantAddresses = customDecodeAddresses(encodedResult);
 
-          if (assistantAddresses && Array.isArray(assistantAddresses) && assistantAddresses.length > 0) {
+          if (
+            assistantAddresses && Array.isArray(assistantAddresses) &&
+            assistantAddresses.length > 0
+          ) {
             newTypeConfigs[typeIdValue] = assistantAddresses;
           }
         }
 
         setTypeConfigs(newTypeConfigs);
       } catch (error: any) {
-        console.error('Error fetching UP Type Configs:', error);
-        setError('Error fetching UP Type Configs');
+        console.error("Error fetching UP Type Configs:", error);
+        setError("Error fetching UP Type Configs");
       }
     };
 

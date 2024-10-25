@@ -1,16 +1,16 @@
-import React from 'react';
-import './LightbulbLoader.css'; // Include the CSS for animation
-import { Box, Flex } from '@chakra-ui/react';
+import React from "react";
+import "./LightbulbLoader.css"; // Include the CSS for animation
+import { Box, Flex } from "@chakra-ui/react";
 
 const LightbulbLoader: React.FC = () => {
   return (
     <Flex
-      flexDirection={'column'}
+      flexDirection={"column"}
       gap={2}
-      w={'100%'}
-      height={'calc(100vh - 230px)'}
-      justifyContent={'center'}
-      alignItems={'center'}
+      w={"100%"}
+      height={"calc(100vh - 230px)"}
+      justifyContent={"center"}
+      alignItems={"center"}
     >
       <div className="lightbulb-loader">
         <svg
@@ -44,7 +44,7 @@ const LightbulbLoader: React.FC = () => {
       <Box
         ml={4}
         fontSize="lg"
-        fontFamily={'Tomorrow'}
+        fontFamily={"Tomorrow"}
         fontWeight="bold"
         className="lightbulb-glow"
         stroke="#053241"

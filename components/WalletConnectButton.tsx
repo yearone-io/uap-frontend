@@ -1,77 +1,76 @@
-'use client';
-import React, { useEffect, useState } from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
+  Box,
   Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Flex,
   Image,
-  MenuGroup,
-  Box,
+  Menu,
+  MenuButton,
   MenuDivider,
-} from '@chakra-ui/react';
+  MenuGroup,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/react";
 import {
   useDisconnect,
   useWeb3Modal,
   useWeb3ModalAccount,
-} from '@web3modal/ethers/react';
-import { formatAddress, getNetwork } from '@/utils/utils';
-import { useProfile } from '@/contexts/ProfileContext';
-import Link from 'next/link';
-import { supportedNetworks } from '@/constants/supportedNetworks';
+} from "@web3modal/ethers/react";
+import { formatAddress, getNetwork } from "@/utils/utils";
+import { useProfile } from "@/contexts/ProfileContext";
+import Link from "next/link";
+import { supportedNetworks } from "@/constants/supportedNetworks";
 
 export default function WalletConnectButton() {
   const { open } = useWeb3Modal();
   const { disconnect } = useDisconnect();
   const { address, isConnected, chainId } = useWeb3ModalAccount();
   console.log(
-    'address',
+    "address",
     address,
-    'isConnected',
+    "isConnected",
     isConnected,
-    'chainId',
-    chainId
+    "chainId",
+    chainId,
   );
   const { profile } = useProfile();
   const [networkIcon, setNetworkIcon] = useState<string>();
   const [networkName, setNetworkName] = useState<string>();
   const [userConnected, setUserConnected] = useState(false);
-  const [buttonMessage, setButtonMessage] = useState('Sign In');
+  const [buttonMessage, setButtonMessage] = useState("Sign In");
   const [buttonStyling, setButtonStyling] = useState({
-    background: '#FFF8DD',
-    color: '#053241',
+    background: "#FFF8DD",
+    color: "#053241",
   });
 
   useEffect(() => {
     setButtonMessage(
       isConnected
-        ? profile?.name
-          ? profile.name
-          : formatAddress(address as string)
-        : 'Sign In'
+        ? profile?.name ? profile.name : formatAddress(address as string)
+        : "Sign In",
     );
   }, [profile, isConnected, address]);
 
   useEffect(() => {
     setButtonStyling(
       isConnected
-        ? { background: '#DB7C3D', color: '#fff' }
-        : { background: '#FFF8DD', color: '#053241' }
+        ? { background: "#DB7C3D", color: "#fff" }
+        : { background: "#FFF8DD", color: "#053241" },
     );
   }, [isConnected]);
 
-  const profileImage =
-    isConnected && profile && profile.mainImage ? (
+  const profileImage = isConnected && profile && profile.mainImage
+    ? (
       <Avatar
-        size={'sm'}
-        border={'1px solid #053241'}
+        size={"sm"}
+        border={"1px solid #053241"}
         name={profile.name}
         src={profile.mainImage}
       />
-    ) : null;
+    )
+    : null;
 
   useEffect(() => {
     if (isConnected) {
@@ -89,61 +88,63 @@ export default function WalletConnectButton() {
     }
   }, [chainId]);
 
-  return userConnected ? (
-    <Menu>
-      <MenuButton
-        as={Button}
+  return userConnected
+    ? (
+      <Menu>
+        <MenuButton
+          as={Button}
+          style={{
+            fontFamily: "Montserrat",
+            fontWeight: 600,
+            border: "1px solid #053241",
+            borderRadius: 10,
+            ...buttonStyling,
+          }}
+          size={"md"}
+        >
+          <Flex gap={2} alignItems={"center"} justifyContent={"center"}>
+            {profileImage}
+            {buttonMessage}
+          </Flex>
+        </MenuButton>
+        <MenuList>
+          <MenuItem as={Link} href={`/profile/${address}`}>
+            View profile
+          </MenuItem>
+          <MenuDivider />
+          <MenuGroup>
+            <Flex
+              mx={4}
+              my={2}
+              fontWeight={600}
+              flexDirection={"row"}
+              gap={2}
+              alignItems={"center"}
+            >
+              <Box>Network:</Box>
+              <Image height={"20px"} src={networkIcon} alt={networkName} />
+            </Flex>
+            <MenuItem onClick={() => open({ view: "Networks" })}>
+              Change network
+            </MenuItem>
+            <MenuItem onClick={() => disconnect()}>Sign out</MenuItem>
+          </MenuGroup>
+        </MenuList>
+      </Menu>
+    )
+    : (
+      <Button
         style={{
-          fontFamily: 'Montserrat',
+          fontFamily: "Montserrat",
           fontWeight: 600,
-          border: '1px solid #053241',
+          border: "1px solid #053241",
           borderRadius: 10,
           ...buttonStyling,
         }}
-        size={'md'}
+        onClick={() => open()}
+        size={"md"}
       >
-        <Flex gap={2} alignItems={'center'} justifyContent={'center'}>
-          {profileImage}
-          {buttonMessage}
-        </Flex>
-      </MenuButton>
-      <MenuList>
-        <MenuItem as={Link} href={`/profile/${address}`}>
-          View profile
-        </MenuItem>
-        <MenuDivider />
-        <MenuGroup>
-          <Flex
-            mx={4}
-            my={2}
-            fontWeight={600}
-            flexDirection={'row'}
-            gap={2}
-            alignItems={'center'}
-          >
-            <Box>Network:</Box>
-            <Image height={'20px'} src={networkIcon} alt={networkName} />
-          </Flex>
-          <MenuItem onClick={() => open({ view: 'Networks' })}>
-            Change network
-          </MenuItem>
-          <MenuItem onClick={() => disconnect()}>Sign out</MenuItem>
-        </MenuGroup>
-      </MenuList>
-    </Menu>
-  ) : (
-    <Button
-      style={{
-        fontFamily: 'Montserrat',
-        fontWeight: 600,
-        border: '1px solid #053241',
-        borderRadius: 10,
-        ...buttonStyling,
-      }}
-      onClick={() => open()}
-      size={'md'}
-    >
-      {buttonMessage}
-    </Button>
-  );
+        {buttonMessage}
+      </Button>
+    );
 }

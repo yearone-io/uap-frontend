@@ -7,7 +7,7 @@ import {
   ContractTransactionResponse,
   Interface,
 } from "ethers";
-import type { Signer, ContractDeployTransaction, ContractRunner } from "ethers";
+import type { ContractDeployTransaction, ContractRunner, Signer } from "ethers";
 import type { NonPayableOverrides } from "../common";
 import type { ERC725XInit, ERC725XInitInterface } from "../ERC725XInit";
 
@@ -321,7 +321,7 @@ type ERC725XInitConstructorParams =
   | ConstructorParameters<typeof ContractFactory>;
 
 const isSuperArgs = (
-  xs: ERC725XInitConstructorParams
+  xs: ERC725XInitConstructorParams,
 ): xs is ConstructorParameters<typeof ContractFactory> => xs.length > 1;
 
 export class ERC725XInit__factory extends ContractFactory {
@@ -334,7 +334,7 @@ export class ERC725XInit__factory extends ContractFactory {
   }
 
   override getDeployTransaction(
-    overrides?: NonPayableOverrides & { from?: string }
+    overrides?: NonPayableOverrides & { from?: string },
   ): Promise<ContractDeployTransaction> {
     return super.getDeployTransaction(overrides || {});
   }

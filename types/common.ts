@@ -2,15 +2,15 @@
 /* tslint:disable */
 /* eslint-disable */
 import type {
-  FunctionFragment,
-  Typed,
-  EventFragment,
   ContractTransaction,
   ContractTransactionResponse,
   DeferredTopicFilter,
+  EventFragment,
   EventLog,
-  TransactionRequest,
+  FunctionFragment,
   LogDescription,
+  TransactionRequest,
+  Typed,
 } from "ethers";
 
 export interface TypedDeferredTopicFilter<_TCEvent extends TypedContractEvent>
@@ -19,7 +19,7 @@ export interface TypedDeferredTopicFilter<_TCEvent extends TypedContractEvent>
 export interface TypedContractEvent<
   InputTuple extends Array<any> = any,
   OutputTuple extends Array<any> = any,
-  OutputObject = any
+  OutputObject = any,
 > {
   (...args: Partial<InputTuple>): TypedDeferredTopicFilter<
     TypedContractEvent<InputTuple, OutputTuple, OutputObject>
@@ -32,15 +32,13 @@ export interface TypedContractEvent<
 type __TypechainAOutputTuple<T> = T extends TypedContractEvent<
   infer _U,
   infer W
->
-  ? W
+> ? W
   : never;
 type __TypechainOutputObject<T> = T extends TypedContractEvent<
   infer _U,
   infer _W,
   infer V
->
-  ? V
+> ? V
   : never;
 
 export interface TypedEventLog<TCEvent extends TypedContractEvent>
@@ -57,7 +55,7 @@ export type TypedListener<TCEvent extends TypedContractEvent> = (
   ...listenerArg: [
     ...__TypechainAOutputTuple<TCEvent>,
     TypedEventLog<TCEvent>,
-    ...undefined[]
+    ...undefined[],
   ]
 ) => void;
 
@@ -68,8 +66,7 @@ export type MinEthersFactory<C, ARGS> = {
 export type GetContractTypeFromFactory<F> = F extends MinEthersFactory<
   infer C,
   any
->
-  ? C
+> ? C
   : never;
 export type GetARGsTypeFromFactory<F> = F extends MinEthersFactory<any, any>
   ? Parameters<F["deploy"]>
@@ -89,8 +86,7 @@ export type PayableOverrides = Omit<
 export type ViewOverrides = Omit<TransactionRequest, "to" | "data">;
 export type Overrides<S extends StateMutability> = S extends "nonpayable"
   ? NonPayableOverrides
-  : S extends "payable"
-  ? PayableOverrides
+  : S extends "payable" ? PayableOverrides
   : ViewOverrides;
 
 export type PostfixOverrides<A extends Array<any>, S extends StateMutability> =
@@ -98,7 +94,7 @@ export type PostfixOverrides<A extends Array<any>, S extends StateMutability> =
   | [...A, Overrides<S>];
 export type ContractMethodArgs<
   A extends Array<any>,
-  S extends StateMutability
+  S extends StateMutability,
 > = PostfixOverrides<{ [I in keyof A]-?: A[I] | Typed }, S>;
 
 export type DefaultReturnType<R> = R extends Array<any> ? R[0] : R;
@@ -107,10 +103,11 @@ export type DefaultReturnType<R> = R extends Array<any> ? R[0] : R;
 export interface TypedContractMethod<
   A extends Array<any> = Array<any>,
   R = any,
-  S extends StateMutability = "payable"
+  S extends StateMutability = "payable",
 > {
-  (...args: ContractMethodArgs<A, S>): S extends "view"
-    ? Promise<DefaultReturnType<R>>
+  (
+    ...args: ContractMethodArgs<A, S>
+  ): S extends "view" ? Promise<DefaultReturnType<R>>
     : Promise<ContractTransactionResponse>;
 
   name: string;

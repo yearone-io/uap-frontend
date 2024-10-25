@@ -1,5 +1,5 @@
-'use client';
-import React from 'react';
+"use client";
+import React from "react";
 import {
   Box,
   Breadcrumb,
@@ -10,20 +10,20 @@ import {
   Heading,
   Image,
   Link as ChakraLink,
-} from '@chakra-ui/react';
-import { supportedNetworks } from '@/constants/supportedNetworks';
-import { FaExternalLinkAlt } from 'react-icons/fa';
-import { useNetwork } from '@/contexts/NetworkContext';
+} from "@chakra-ui/react";
+import { supportedNetworks } from "@/constants/supportedNetworks";
+import { FaExternalLinkAlt } from "react-icons/fa";
+import { useNetwork } from "@/contexts/NetworkContext";
 
 export default function Contracts() {
   const { network } = useNetwork();
   return (
     <>
-      <Flex w={'100%'} justifyContent={'flex-start'}>
+      <Flex w={"100%"} justifyContent={"flex-start"}>
         <Breadcrumb
           separator="/"
-          color={'hashlists.orange'}
-          fontFamily={'Tomorrow'}
+          color={"hashlists.orange"}
+          fontFamily={"Tomorrow"}
           fontWeight={600}
         >
           <BreadcrumbItem>
@@ -38,9 +38,9 @@ export default function Contracts() {
       </Flex>
       <Flex
         display="flex"
-        w={'100%'}
-        flexDirection={'row'}
-        flexWrap={'wrap'}
+        w={"100%"}
+        flexDirection={"row"}
+        flexWrap={"wrap"}
         gap={16}
         justifyContent="center"
         alignItems="center"
@@ -48,16 +48,16 @@ export default function Contracts() {
         <Flex
           justifyContent="center"
           alignItems="center"
-          flexDir={'column'}
-          w={'100%'}
+          flexDir={"column"}
+          w={"100%"}
           maxWidth="250px"
           gap={3}
         >
           <Heading
-            fontSize={'lg'}
+            fontSize={"lg"}
             fontWeight={600}
-            fontFamily={'Tomorrow'}
-            color={'#053241'}
+            fontFamily={"Tomorrow"}
+            color={"#053241"}
           >
             View Universal Assistant protocol contract deployments
           </Heading>
@@ -81,7 +81,7 @@ export default function Contracts() {
                     <Image
                       src={network.icon}
                       alt={network.icon}
-                      height={'30px'}
+                      height={"30px"}
                     />
                   </Flex>
                 </Button>

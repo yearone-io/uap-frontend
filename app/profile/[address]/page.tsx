@@ -22,7 +22,7 @@ import ConfiguredAssistants from '@/components/ConfiguredAssistants';
 import { useNetwork } from '@/contexts/NetworkContext';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 
-const UserPage = () => {
+const ProfilePage = () => {
   const { address, chainId: walletNetworkId } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
   const { open } = useWeb3Modal();
@@ -63,7 +63,7 @@ const UserPage = () => {
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" mr={2}>
-            User {formatAddressForBreadcrumbs(address)}
+            Profile {formatAddressForBreadcrumbs(address)}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
@@ -141,4 +141,4 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default ProfilePage;

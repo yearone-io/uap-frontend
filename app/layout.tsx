@@ -1,12 +1,12 @@
-import { Metadata } from "next";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import { Providers } from "./providers";
-import "./globals.css";
-import { Flex } from "@chakra-ui/react";
+import { Metadata } from 'next';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
+import { Providers } from './providers';
+import './globals.css';
+import { Flex } from '@chakra-ui/react';
 
-const title = "UAP";
-const description = "";
+const title = 'UAP';
+const description = '';
 
 export const metadata: Metadata = {
   title: title,
@@ -40,22 +40,22 @@ export default function RootLayout({
         <Providers>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "100%",
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
             }}
           >
             <NavBar />
             <Flex
               display="flex"
-              flexDirection={"column"}
-              w={"100%"}
-              my={"30px"}
-              px={{ base: "20px", md: "50px" }}
+              flexDirection={'column'}
+              w={'100%'}
+              my={'30px'}
+              px={{ base: '20px', md: '50px' }}
               gap={8}
               minH="calc(100vh - 230px)"
-              alignItems={"flex-start"}
-              justifyContent={"flex-start"}
+              alignItems={'flex-start'}
+              justifyContent={'flex-start'}
               className="hashlists-layout"
             >
               {children}

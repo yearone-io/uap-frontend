@@ -1,23 +1,21 @@
-"use client";
+'use client';
 import React, {
   createContext,
   useContext,
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
-} from "@web3modal/ethers/react";
-import lsp3ProfileSchema from "@erc725/erc725.js/schemas/LSP3ProfileMetadata.json" assert {
-  type: "json",
-};
-import { ERC725, ERC725JSONSchema } from "@erc725/erc725.js";
+} from '@web3modal/ethers/react';
+import lsp3ProfileSchema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json' assert { type: 'json' };
+import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js';
 
-import { getImageFromIPFS } from "@/utils/ipfs";
-import { supportedNetworks } from "@/constants/supportedNetworks";
-import { getNetwork } from "@/utils/utils";
+import { getImageFromIPFS } from '@/utils/ipfs';
+import { supportedNetworks } from '@/constants/supportedNetworks';
+import { getNetwork } from '@/utils/utils';
 
 interface Profile {
   name: string;
@@ -58,7 +56,7 @@ const initialProfileContextValue: ProfileContextType = {
 
 // Set up the empty React context
 const ProfileContext = createContext<ProfileContextType>(
-  initialProfileContextValue,
+  initialProfileContextValue
 );
 
 /**
@@ -88,7 +86,7 @@ export function ProfileProvider({
   // Load profile from local storage on initial render
   useEffect(() => {
     const loadProfileFromLocalStorage = () => {
-      const storedProfileData = localStorage.getItem("profileData");
+      const storedProfileData = localStorage.getItem('profileData');
       return storedProfileData ? JSON.parse(storedProfileData) : null;
     };
 
@@ -104,15 +102,15 @@ export function ProfileProvider({
   useEffect(() => {
     if (profile && profile.profileImage && profile.profileImage.length > 0) {
       getImageFromIPFS(profile.profileImage[0].url, chainId as number).then(
-        (imageUrl) => {
+        imageUrl => {
           // @ts-ignore
-          setProfile((prevProfile) => {
+          setProfile(prevProfile => {
             return {
               ...prevProfile,
               mainImage: imageUrl,
             };
           });
-        },
+        }
       );
     }
   }, [profile?.profileImage, chainId]);
@@ -121,8 +119,8 @@ export function ProfileProvider({
   useEffect(() => {
     if (profile) {
       localStorage.setItem(
-        "profileData",
-        JSON.stringify({ address, data: profile }),
+        'profileData',
+        JSON.stringify({ address, data: profile })
       );
     }
   }, [profile, address, chainId]);
@@ -153,20 +151,20 @@ export function ProfileProvider({
         lsp3ProfileSchema as ERC725JSONSchema[],
         address,
         currentNetwork.rpcUrl,
-        { ipfsGateway: currentNetwork.ipfsGateway },
+        { ipfsGateway: currentNetwork.ipfsGateway }
       );
 
       try {
         // Download and verify the full profile metadata
-        const profileMetaData = await erc725js.fetchData("LSP3Profile");
+        const profileMetaData = await erc725js.fetchData('LSP3Profile');
         const lsp12IssuedAssets = await erc725js.fetchData(
-          "LSP12IssuedAssets[]",
+          'LSP12IssuedAssets[]'
         );
 
         if (
           profileMetaData.value &&
-          typeof profileMetaData.value === "object" &&
-          "LSP3Profile" in profileMetaData.value
+          typeof profileMetaData.value === 'object' &&
+          'LSP3Profile' in profileMetaData.value
         ) {
           // Update the profile state
           setProfile(profileMetaData.value.LSP3Profile);
@@ -177,7 +175,7 @@ export function ProfileProvider({
           setIssuedAssets(lsp12IssuedAssets.value);
         }
       } catch (error) {
-        console.log("Can not fetch profile data: ", error);
+        console.log('Can not fetch profile data: ', error);
       }
     };
 
@@ -196,13 +194,13 @@ export function ProfileProvider({
     };
 
     // Add event listeners
-    (walletProvider as any).on("chainChanged", handleChainChanged);
+    (walletProvider as any).on('chainChanged', handleChainChanged);
 
     // Cleanup event listeners on component unmount
     return () => {
       (walletProvider as any).removeListener(
-        "chainChanged",
-        handleChainChanged,
+        'chainChanged',
+        handleChainChanged
       );
     };
   }, [walletProvider]);
@@ -218,7 +216,7 @@ export function ProfileProvider({
       setIssuedAssets,
       issuedAssets,
     }),
-    [profile, setProfile, setIssuedAssets, issuedAssets],
+    [profile, setProfile, setIssuedAssets, issuedAssets]
   );
 
   return (

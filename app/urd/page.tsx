@@ -1,5 +1,5 @@
-"use client";
-import React, { ChangeEvent, useEffect, useState } from "react";
+'use client';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   Box,
   Breadcrumb,
@@ -14,38 +14,38 @@ import {
   Text,
   useToast,
   VStack,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 import {
   BrowserProvider,
   Eip1193Provider,
   ethers,
   verifyMessage,
-} from "ethers";
-import ERC725 from "@erc725/erc725.js";
+} from 'ethers';
+import ERC725 from '@erc725/erc725.js';
 import {
   useWeb3Modal,
   useWeb3ModalAccount,
   useWeb3ModalProvider,
-} from "@web3modal/ethers/react";
-import { getNetwork } from "@/utils/utils";
-import SignInBox from "@/components/SignInBox";
-import ConfiguredAssistants from "@/components/ConfiguredAssistants";
-import { SiweMessage } from "siwe";
+} from '@web3modal/ethers/react';
+import { getNetwork } from '@/utils/utils';
+import SignInBox from '@/components/SignInBox';
+import ConfiguredAssistants from '@/components/ConfiguredAssistants';
+import { SiweMessage } from 'siwe';
 
 // Import the Type ID options map and order
-import { typeIdOptionsMap, typeIdOrder } from "@/constants/assistantTypes";
+import { typeIdOptionsMap, typeIdOrder } from '@/constants/assistantTypes';
 import {
   customEncodeAddresses,
   generateMappingKey,
   toggleUniveralAssistantsSubscribe,
   updateBECPermissions,
-} from "@/utils/configDataKeyValueStore";
-import { ERC725__factory } from "@/types";
-import { useNetwork } from "@/contexts/NetworkContext";
-import WalletNetworkSelectorButton from "@/components/AppNetworkSelectorDropdown";
+} from '@/utils/configDataKeyValueStore';
+import { ERC725__factory } from '@/types';
+import { useNetwork } from '@/contexts/NetworkContext';
+import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 
 const UAPConfigPage = () => {
-  const toast = useToast({ position: "bottom-left" });
+  const toast = useToast({ position: 'bottom-left' });
   const {
     address,
     chainId: walletNetworkId,
@@ -54,9 +54,9 @@ const UAPConfigPage = () => {
   const { walletProvider } = useWeb3ModalProvider();
   const { open } = useWeb3Modal();
   const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const [typeId, setTypeId] = useState<string>("");
-  const [assistantAddresses, setAssistantAddresses] = useState<string[]>([""]);
+  const [error, setError] = useState<string>('');
+  const [typeId, setTypeId] = useState<string>('');
+  const [assistantAddresses, setAssistantAddresses] = useState<string[]>(['']);
 
   const { network } = useNetwork();
 
@@ -68,7 +68,7 @@ const UAPConfigPage = () => {
 
   const handleAssistantAddressChange = (
     index: number,
-    event: ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>
   ) => {
     const newAddresses = [...assistantAddresses];
     newAddresses[index] = event.target.value;
@@ -76,7 +76,7 @@ const UAPConfigPage = () => {
   };
 
   const handleAddAssistantAddress = () => {
-    setAssistantAddresses([...assistantAddresses, ""]);
+    setAssistantAddresses([...assistantAddresses, '']);
   };
 
   const handleRemoveAssistantAddress = (index: number) => {
@@ -84,14 +84,14 @@ const UAPConfigPage = () => {
     setAssistantAddresses(newAddresses);
   };
   const handleToggleAssistant = async (
-    event: React.FormEvent<HTMLFormElement>,
+    event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
     if (!isConnected) {
       toast({
-        title: "Wallet not connected",
-        description: "Please connect your wallet to proceed.",
-        status: "warning",
+        title: 'Wallet not connected',
+        description: 'Please connect your wallet to proceed.',
+        status: 'warning',
         duration: 5000,
         isClosable: true,
       });
@@ -105,49 +105,49 @@ const UAPConfigPage = () => {
       //console.log('Accounts:', accounts);
       const upAddress = address as string;
       const signer = await provider.getSigner(upAddress);
-      console.log("Signer:", signer);
+      console.log('Signer:', signer);
       // Assuming the user is interacting with their own UP// Prepare a message with the SIWE-specific format
       const siweMessage = new SiweMessage({
         domain: window.location.host, // Domain requesting the signing
         uri: window.location.origin,
         address: upAddress, // Address performing the signing
         statement:
-          "Signing this message will enable the Universal Assistants Catalog to allow your UP Browser Extension to manage Assistant configurations.", // Human-readable assertion the user signs  // URI from the resource that is the subject of the signature
-        version: "1", // Current version of the SIWE Message
+          'Signing this message will enable the Universal Assistants Catalog to allow your UP Browser Extension to manage Assistant configurations.', // Human-readable assertion the user signs  // URI from the resource that is the subject of the signature
+        version: '1', // Current version of the SIWE Message
         chainId: network.chainId, // Chain ID to which the session is bound to
         resources: [`${window.location.origin}/terms`], // Authentication resource as part of authentication by the relying party
       }).prepareMessage();
       // Request the extension to sign the message
       const signature = await signer.signMessage(siweMessage);
       const mainUPController = verifyMessage(siweMessage, signature);
-      console.log("signer:", signer);
-      console.log("upAddress:", upAddress);
-      console.log("mainController:", mainUPController);
-      console.log("step 0");
+      console.log('signer:', signer);
+      console.log('upAddress:', upAddress);
+      console.log('mainController:', mainUPController);
+      console.log('step 0');
       await updateBECPermissions(provider, upAddress, mainUPController!);
-      console.log("step 1");
+      console.log('step 1');
       await toggleUniveralAssistantsSubscribe(
         provider,
         upAddress,
         network.protocolAddress,
         network.defaultURDUP,
-        false,
+        false
       );
 
       toast({
-        title: "Success",
-        description: "UAPTypeConfig has been set successfully.",
-        status: "success",
+        title: 'Success',
+        description: 'UAPTypeConfig has been set successfully.',
+        status: 'success',
         duration: 5000,
         isClosable: true,
       });
     } catch (error: any) {
-      console.error("Error setting UAPTypeConfig", error);
+      console.error('Error setting UAPTypeConfig', error);
       setError(`Error setting UAPTypeConfig: ${error.message}`);
       toast({
-        title: "Error",
+        title: 'Error',
         description: `Error setting UAPTypeConfig: ${error.message}`,
-        status: "error",
+        status: 'error',
         duration: 5000,
         isClosable: true,
       });
@@ -155,14 +155,14 @@ const UAPConfigPage = () => {
   };
 
   const handleSubmitConfig = async (
-    event: React.FormEvent<HTMLFormElement>,
+    event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
     if (!isConnected) {
       toast({
-        title: "Wallet not connected",
-        description: "Please connect your wallet to proceed.",
-        status: "warning",
+        title: 'Wallet not connected',
+        description: 'Please connect your wallet to proceed.',
+        status: 'warning',
         duration: 5000,
         isClosable: true,
       });
@@ -174,9 +174,9 @@ const UAPConfigPage = () => {
     // Input validation
     if (!ethers.isHexString(typeId, 32)) {
       toast({
-        title: "Invalid Type ID",
-        description: "Type ID must be a valid bytes32 hex string.",
-        status: "error",
+        title: 'Invalid Type ID',
+        description: 'Type ID must be a valid bytes32 hex string.',
+        status: 'error',
         duration: 5000,
         isClosable: true,
       });
@@ -186,9 +186,9 @@ const UAPConfigPage = () => {
     for (let addr of assistantAddresses) {
       if (!ethers.isAddress(addr)) {
         toast({
-          title: "Invalid Address",
+          title: 'Invalid Address',
           description: `Assistant address ${addr} is not valid.`,
-          status: "error",
+          status: 'error',
           duration: 5000,
           isClosable: true,
         });
@@ -201,33 +201,33 @@ const UAPConfigPage = () => {
       //console.log('Accounts:', accounts);
       const upAddress = address as string;
       const signer = await provider.getSigner(upAddress);
-      console.log("Signer:", signer);
+      console.log('Signer:', signer);
       // Assuming the user is interacting with their own UP// Prepare a message with the SIWE-specific format
       const siweMessage = new SiweMessage({
         domain: window.location.host, // Domain requesting the signing
         uri: window.location.origin,
         address: upAddress, // Address performing the signing
         statement:
-          "Signing this message will enable the Universal Assistants Catalog to allow your UP Browser Extension to manage Assistant configurations.", // Human-readable assertion the user signs  // URI from the resource that is the subject of the signature
-        version: "1", // Current version of the SIWE Message
+          'Signing this message will enable the Universal Assistants Catalog to allow your UP Browser Extension to manage Assistant configurations.', // Human-readable assertion the user signs  // URI from the resource that is the subject of the signature
+        version: '1', // Current version of the SIWE Message
         chainId: network.chainId, // Chain ID to which the session is bound to
         resources: [`${window.location.origin}/terms`], // Authentication resource as part of authentication by the relying party
       }).prepareMessage();
       // Request the extension to sign the message
       const signature = await signer.signMessage(siweMessage);
       const signerAddress = verifyMessage(siweMessage, signature);
-      console.log("signer:", signer);
-      console.log("upAddress:", upAddress);
-      console.log("mainController:", signerAddress);
-      const mappingKey = generateMappingKey("UAPTypeConfig", typeId);
+      console.log('signer:', signer);
+      console.log('upAddress:', upAddress);
+      console.log('mainController:', signerAddress);
+      const mappingKey = generateMappingKey('UAPTypeConfig', typeId);
 
       // Define the schema with the dynamic key
       const typeSchema = {
-        name: "UAPTypeConfig:<bytes32>",
+        name: 'UAPTypeConfig:<bytes32>',
         key: mappingKey,
-        keyType: "Mapping",
-        valueType: "address[]",
-        valueContent: "Address",
+        keyType: 'Mapping',
+        valueType: 'address[]',
+        valueContent: 'Address',
       };
       const schema = [typeSchema];
 
@@ -247,32 +247,32 @@ const UAPConfigPage = () => {
       // use custom function to encode the data
       const encodedValues = customEncodeAddresses(assistantAddresses);
 
-      console.log("Encoded data:", encodedKeysData);
+      console.log('Encoded data:', encodedKeysData);
 
       const UP = ERC725__factory.connect(upAddress, signer);
       const tx = await UP.connect(signer).setData(
         encodedKeysData.keys[0],
-        encodedValues,
+        encodedValues
       );
 
       await tx.wait();
 
       toast({
-        title: "Success",
-        description: "UAPTypeConfig has been set successfully.",
-        status: "success",
+        title: 'Success',
+        description: 'UAPTypeConfig has been set successfully.',
+        status: 'success',
         duration: 5000,
         isClosable: true,
       });
 
       // Redirect or update as needed
     } catch (error: any) {
-      console.error("Error setting UAPTypeConfig", error);
+      console.error('Error setting UAPTypeConfig', error);
       setError(`Error setting UAPTypeConfig: ${error.message}`);
       toast({
-        title: "Error",
+        title: 'Error',
         description: `Error setting UAPTypeConfig: ${error.message}`,
-        status: "error",
+        status: 'error',
         duration: 5000,
         isClosable: true,
       });
@@ -283,8 +283,8 @@ const UAPConfigPage = () => {
     <>
       <Breadcrumb
         separator="/"
-        color={"hashlists.orange"}
-        fontFamily={"Tomorrow"}
+        color={'hashlists.orange'}
+        fontFamily={'Tomorrow'}
         fontWeight={600}
       >
         <BreadcrumbItem>
@@ -316,7 +316,7 @@ const UAPConfigPage = () => {
           justifyContent="center"
           pt={4}
         >
-          <SignInBox boxText={"Sign in to set UAPTypeConfig"} />
+          <SignInBox boxText={'Sign in to set UAPTypeConfig'} />
         </Flex>
       </>
     );
@@ -335,18 +335,17 @@ const UAPConfigPage = () => {
         >
           <VStack>
             <Text>
-              You're on the {network.name} site but your connected wallet is on
-              {" "}
+              You're on the {network.name} site but your connected wallet is on{' '}
               {getNetwork(walletNetworkId).name}
             </Text>
             <Text>Please change network</Text>
-            <Button onClick={() => open({ view: "Networks" })}>
+            <Button onClick={() => open({ view: 'Networks' })}>
               Change network
             </Button>
             <Text>Or visit the {getNetwork(walletNetworkId).name} site</Text>
             <WalletNetworkSelectorButton
               currentNetwork={network.chainId}
-              urlTemplate={() => "/urd"}
+              urlTemplate={() => '/urd'}
             />
           </VStack>
         </Flex>
@@ -360,13 +359,13 @@ const UAPConfigPage = () => {
       {breadCrumbs}
       <Flex
         display="flex"
-        w={"100%"}
-        flexDirection={"column"}
-        flexWrap={"wrap"}
+        w={'100%'}
+        flexDirection={'column'}
+        flexWrap={'wrap'}
         gap={4}
         mt={4}
       >
-        <Box flex="1" w={"100%"} maxWidth="800px">
+        <Box flex="1" w={'100%'} maxWidth="800px">
           <ConfiguredAssistants
             upAddress={address as string}
             networkId={walletNetworkId as number}
@@ -381,9 +380,9 @@ const UAPConfigPage = () => {
               <Select
                 placeholder="Select Type ID"
                 value={typeId}
-                onChange={(e) => setTypeId(e.target.value)}
+                onChange={e => setTypeId(e.target.value)}
               >
-                {typeIdOrder.map((typeIdValue) => {
+                {typeIdOrder.map(typeIdValue => {
                   const option = typeIdOptionsMap[typeIdValue];
                   return (
                     <option value={option.value} key={option.value}>
@@ -400,7 +399,7 @@ const UAPConfigPage = () => {
                   <Input
                     placeholder="0x..."
                     value={addr}
-                    onChange={(e) => handleAssistantAddressChange(index, e)}
+                    onChange={e => handleAssistantAddressChange(index, e)}
                   />
                   {assistantAddresses.length > 1 && (
                     <Button
@@ -421,7 +420,7 @@ const UAPConfigPage = () => {
             </Button>
           </form>
           {error && (
-            <Text mt={4} color={"red"}>
+            <Text mt={4} color={'red'}>
               {error}
             </Text>
           )}

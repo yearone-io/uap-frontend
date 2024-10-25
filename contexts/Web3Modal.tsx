@@ -1,7 +1,7 @@
-"use client";
-import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react";
-import { config } from "@/constants/config";
-import { supportedNetworks } from "@/constants/supportedNetworks";
+'use client';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/react';
+import { config } from '@/constants/config';
+import { supportedNetworks } from '@/constants/supportedNetworks';
 
 // Wallet Connect: Metadata Setup
 const metadata = {
@@ -17,7 +17,7 @@ const ethersConfig = defaultConfig({
 });
 
 // Wallet Connect: Chain Data
-const chains = Object.values(supportedNetworks).map((network) => ({
+const chains = Object.values(supportedNetworks).map(network => ({
   chainId: network.chainId,
   name: network.name,
   currency: network.token,
@@ -27,7 +27,7 @@ const chains = Object.values(supportedNetworks).map((network) => ({
 
 // Wallet Connect: Chain Images
 const walletConnectChainImages: Record<number, string> = {};
-Object.values(supportedNetworks).forEach((network) => {
+Object.values(supportedNetworks).forEach(network => {
   walletConnectChainImages[network.chainId] = network.icon;
 });
 
@@ -35,10 +35,10 @@ Object.values(supportedNetworks).forEach((network) => {
 createWeb3Modal({
   ethersConfig,
   chains,
-  projectId: config.walletTools.walletConnectProjectID || "1",
+  projectId: config.walletTools.walletConnectProjectID || '1',
   chainImages: walletConnectChainImages,
-  featuredWalletIds: ["NONE"],
-  themeMode: "light",
+  featuredWalletIds: ['NONE'],
+  themeMode: 'light',
 });
 
 export function AppKit({ children }: any) {

@@ -6,9 +6,9 @@ const nextConfig = {
      */
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "**", // Wildcard for all hostnames
-        pathname: "**", // Wildcard for all paths
+        protocol: 'https',
+        hostname: '**', // Wildcard for all hostnames
+        pathname: '**', // Wildcard for all paths
       },
     ],
   },
@@ -20,8 +20,8 @@ const nextConfig = {
   reactStrictMode: false,
   // Wallet Connect Configuration
   // https://docs.walletconnect.com/web3modal/nextjs/about
-  webpack: (config) => {
-    config.externals.push("pino-pretty", "lokijs", "encoding");
+  webpack: config => {
+    config.externals.push('pino-pretty', 'lokijs', 'encoding');
     return config;
   },
 };

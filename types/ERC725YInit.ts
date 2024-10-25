@@ -13,7 +13,7 @@ import type {
   Interface,
   Listener,
   Result,
-} from "ethers";
+} from 'ethers';
 import type {
   TypedContractEvent,
   TypedContractMethod,
@@ -21,83 +21,83 @@ import type {
   TypedEventLog,
   TypedListener,
   TypedLogDescription,
-} from "./common";
+} from './common';
 
 export interface ERC725YInitInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "getData"
-      | "getDataBatch"
-      | "initialize"
-      | "owner"
-      | "renounceOwnership"
-      | "setData"
-      | "setDataBatch"
-      | "supportsInterface"
-      | "transferOwnership",
+      | 'getData'
+      | 'getDataBatch'
+      | 'initialize'
+      | 'owner'
+      | 'renounceOwnership'
+      | 'setData'
+      | 'setDataBatch'
+      | 'supportsInterface'
+      | 'transferOwnership'
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "DataChanged"
-      | "Initialized"
-      | "OwnershipTransferred",
+      | 'DataChanged'
+      | 'Initialized'
+      | 'OwnershipTransferred'
   ): EventFragment;
 
-  encodeFunctionData(functionFragment: "getData", values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: 'getData', values: [BytesLike]): string;
   encodeFunctionData(
-    functionFragment: "getDataBatch",
-    values: [BytesLike[]],
+    functionFragment: 'getDataBatch',
+    values: [BytesLike[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
-    values: [AddressLike],
+    functionFragment: 'initialize',
+    values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'owner', values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined,
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setData",
-    values: [BytesLike, BytesLike],
+    functionFragment: 'renounceOwnership',
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setDataBatch",
-    values: [BytesLike[], BytesLike[]],
+    functionFragment: 'setData',
+    values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "supportsInterface",
-    values: [BytesLike],
+    functionFragment: 'setDataBatch',
+    values: [BytesLike[], BytesLike[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [AddressLike],
+    functionFragment: 'supportsInterface',
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: 'transferOwnership',
+    values: [AddressLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "getData", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getData', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getDataBatch",
-    data: BytesLike,
+    functionFragment: 'getDataBatch',
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'initialize', data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'owner', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike,
+    functionFragment: 'renounceOwnership',
+    data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setData", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'setData', data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setDataBatch",
-    data: BytesLike,
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "supportsInterface",
-    data: BytesLike,
+    functionFragment: 'setDataBatch',
+    data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike,
+    functionFragment: 'supportsInterface',
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: 'transferOwnership',
+    data: BytesLike
   ): Result;
 }
 
@@ -148,138 +148,138 @@ export interface ERC725YInit extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined,
+    toBlock?: string | number | undefined
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
   on<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   once<TCEvent extends TypedContractEvent>(
     event: TCEvent,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>,
+    listener: TypedListener<TCEvent>
   ): Promise<this>;
 
   listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+    event: TCEvent
   ): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
   removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent,
+    event?: TCEvent
   ): Promise<this>;
 
-  getData: TypedContractMethod<[dataKey: BytesLike], [string], "view">;
+  getData: TypedContractMethod<[dataKey: BytesLike], [string], 'view'>;
 
   getDataBatch: TypedContractMethod<
     [dataKeys: BytesLike[]],
     [string[]],
-    "view"
+    'view'
   >;
 
   initialize: TypedContractMethod<
     [initialOwner: AddressLike],
     [void],
-    "payable"
+    'payable'
   >;
 
-  owner: TypedContractMethod<[], [string], "view">;
+  owner: TypedContractMethod<[], [string], 'view'>;
 
-  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+  renounceOwnership: TypedContractMethod<[], [void], 'nonpayable'>;
 
   setData: TypedContractMethod<
     [dataKey: BytesLike, dataValue: BytesLike],
     [void],
-    "payable"
+    'payable'
   >;
 
   setDataBatch: TypedContractMethod<
     [dataKeys: BytesLike[], dataValues: BytesLike[]],
     [void],
-    "payable"
+    'payable'
   >;
 
   supportsInterface: TypedContractMethod<
     [interfaceId: BytesLike],
     [boolean],
-    "view"
+    'view'
   >;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
-    "nonpayable"
+    'nonpayable'
   >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment,
+    key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "getData",
-  ): TypedContractMethod<[dataKey: BytesLike], [string], "view">;
+    nameOrSignature: 'getData'
+  ): TypedContractMethod<[dataKey: BytesLike], [string], 'view'>;
   getFunction(
-    nameOrSignature: "getDataBatch",
-  ): TypedContractMethod<[dataKeys: BytesLike[]], [string[]], "view">;
+    nameOrSignature: 'getDataBatch'
+  ): TypedContractMethod<[dataKeys: BytesLike[]], [string[]], 'view'>;
   getFunction(
-    nameOrSignature: "initialize",
-  ): TypedContractMethod<[initialOwner: AddressLike], [void], "payable">;
+    nameOrSignature: 'initialize'
+  ): TypedContractMethod<[initialOwner: AddressLike], [void], 'payable'>;
   getFunction(
-    nameOrSignature: "owner",
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: 'owner'
+  ): TypedContractMethod<[], [string], 'view'>;
   getFunction(
-    nameOrSignature: "renounceOwnership",
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: 'renounceOwnership'
+  ): TypedContractMethod<[], [void], 'nonpayable'>;
   getFunction(
-    nameOrSignature: "setData",
+    nameOrSignature: 'setData'
   ): TypedContractMethod<
     [dataKey: BytesLike, dataValue: BytesLike],
     [void],
-    "payable"
+    'payable'
   >;
   getFunction(
-    nameOrSignature: "setDataBatch",
+    nameOrSignature: 'setDataBatch'
   ): TypedContractMethod<
     [dataKeys: BytesLike[], dataValues: BytesLike[]],
     [void],
-    "payable"
+    'payable'
   >;
   getFunction(
-    nameOrSignature: "supportsInterface",
-  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
+    nameOrSignature: 'supportsInterface'
+  ): TypedContractMethod<[interfaceId: BytesLike], [boolean], 'view'>;
   getFunction(
-    nameOrSignature: "transferOwnership",
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    nameOrSignature: 'transferOwnership'
+  ): TypedContractMethod<[newOwner: AddressLike], [void], 'nonpayable'>;
 
   getEvent(
-    key: "DataChanged",
+    key: 'DataChanged'
   ): TypedContractEvent<
     DataChangedEvent.InputTuple,
     DataChangedEvent.OutputTuple,
     DataChangedEvent.OutputObject
   >;
   getEvent(
-    key: "Initialized",
+    key: 'Initialized'
   ): TypedContractEvent<
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred",
+    key: 'OwnershipTransferred'
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
@@ -287,7 +287,7 @@ export interface ERC725YInit extends BaseContract {
   >;
 
   filters: {
-    "DataChanged(bytes32,bytes)": TypedContractEvent<
+    'DataChanged(bytes32,bytes)': TypedContractEvent<
       DataChangedEvent.InputTuple,
       DataChangedEvent.OutputTuple,
       DataChangedEvent.OutputObject
@@ -298,7 +298,7 @@ export interface ERC725YInit extends BaseContract {
       DataChangedEvent.OutputObject
     >;
 
-    "Initialized(uint8)": TypedContractEvent<
+    'Initialized(uint8)': TypedContractEvent<
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
@@ -309,7 +309,7 @@ export interface ERC725YInit extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    "OwnershipTransferred(address,address)": TypedContractEvent<
+    'OwnershipTransferred(address,address)': TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject

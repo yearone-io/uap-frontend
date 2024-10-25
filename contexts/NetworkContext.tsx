@@ -1,7 +1,7 @@
-"use client";
-import React, { createContext, useContext } from "react";
-import { supportedNetworks } from "@/constants/supportedNetworks";
-import { getNetwork } from "@/utils/utils";
+'use client';
+import React, { createContext, useContext } from 'react';
+import { supportedNetworks } from '@/constants/supportedNetworks';
+import { getNetwork } from '@/utils/utils';
 
 interface NetworkContextType {
   network: (typeof supportedNetworks)[number];
@@ -14,7 +14,7 @@ const initialNetworkContextValue: NetworkContextType = {
 };
 
 const NetworkContext = createContext<NetworkContextType>(
-  initialNetworkContextValue,
+  initialNetworkContextValue
 );
 
 export function useNetwork() {

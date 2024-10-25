@@ -1,54 +1,54 @@
-import React from "react";
-import { Box, Flex, Link, Text } from "@chakra-ui/react";
-import { FaBookMedical, FaDatabase, FaSquareGithub } from "react-icons/fa6";
+import React from 'react';
+import { Box, Flex, Link, Text } from '@chakra-ui/react';
+import { FaBookMedical, FaDatabase, FaSquareGithub } from 'react-icons/fa6';
 
 export default function Footer() {
   return (
     <Box
       as="footer"
       borderTop="2px solid var(--chakra-colors-hashlists-grey)"
-      height={"90px"}
+      height={'90px'}
       className="hashlists-footer"
     >
       <Flex
         alignItems="center"
         justifyContent="space-between"
         py={8}
-        px={{ base: "20px", md: "50px" }}
+        px={{ base: '20px', md: '50px' }}
       >
         <Flex alignItems="center">
-          <Flex gap={3} display={["none", "none", "flex"]}>
+          <Flex gap={3} display={['none', 'none', 'flex']}>
             <Link
               href="https://github.com/yearone-io/hashlists-protocol"
               isExternal
               fontSize="24px"
             >
-              <FaSquareGithub color={"var(--chakra-colors-hashlists-grey)"} />
+              <FaSquareGithub color={'var(--chakra-colors-hashlists-grey)'} />
             </Link>
-            <Link href={"/contracts"}>
+            <Link href={'/contracts'}>
               <Text fontSize="md" fontWeight={400} letterSpacing={1.5}>
                 Contracts
               </Text>
             </Link>
-            <Link href={"https://docs.hashlists.xyz"}>
+            <Link href={'https://docs.hashlists.xyz'}>
               <Text fontSize="md" fontWeight={400} letterSpacing={1.5}>
                 Docs
               </Text>
             </Link>
           </Flex>
-          <Flex gap={3} display={["flex", "flex", "none"]} alignItems="center">
+          <Flex gap={3} display={['flex', 'flex', 'none']} alignItems="center">
             <Link
               href="https://github.com/yearone-io/hashlists-protocol"
               isExternal
               fontSize="24px"
             >
-              <FaSquareGithub color={"var(--chakra-colors-hashlists-grey)"} />
+              <FaSquareGithub color={'var(--chakra-colors-hashlists-grey)'} />
             </Link>
-            <Link href={"/contracts"} fontSize="20px">
-              <FaDatabase color={"var(--chakra-colors-hashlists-grey)"} />
+            <Link href={'/contracts'} fontSize="20px">
+              <FaDatabase color={'var(--chakra-colors-hashlists-grey)'} />
             </Link>
-            <Link href={"https://docs.hashlists.xyz"} fontSize="20px">
-              <FaBookMedical color={"var(--chakra-colors-hashlists-grey)"} />
+            <Link href={'https://docs.hashlists.xyz'} fontSize="20px">
+              <FaBookMedical color={'var(--chakra-colors-hashlists-grey)'} />
             </Link>
           </Flex>
         </Flex>
@@ -57,14 +57,14 @@ export default function Footer() {
           lineHeight="xs"
           fontWeight={500}
           letterSpacing={1.5}
-          color={"hashlists.grey"}
+          color={'hashlists.grey'}
         >
           built by
           <Link
             href="https://twitter.com/YearOneIO"
             textDecoration="underline"
             target="blank"
-            color={"var(--chakra-colors-hashlists-grey)"}
+            color={'var(--chakra-colors-hashlists-grey)'}
           >
             @yearoneio
           </Link>

@@ -6,21 +6,20 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
+  Image,
 } from '@chakra-ui/react';
 import { Eip1193Provider } from 'ethers';
 import {
-  useWeb3ModalAccount,
   useWeb3ModalProvider,
 } from '@web3modal/ethers/react';
 import { formatAddress } from '@/utils/utils';
-import ConfiguredAssistants from '@/components/ConfiguredAssistants';
-import { useNetwork } from '@/contexts/NetworkContext';
-import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
-
-const ProfilePage = () => {
-  const { address, chainId: walletNetworkId } = useWeb3ModalAccount();
+import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
+import { supportedNetworks } from '@/constants/supportedNetworks';
+export default function ProfilePage({ params }: { params: { address: string, chainId: number } }) {
+  const { address, chainId } = params;
   const { walletProvider } = useWeb3ModalProvider();
-  const { network } = useNetwork();
+
+  const { icon, name } = supportedNetworks[chainId];
 
   const formatAddressForBreadcrumbs = (address: string | undefined) => {
     const truncatedAddress = formatAddress(address ? address : '');
@@ -42,19 +41,16 @@ const ProfilePage = () => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbItem>
-          <WalletNetworkSelectorButton
-            currentNetwork={network.chainId}
-            urlTemplate={() => `/urd`}
-          />
-        </BreadcrumbItem>
+        <Image src={icon} alt={icon} height={'30px'} />
+        <Box ml={2}>
+        {name} /</Box>
         <BreadcrumbItem isCurrentPage>
-          <BreadcrumbLink href="" mr={2}>
+          <BreadcrumbLink href="" ml={2} mr={2}>
             Profile {formatAddressForBreadcrumbs(address)}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
-    </>
+    </> 
   );
 
   return (
@@ -69,9 +65,9 @@ const ProfilePage = () => {
         mt={4}
       >
         <Box flex="1" w={'100%'} maxWidth="800px">
-          <ConfiguredAssistants
+          <ReadConfiguredAssistants
             upAddress={address as string}
-            networkId={walletNetworkId as number}
+            networkId={chainId}
             walletProvider={walletProvider as Eip1193Provider}
           />
         </Box>
@@ -79,5 +75,3 @@ const ProfilePage = () => {
     </>
   );
 };
-
-export default ProfilePage;

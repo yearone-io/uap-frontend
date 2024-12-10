@@ -43,8 +43,12 @@ import {
 import { ERC725__factory } from '@/types';
 import { useNetwork } from '@/contexts/NetworkContext';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { supportedNetworks } from '@/constants/supportedNetworks';
 
-const UAPConfigPage = () => {
+const UAPConfigPage = ({ params }: { params: { network: string } }) => {
+  const networkUrlId = params.network;
+  const networkUrl = supportedNetworks[networkUrlId];
+
   const toast = useToast({ position: 'bottom-left' });
   const {
     address,
@@ -290,12 +294,9 @@ const UAPConfigPage = () => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbItem>
-          <WalletNetworkSelectorButton
-            currentNetwork={network.chainId}
-            urlTemplate={() => `/urd`}
-          />
-        </BreadcrumbItem>
+        <BreadcrumbLink mr={2}>
+         {networkUrl.displayName }
+        </BreadcrumbLink>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" mr={2}>
             Configure Assistant

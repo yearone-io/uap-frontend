@@ -13,16 +13,10 @@ import {
 } from '@chakra-ui/react';
 import { supportedNetworks } from '@/constants/supportedNetworks';
 import { FaExternalLinkAlt } from 'react-icons/fa';
+import { useNetwork } from '@/contexts/NetworkContext';
 
-export default function Contracts({ params }: { params: { network: string } }) {
-
-  const networkId = params.network;
-  const network = supportedNetworks[networkId];
-
-  if (!network) {
-    return <Heading>Invalid network</Heading>
-  }
-
+export default function Contracts() {
+  const { network } = useNetwork();
   return (
     <>
       <Flex w={'100%'} justifyContent={'flex-start'}>
@@ -35,11 +29,6 @@ export default function Contracts({ params }: { params: { network: string } }) {
           <BreadcrumbItem>
             <BreadcrumbLink href="/">#</BreadcrumbLink>
           </BreadcrumbItem>
-        <BreadcrumbItem>
-        <BreadcrumbLink mr={2}>
-         {network.displayName }
-        </BreadcrumbLink>
-        </BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>
             <BreadcrumbLink href="" mr={2}>
               Contracts
@@ -70,32 +59,36 @@ export default function Contracts({ params }: { params: { network: string } }) {
             fontFamily={'Tomorrow'}
             color={'#053241'}
           >
-            {`View ${network.name} protocol contract deployments`}
+            View Universal Assistant protocol contract deployments
           </Heading>
-          <ChakraLink
-            isExternal
-            href={`${network.explorer}address/${network.protocolAddress}`}
-          >
-            <Button>
-              <Flex
-                justifyContent="center"
-                alignItems="center"
-                gap={3}
-                flexDirection="row"
-                w="250px"
+          {Object.keys(supportedNetworks).map((networkId: string) => {
+            return (
+              <ChakraLink
+                isExternal
+                key={networkId}
+                href={`${network.explorer}address/${network.protocolAddress}`}
               >
-                <Box>{network.name}</Box>
-                <FaExternalLinkAlt />
-                <Image
-                  src={network.icon}
-                  alt={network.icon}
-                  height={'30px'}
-                />
-              </Flex>
-            </Button>
-          </ChakraLink>
+                <Button>
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={3}
+                    flexDirection="row"
+                    w="250px"
+                  >
+                    <Box>{network.name}</Box>
+                    <FaExternalLinkAlt />
+                    <Image
+                      src={network.icon}
+                      alt={network.icon}
+                      height={'30px'}
+                    />
+                  </Flex>
+                </Button>
+              </ChakraLink>
+            );
+          })}
         </Flex>
       </Flex>
-    </>
-  );
+    </>  );
 }

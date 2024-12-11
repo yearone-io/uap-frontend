@@ -47,7 +47,6 @@ import { supportedNetworks } from '@/constants/supportedNetworks';
 
 const UAPConfigPage = ({ params }: { params: { network: string } }) => {
   const networkUrlId = params.network;
-  const networkUrl = supportedNetworks[networkUrlId];
 
   const toast = useToast({ position: 'bottom-left' });
   const {
@@ -294,9 +293,12 @@ const UAPConfigPage = ({ params }: { params: { network: string } }) => {
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbLink mr={2}>
-         {networkUrl.displayName }
-        </BreadcrumbLink>
+        <BreadcrumbItem>
+          <WalletNetworkSelectorButton
+            currentNetwork={Number(networkUrlId)}
+            urlTemplate={`/urd`}
+          />
+        </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" mr={2}>
             Configure Assistant
@@ -323,7 +325,7 @@ const UAPConfigPage = ({ params }: { params: { network: string } }) => {
     );
   }
 
-  if (walletNetworkId !== network.chainId) {
+  if (walletNetworkId !== Number(networkUrlId)) {
     return (
       <>
         {breadCrumbs}
@@ -343,10 +345,10 @@ const UAPConfigPage = ({ params }: { params: { network: string } }) => {
             <Button onClick={() => open({ view: 'Networks' })}>
               Change network
             </Button>
-            <Text>Or visit the {getNetwork(walletNetworkId).name} site</Text>
+            <Text>Or visit the {getNetwork(walletNetworkId).name} section</Text>
             <WalletNetworkSelectorButton
-              currentNetwork={network.chainId}
-              urlTemplate={() => '/urd'}
+            currentNetwork={Number(networkUrlId)}
+              urlTemplate={`/urd`}
             />
           </VStack>
         </Flex>

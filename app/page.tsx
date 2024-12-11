@@ -6,9 +6,6 @@ export const metadata: Metadata = {
   description: 'tbd',
 };
 
-const Home = ({ params }: { params: { network: string } }) => {
-  return <LandingBox network={
-    params.network
-  }/>;
+export default function Home() {
+  return <LandingBox />;
 }
-export default Home;

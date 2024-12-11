@@ -10,7 +10,6 @@ import {
 } from '@chakra-ui/react';
 import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
-import { supportedNetworks } from '@/constants/supportedNetworks';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
 export default function ProfilePage({
@@ -70,7 +69,7 @@ export default function ProfilePage({
         <Box flex="1" w={'100%'} maxWidth="800px">
           <ReadConfiguredAssistants
             upAddress={address as string}
-            networkId={Number(network)}
+            networkId={network}
           />
         </Box>
       </Flex>

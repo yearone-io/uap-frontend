@@ -3,11 +3,15 @@ import React from 'react';
 import Link from 'next/link';
 import { Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import WalletConnectButton from '@/components/WalletConnectButton';
+import { useWeb3ModalAccount } from '@web3modal/ethers/react';
 
 /**
  * Provides a top navigation bar including links to all pages.
  */
 const NavBar = () => {
+  const { isConnected, chainId } = useWeb3ModalAccount();
+  const networkId = isConnected ? chainId : 42;
+
   return (
     <nav className="hashlists-topbar">
       <Flex
@@ -45,7 +49,7 @@ const NavBar = () => {
             fontWeight={500}
             backgroundColor={'hashlists.yellow'}
             as={Link}
-            href=""
+            href={`/${networkId}/urd`}
           >
             Configure
           </Button>

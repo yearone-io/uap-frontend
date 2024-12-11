@@ -52,7 +52,7 @@ const LandingBox = () => {
           Engage your personal digital assistant
         </Text>
         <Flex gap={4} mt="30px">
-          <Link href={'/urd'}>
+          <Link href={`/${}/urd`}>
             <Button
               color={'hashlists.grey'}
               borderRadius="10px"

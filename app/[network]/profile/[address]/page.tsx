@@ -17,7 +17,6 @@ export default function ProfilePage({
   params: { address: string; network: number };
 }) {
   const { address, network } = params;
-  console.log('address', address);
   const { icon, displayName, chainId } = supportedNetworks[network];
 
   const formatAddressForBreadcrumbs = (address: string | undefined) => {

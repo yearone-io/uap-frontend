@@ -100,7 +100,7 @@ export default function WalletConnectButton() {
         </Flex>
       </MenuButton>
       <MenuList>
-        <MenuItem as={Link} href={`${chainId}/profile/${address}`}>
+        <MenuItem as={Link} href={`/${chainId}/profile/${address}`}>
           View profile
         </MenuItem>
         <MenuDivider />

@@ -3,10 +3,12 @@ import React from 'react';
 import { Button, Flex, Image, Text, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useWeb3ModalAccount } from '@web3modal/ethers/react';
+import { getUrlNameByChainId } from '@/utils/universalProfile';
 
 const LandingBox = () => {
   const { isConnected, chainId } = useWeb3ModalAccount();
-  const network = isConnected ? chainId : 42;
+  const networkId = isConnected && chainId ? chainId : 42;
+  const urlName = getUrlNameByChainId(networkId);
 
   return (
     <Flex
@@ -56,7 +58,7 @@ const LandingBox = () => {
           Engage your personal digital assistant
         </Text>
         <Flex gap={4} mt="30px">
-          <Link href={`/${network}/urd`}>
+          <Link href={`/${urlName}/urd`}>
             <Button
               color={'hashlists.grey'}
               borderRadius="10px"

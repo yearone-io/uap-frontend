@@ -21,6 +21,7 @@ import {
 import { formatAddress, getNetwork } from '@/utils/utils';
 import { useProfile } from '@/contexts/ProfileContext';
 import Link from 'next/link';
+import { getUrlNameByChainId } from '@/utils/universalProfile';
 
 export default function WalletConnectButton() {
   const { open } = useWeb3Modal();
@@ -81,6 +82,12 @@ export default function WalletConnectButton() {
     }
   }, [chainId]);
 
+  const getProfileUrl = () => {
+    if (!chainId || !address) return '/'; // lint
+    const networkUrlName = getUrlNameByChainId(chainId);
+    return `/${networkUrlName}/profile/${address}`;
+  };
+
   return userConnected ? (
     <Menu>
       <MenuButton
@@ -100,7 +107,7 @@ export default function WalletConnectButton() {
         </Flex>
       </MenuButton>
       <MenuList>
-        <MenuItem as={Link} href={`/${chainId}/profile/${address}`}>
+        <MenuItem as={Link} href={getProfileUrl()}>
           View profile
         </MenuItem>
         <MenuDivider />

@@ -12,12 +12,14 @@ import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
 import { supportedNetworks } from '@/constants/supportedNetworks';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { getChainIdByUrlName } from '@/utils/universalProfile';
 export default function ProfilePage({
   params,
 }: {
-  params: { address: string; network: number };
+  params: { address: string; networkName: string };
 }) {
-  const { address, network } = params;
+  const { address, networkName } = params;
+  const network = getChainIdByUrlName(networkName);
 
   const formatAddressForBreadcrumbs = (address: string | undefined) => {
     const truncatedAddress = formatAddress(address ? address : '');

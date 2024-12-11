@@ -43,9 +43,10 @@ import {
 import { ERC725__factory } from '@/types';
 import { useNetwork } from '@/contexts/NetworkContext';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { getChainIdByUrlName } from '@/utils/universalProfile';
 
-const UAPConfigPage = ({ params }: { params: { network: string } }) => {
-  const networkUrlId = Number(params.network);
+const UAPConfigPage = ({ params }: { params: { networkName: string } }) => {
+  const networkUrlId = getChainIdByUrlName(params.networkName);
 
   const toast = useToast({ position: 'bottom-left' });
   const {

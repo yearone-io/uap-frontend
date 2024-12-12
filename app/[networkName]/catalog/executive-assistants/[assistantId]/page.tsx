@@ -11,24 +11,62 @@ import ScreeningOptionCard from '@/components/ScreeningOptionCard';
 import AssistantInfo from '@/components/AssistantInfo';
 import SupportedTransactions from '@/components/SupportedTransactions';
 
+type Link = {
+  name: string;
+  url: string;
+};
 
-// Screening Options Component
-function ScreeningOptions() {
-  return (
-    <Flex flexDirection="row" alignItems="flex-start" gap={4} mt={4}>
-      <Text fontWeight="bold" fontSize="md" color="gray.600">
-        Screening Options
-      </Text>
-      <ScreeningOptionCard />
-    </Flex>
-  );
-}
+type ExecutiveAssistant = {
+  address: string;
+  name: string;
+  description: string;
+  iconPath: string;
+  links: Link[];
+  assistantType: 'Executive';
+  creatorAddress: string;
+  supportedTransactionTypes: string[];
+  configParams: { destinationAddress: string };
+};
 
-export default function ExecutiveAssistantPage({
-  params,
-}: {
+type ScreenerAssistant = {
+  address: string;
+  name: string;
+  description: string;
+  iconPath: string;
+  links: Link[];
+  assistantType: 'Screener';
+  creatorAddress: string;
+  configParams: { curatedListAddress: string };
+};
+
+const forwarderAssistant: ExecutiveAssistant = {
+  address: '0x...',
+  name: 'Asset Forwarder',
+  description:
+    'An executive assistant that can forward digital assets to another destination address.',
+  iconPath: 'assets/assistants/forwarder.svg',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Executive',
+  creatorAddress: '0x...',
+  supportedTransactionTypes: ['LSP7Tokens', 'LSP8Tokens', 'LYX'],
+  configParams: { destinationAddress: '0x...' },
+};
+
+const curationCheckerAssistant: ScreenerAssistant = {
+  address: '0x...',
+  name: 'Curation Checker',
+  description:
+    'A screener assistant that can check if a digital asset is curated.',
+  iconPath: 'assets/assistants/curation-checker.svg',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Screener',
+  creatorAddress: '0x...',
+  configParams: { curatedListAddress: '0x...' },
+};
+
+const ExecutiveAssistantPage: React.FC<{
   params: { networkName: string; assistantId: string };
-}) {
+}> = ({ params }) => {
   const { networkName } = params;
 
   const breadCrumbs = (
@@ -57,11 +95,20 @@ export default function ExecutiveAssistantPage({
       {breadCrumbs}
       <Flex direction="column" gap={4} mt={4}>
         <Flex>
-          <AssistantInfo />
-          <SupportedTransactions />
+          {/* Pass forwarderAssistant as a prop to AssistantInfo and SupportedTransactions */}
+          <AssistantInfo assistant={forwarderAssistant} />
+          <SupportedTransactions assistant={forwarderAssistant} />
         </Flex>
-        <ScreeningOptions />
+        <Flex flexDirection="column" gap={4} mt={4}>
+          <Text fontWeight="bold" fontSize="md" color="gray.600">
+            Screening Options
+          </Text>
+          {/* Pass curationCheckerAssistant as a prop to ScreeningOptionCard */}
+          <ScreeningOptionCard screener={curationCheckerAssistant} />
+        </Flex>
       </Flex>
     </Box>
   );
-}
+};
+
+export default ExecutiveAssistantPage;

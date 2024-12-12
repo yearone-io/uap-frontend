@@ -32,7 +32,7 @@ export default function ExecutiveAssistantConfigurePage({
         <BreadcrumbItem>
           <WalletNetworkSelectorButton
             currentNetwork={network}
-            urlTemplate={`/catalog/executive-assistants/${params.assistantId}`}
+            urlTemplate={`/catalog/executive-assistants/${params.assistantId}/configure`}
           />
         </BreadcrumbItem>
         <BreadcrumbItem>

@@ -6,7 +6,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   Flex,
-  Image,
 } from '@chakra-ui/react';
 import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';

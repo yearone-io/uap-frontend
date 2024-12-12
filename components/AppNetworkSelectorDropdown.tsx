@@ -2,27 +2,29 @@ import React from 'react';
 import { supportedNetworks } from '@/constants/supportedNetworks';
 import { Flex, Select, Image } from '@chakra-ui/react';
 import { getNetwork } from '@/utils/utils';
-import { useNetwork } from '@/contexts/NetworkContext';
 
 const WalletNetworkSelectorButton = ({
   currentNetwork,
   urlTemplate,
 }: {
   currentNetwork: number;
-  urlTemplate: (networkId: number) => string;
+  urlTemplate: string;
 }) => {
-  const { network } = useNetwork();
+  const { icon } = supportedNetworks[currentNetwork];
   return (
     <Flex gap={2} flexDirection={'row'} alignItems={'center'}>
-      <Image src={network.icon} alt={network.icon} height={'30px'} />
+      <Image src={icon} alt={icon} height={'30px'} />
       <Select
         border={'1px solid var(--chakra-colors-hashlists-orange)'}
         variant="outline"
-        defaultValue={currentNetwork}
+        value={currentNetwork}
         fontWeight={600}
         onChange={event => {
           const chainId = parseInt(event.target.value);
-          window.location.href = getNetwork(chainId).url + urlTemplate(chainId);
+          const network = getNetwork(chainId);
+
+          const url = `/` + network.urlName + urlTemplate;
+          window.location.href = url;
         }}
       >
         {Object.keys(supportedNetworks).map((networkId: string) => {

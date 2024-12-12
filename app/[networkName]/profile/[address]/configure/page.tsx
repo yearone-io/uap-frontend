@@ -11,7 +11,8 @@ import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
-export default function ProfilePage({
+
+export default function ProfileConfigurePage({
   params,
 }: {
   params: { address: string; networkName: string };
@@ -42,12 +43,17 @@ export default function ProfilePage({
         <BreadcrumbItem>
           <WalletNetworkSelectorButton
             currentNetwork={network}
-            urlTemplate={`/profile/${address}`}
+            urlTemplate={`/profile/${address}/configure`}
           />
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbLink href={`/${network}/profile/${address}`} ml={2} mr={2}>
+            Profile {formatAddressForBreadcrumbs(address)}
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" ml={2} mr={2}>
-            Profile {formatAddressForBreadcrumbs(address)}
+            Configure
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>

@@ -7,26 +7,16 @@ import {
   BreadcrumbLink,
   Flex,
 } from '@chakra-ui/react';
-import { formatAddress } from '@/utils/utils';
-import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
-export default function ProfilePage({
+
+export default function ConfigureAssistantPage({
   params,
 }: {
-  params: { address: string; networkName: string };
+  params: { assistantId: string; networkName: string };
 }) {
-  const { address, networkName } = params;
+  const { networkName } = params;
   const network = getChainIdByUrlName(networkName);
-
-  const formatAddressForBreadcrumbs = (address: string | undefined) => {
-    const truncatedAddress = formatAddress(address ? address : '');
-    if (truncatedAddress === '0x') {
-      return '';
-    } else {
-      return truncatedAddress;
-    }
-  };
 
   const breadCrumbs = (
     <>
@@ -42,12 +32,35 @@ export default function ProfilePage({
         <BreadcrumbItem>
           <WalletNetworkSelectorButton
             currentNetwork={network}
-            urlTemplate={`/profile/${address}`}
+            urlTemplate={`/catalog/screener/${params.assistantId}/configure`}
           />
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbLink href={`/${networkName}/catalog`} ml={2} mr={2}>
+            Catalog
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbLink
+            href={`/${networkName}/catalog/screener`}
+            ml={2}
+            mr={2}
+          >
+            Screener
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbItem>
+          <BreadcrumbLink
+            href={`/${networkName}/catalog/screener/${params.assistantId}`}
+            ml={2}
+            mr={2}
+          >
+            Assistant {params.assistantId}
+          </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" ml={2} mr={2}>
-            Profile {formatAddressForBreadcrumbs(address)}
+            Configure
           </BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
@@ -66,10 +79,7 @@ export default function ProfilePage({
         mt={4}
       >
         <Box flex="1" w={'100%'} maxWidth="800px">
-          <ReadConfiguredAssistants
-            upAddress={address as string}
-            networkId={network}
-          />
+          CATALOG SCREENER ASSISTANT CONFIGURE PAGE
         </Box>
       </Flex>
     </>

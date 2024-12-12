@@ -54,3 +54,15 @@ const getProfileData = async (
   return (profileData!.value as { LSP3Profile: Record<string, any> })
     .LSP3Profile as LSP3ProfileMetadata;
 };
+
+export const getUrlNameByChainId = (chainId: number): string => {
+  return supportedNetworks[chainId].urlName;
+};
+
+export const getChainIdByUrlName = (urlName: string): number => {
+  return (
+    Object.values(supportedNetworks).find(
+      network => network.urlName === urlName
+    )?.chainId || 42
+  );
+};

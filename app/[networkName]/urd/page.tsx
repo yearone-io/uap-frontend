@@ -43,8 +43,11 @@ import {
 import { ERC725__factory } from '@/types';
 import { useNetwork } from '@/contexts/NetworkContext';
 import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { getChainIdByUrlName } from '@/utils/universalProfile';
 
-const UAPConfigPage = () => {
+const UAPConfigPage = ({ params }: { params: { networkName: string } }) => {
+  const networkUrlId = getChainIdByUrlName(params.networkName);
+
   const toast = useToast({ position: 'bottom-left' });
   const {
     address,
@@ -292,8 +295,8 @@ const UAPConfigPage = () => {
         </BreadcrumbItem>
         <BreadcrumbItem>
           <WalletNetworkSelectorButton
-            currentNetwork={network.chainId}
-            urlTemplate={() => `/urd`}
+            currentNetwork={networkUrlId}
+            urlTemplate={`/urd`}
           />
         </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
@@ -322,7 +325,7 @@ const UAPConfigPage = () => {
     );
   }
 
-  if (walletNetworkId !== network.chainId) {
+  if (walletNetworkId !== networkUrlId) {
     return (
       <>
         {breadCrumbs}
@@ -342,10 +345,10 @@ const UAPConfigPage = () => {
             <Button onClick={() => open({ view: 'Networks' })}>
               Change network
             </Button>
-            <Text>Or visit the {getNetwork(walletNetworkId).name} site</Text>
+            <Text>Or visit the {getNetwork(walletNetworkId).name} section</Text>
             <WalletNetworkSelectorButton
-              currentNetwork={network.chainId}
-              urlTemplate={() => '/urd'}
+              currentNetwork={networkUrlId}
+              urlTemplate={`/urd`}
             />
           </VStack>
         </Flex>

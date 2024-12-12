@@ -10,14 +10,15 @@ import {
 } from '@chakra-ui/react';
 import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
-import { supportedNetworks } from '@/constants/supportedNetworks';
+import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { getChainIdByUrlName } from '@/utils/universalProfile';
 export default function ProfilePage({
   params,
 }: {
-  params: { address: string; chainId: number };
+  params: { address: string; networkName: string };
 }) {
-  const { address, chainId } = params;
-  const { icon, name } = supportedNetworks[chainId];
+  const { address, networkName } = params;
+  const network = getChainIdByUrlName(networkName);
 
   const formatAddressForBreadcrumbs = (address: string | undefined) => {
     const truncatedAddress = formatAddress(address ? address : '');
@@ -39,8 +40,12 @@ export default function ProfilePage({
         <BreadcrumbItem>
           <BreadcrumbLink href="/">#</BreadcrumbLink>
         </BreadcrumbItem>
-        <Image src={icon} alt={icon} height={'30px'} />
-        <Box ml={2}>{name} /</Box>
+        <BreadcrumbItem>
+          <WalletNetworkSelectorButton
+            currentNetwork={network}
+            urlTemplate={`/profile/${address}`}
+          />
+        </BreadcrumbItem>
         <BreadcrumbItem isCurrentPage>
           <BreadcrumbLink href="" ml={2} mr={2}>
             Profile {formatAddressForBreadcrumbs(address)}
@@ -64,7 +69,7 @@ export default function ProfilePage({
         <Box flex="1" w={'100%'} maxWidth="800px">
           <ReadConfiguredAssistants
             upAddress={address as string}
-            networkId={Number(chainId)}
+            networkId={network}
           />
         </Box>
       </Flex>

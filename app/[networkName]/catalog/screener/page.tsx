@@ -36,7 +36,7 @@ export default function ScreenerPage({
           />
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink href={`${networkName}/catalog`} ml={2} mr={2}>
+          <BreadcrumbLink href={`/${networkName}/catalog`} ml={2} mr={2}>
             Catalog
           </BreadcrumbLink>
         </BreadcrumbItem>

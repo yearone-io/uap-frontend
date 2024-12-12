@@ -36,13 +36,13 @@ export default function ExecutiveAssistantPage({
           />
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink href={`${networkName}/catalog`} ml={2} mr={2}>
+          <BreadcrumbLink href={`/${networkName}/catalog`} ml={2} mr={2}>
             Catalog
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem>
           <BreadcrumbLink
-            href={`${networkName}/catalog//executive-assistants`}
+            href={`/${networkName}/catalog//executive-assistants`}
             ml={2}
             mr={2}
           >

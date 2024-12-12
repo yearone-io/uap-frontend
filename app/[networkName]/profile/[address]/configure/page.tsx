@@ -47,7 +47,7 @@ export default function ProfileConfigurePage({
           />
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/profile/${address}`} ml={2} mr={2}>
+          <BreadcrumbLink href={`/${network}/profile/${address}`} ml={2} mr={2}>
             Profile {formatAddressForBreadcrumbs(address)}
           </BreadcrumbLink>
         </BreadcrumbItem>

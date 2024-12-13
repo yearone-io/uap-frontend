@@ -91,21 +91,34 @@ const ExecutiveAssistantPage: React.FC<{
   );
 
   return (
-    <Box p={4}>
+    <Box p={4} w="100%">
       {breadCrumbs}
-      <Flex direction="column" gap={4} mt={4}>
-        <Flex>
-          {/* Pass forwarderAssistant as a prop to AssistantInfo and SupportedTransactions */}
+      <Flex direction="column" gap={4} mt={4} w="100%">
+        <Flex w="100%">
           <AssistantInfo assistant={forwarderAssistant} />
           <SupportedTransactions assistant={forwarderAssistant} />
         </Flex>
-        <Flex flexDirection="column" gap={4} mt={4}>
-          <Text fontWeight="bold" fontSize="md" color="gray.600">
+        {/* // add a grey line here */}
+        <Box border="1px" borderColor="gray.200" w="100%" />
+        <Flex
+          flexDirection="row"
+          gap={4}
+          mt={4}
+          justifyContent="left"
+          alignItems="center"
+          w="100%"
+        >
+          <Text
+            fontWeight="bold"
+            fontSize="md"
+            color="gray.600"
+            textAlign="center"
+          >
             Screening Options
           </Text>
-          {/* Pass curationCheckerAssistant as a prop to ScreeningOptionCard */}
           <ScreeningOptionCard screener={curationCheckerAssistant} />
         </Flex>
+        <Box border="1px" borderColor="gray.200" />
       </Flex>
     </Box>
   );

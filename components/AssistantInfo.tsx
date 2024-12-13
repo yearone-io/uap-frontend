@@ -23,12 +23,11 @@ const AssistantInfo: React.FC<{ assistant: ExecutiveAssistant }> = ({
 }) => {
   return (
     <Flex
-      borderWidth="1px"
-      borderRadius="lg"
       p={4}
       flexDirection="row"
       alignItems="center"
-      maxWidth="400px"
+      minWidth="400px"
+      maxWidth="600px"
     >
       <Image
         boxSize="50px"

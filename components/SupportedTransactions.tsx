@@ -18,8 +18,6 @@ const SupportedTransactions: React.FC<{ assistant: ExecutiveAssistant }> = ({
 }) => {
   return (
     <Flex
-      borderWidth="1px"
-      borderRadius="lg"
       p={4}
       alignItems="center"
       justifyContent="space-between"

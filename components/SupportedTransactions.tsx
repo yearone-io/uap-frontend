@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, HStack, Image, Text, VStack } from '@chakra-ui/react';
+import { Flex, Text, VStack, HStack, Image } from '@chakra-ui/react';
 
 type ExecutiveAssistant = {
   address: string;
@@ -41,7 +41,7 @@ const TransactionBlock: React.FC<{
       {label}
     </Text>
     <Flex>
-      <Text fontWeight="bold" fontSize="md" ml="2px">
+      <Text fontWeight="bold" fontSize="md" ml="4px">
         {icon && icon}
         {iconPath && <Image src={iconPath} alt={iconPath} height={'20px'} />}
       </Text>

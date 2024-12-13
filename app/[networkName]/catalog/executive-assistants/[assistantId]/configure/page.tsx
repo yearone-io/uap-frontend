@@ -15,10 +15,10 @@ import { forwarderAssistant } from '@/constants/dummyData';
 import URDSetup from '@/components/URDSetup';
 import { useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
 import SignInBox from '@/components/SignInBox';
-import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
 import { getNetwork } from '@/utils/utils';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
 import { useNetwork } from '@/contexts/NetworkContext';
+import TransactionSelector from '@/components/SetupAssistant';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -91,10 +91,7 @@ export default function ExecutiveAssistantConfigurePage({
           pt={4}
         >
           <VStack>
-            <Text>
-              You're connect to {getNetwork(walletNetworkId).name} to configure{' '}
-              {getNetwork(walletNetworkId).name}
-            </Text>
+            <Text>You're connect to {getNetwork(walletNetworkId).name}.</Text>
             <Text>Please change network</Text>
             <Button onClick={() => open({ view: 'Networks' })}>
               Change network
@@ -105,6 +102,10 @@ export default function ExecutiveAssistantConfigurePage({
     }
 
     // todo if URD is set, show URDSetup
+    // if(!urd) {
+    // return <TransactionSelector />;
+
+    // }
 
     return <URDSetup />;
   };

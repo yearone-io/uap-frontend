@@ -7,6 +7,8 @@ import {
   BreadcrumbLink,
   Flex,
 } from '@chakra-ui/react';
+import AssistantInfo from '@/components/AssistantInfo';
+import { forwarderAssistant } from '@/constants/dummyData';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -14,6 +16,8 @@ export default function ExecutiveAssistantConfigurePage({
   params: { networkName: string; assistantId: string };
 }) {
   const { networkName } = params;
+
+  // todo validate that id from url is a valid assistant id
 
   const breadCrumbs = (
     <>
@@ -59,20 +63,15 @@ export default function ExecutiveAssistantConfigurePage({
   );
 
   return (
-    <>
+    <Box p={4} w="100%">
       {breadCrumbs}
-      <Flex
-        display="flex"
-        w={'100%'}
-        flexDirection={'column'}
-        flexWrap={'wrap'}
-        gap={4}
-        mt={4}
-      >
-        <Box flex="1" w={'100%'} maxWidth="800px">
-          EXECUTIVE ASSISTANT PAGE
-        </Box>
+      <Flex direction="column" gap={4} mt={4} w="100%">
+        <Flex w="100%">
+          <AssistantInfo assistant={forwarderAssistant} />
+        </Flex>
+        <Box border="1px" borderColor="gray.200" w="100%" />
+        <Box border="1px" borderColor="gray.200" w="100%" />
       </Flex>
-    </>
+    </Box>
   );
 }

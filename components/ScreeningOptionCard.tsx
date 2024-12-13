@@ -17,8 +17,8 @@ const ScreeningOptionCard: React.FC<{ screener: ScreenerAssistant }> = ({
 }) => {
   return (
     <Flex
-      borderWidth="1px"
-      borderRadius="lg"
+      border="1px solid #2C5765"
+      borderRadius="10px"
       p={4}
       flexDirection="row"
       alignItems="center"

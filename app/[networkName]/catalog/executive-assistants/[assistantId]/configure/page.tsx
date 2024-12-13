@@ -5,10 +5,20 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Button,
   Flex,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
 import AssistantInfo from '@/components/AssistantInfo';
 import { forwarderAssistant } from '@/constants/dummyData';
+import URDSetup from '@/components/URDSetup';
+import { useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/react';
+import SignInBox from '@/components/SignInBox';
+import WalletNetworkSelectorButton from '@/components/AppNetworkSelectorDropdown';
+import { getNetwork } from '@/utils/utils';
+import { getChainIdByUrlName } from '@/utils/universalProfile';
+import { useNetwork } from '@/contexts/NetworkContext';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -16,7 +26,11 @@ export default function ExecutiveAssistantConfigurePage({
   params: { networkName: string; assistantId: string };
 }) {
   const { networkName } = params;
+  const networkUrlId = getChainIdByUrlName(params.networkName);
+  const { network } = useNetwork();
+  const { open } = useWeb3Modal();
 
+  const { address, chainId: walletNetworkId } = useWeb3ModalAccount();
   // todo validate that id from url is a valid assistant id
 
   const breadCrumbs = (
@@ -62,6 +76,37 @@ export default function ExecutiveAssistantConfigurePage({
     </>
   );
 
+  const renderConfigureBody = () => {
+    if (!walletNetworkId || !address) {
+      return <SignInBox boxText={'Sign in to set UAPTypeConfig'} />;
+    }
+
+    if (walletNetworkId !== networkUrlId) {
+      return (
+        <Flex
+          height="100%"
+          w="100%"
+          alignContent="center"
+          justifyContent="center"
+          pt={4}
+        >
+          <VStack>
+            <Text>
+              You're connect to {getNetwork(walletNetworkId).name} to configure{' '}
+              {getNetwork(walletNetworkId).name}
+            </Text>
+            <Text>Please change network</Text>
+            <Button onClick={() => open({ view: 'Networks' })}>
+              Change network
+            </Button>
+          </VStack>
+        </Flex>
+      );
+    }
+
+    return <URDSetup />;
+  };
+
   return (
     <Box p={4} w="100%">
       {breadCrumbs}
@@ -70,6 +115,7 @@ export default function ExecutiveAssistantConfigurePage({
           <AssistantInfo assistant={forwarderAssistant} />
         </Flex>
         <Box border="1px" borderColor="gray.200" w="100%" />
+        {renderConfigureBody()}
         <Box border="1px" borderColor="gray.200" w="100%" />
       </Flex>
     </Box>

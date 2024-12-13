@@ -104,6 +104,8 @@ export default function ExecutiveAssistantConfigurePage({
       );
     }
 
+    // todo if URD is set, show URDSetup
+
     return <URDSetup />;
   };
 

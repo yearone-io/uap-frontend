@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Image, Text, Badge } from '@chakra-ui/react';
+import { Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
 
 type Link = {
   name: string;

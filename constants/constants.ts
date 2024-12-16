@@ -84,5 +84,7 @@ export const UAP_CONTROLLER_PERMISSIONS = {
   */
 
 export const DEFAULT_UP_URD_PERMISSIONS = {
-  SUPER_CALL: true,
+  REENTRANCY: true,
+  SUPER_SETDATA: true,
+  SETDATA: true,
 };

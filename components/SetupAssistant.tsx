@@ -15,14 +15,8 @@ import {
 import TransactionTypeBlock, {
   transactionTypeMap,
 } from './TransactionTypeBlock';
-import {
-  BrowserProvider,
-  Eip1193Provider,
-  ethers,
-  verifyMessage,
-} from 'ethers';
+import { BrowserProvider, Eip1193Provider } from 'ethers';
 import ERC725 from '@erc725/erc725.js';
-import { SiweMessage } from 'siwe';
 import {
   customEncodeAddresses,
   generateMappingKey,
@@ -55,72 +49,24 @@ const TransactionSelector = (props: { assistantAddress: string }) => {
     setIsValidAddress(isValid);
   };
 
-  const handleSubmitConfig = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
+  const handleSubmitConfig = async () => {
     const provider = new BrowserProvider(walletProvider as Eip1193Provider);
 
-    const typeId = LSP1_TYPE_IDS.LSP7Tokens_RecipientNotification; // todo delete this line
-
     try {
-      //const accounts = await provider.send('eth_requestAccounts', []);
-      //console.log('Accounts:', accounts);
       const upAddress = address as string;
       const signer = await provider.getSigner(upAddress);
-      // console.log('Signer:', signer);
-      // // Assuming the user is interacting with their own UP// Prepare a message with the SIWE-specific format
-      // const siweMessage = new SiweMessage({
-      //   domain: window.location.host, // Domain requesting the signing
-      //   uri: window.location.origin,
-      //   address: upAddress, // Address performing the signing
-      //   statement:
-      //     'Signing this message will enable the Universal Assistants Catalog to allow your UP Browser Extension to manage Assistant configurations.', // Human-readable assertion the user signs  // URI from the resource that is the subject of the signature
-      //   version: '1', // Current version of the SIWE Message
-      //   chainId: network.chainId, // Chain ID to which the session is bound to
-      //   resources: [`${window.location.origin}/terms`], // Authentication resource as part of authentication by the relying party
-      // }).prepareMessage();
-      // Request the extension to sign the message
-      // const signature = await signer.signMessage(siweMessage);
-      // const signerAddress = verifyMessage(siweMessage, signature);
-      // console.log('signer:', signer);
-      // console.log('upAddress:', upAddress);
-      // console.log('mainController:', signerAddress);
-      const mappingKey = generateMappingKey('UAPTypeConfig', typeId);
 
-      // Define the schema with the dynamic key
-      const typeSchema = {
-        name: 'UAPTypeConfig:<bytes32>',
-        key: mappingKey,
-        keyType: 'Mapping',
-        valueType: 'address[]',
-        valueContent: 'Address',
-      };
-      const schema = [typeSchema];
-
-      // Create an instance of ERC725 with the schema
-      const erc725 = new ERC725(schema as any, upAddress, provider, {
-        ipfsGateway: network.ipfsGateway,
-      });
-
-      // Encode the data
-      const encodedKeysData = erc725.encodeData([
-        {
-          keyName: typeSchema.name,
-          dynamicKeyParts: [typeId],
-          value: [props.assistantAddress],
-        },
-      ]);
-      // use custom function to encode the data
-      const encodedValues = customEncodeAddresses([props.assistantAddress]);
-
-      console.log('Encoded data:', encodedKeysData);
+      // Separate keys and values into two arrays
+      const dataKeys = selectedTransactions.map(typeId =>
+        generateMappingKey('UAPTypeConfig', typeId)
+      );
+      const dataValues = selectedTransactions.map(() =>
+        customEncodeAddresses([props.assistantAddress])
+      );
 
       const UP = ERC725__factory.connect(upAddress, signer);
-      const tx = await UP.connect(signer).setData(
-        encodedKeysData.keys[0],
-        encodedValues
-      );
+      // Call setDataBatch with two arrays
+      const tx = await UP.connect(signer).setDataBatch(dataKeys, dataValues);
 
       await tx.wait();
 
@@ -131,8 +77,6 @@ const TransactionSelector = (props: { assistantAddress: string }) => {
         duration: 5000,
         isClosable: true,
       });
-
-      // Redirect or update as needed
     } catch (error: any) {
       console.error('Error setting UAPTypeConfig', error);
       toast({
@@ -161,8 +105,8 @@ const TransactionSelector = (props: { assistantAddress: string }) => {
           >
             <VStack spacing={2} align="stretch">
               {Object.entries(transactionTypeMap).map(
-                ([key, { label, typeName, icon, iconPath }]) => (
-                  <Checkbox key={key} value={key}>
+                ([key, { id, label, typeName, icon, iconPath }]) => (
+                  <Checkbox key={key} value={id}>
                     <TransactionTypeBlock
                       label={label}
                       typeName={typeName}

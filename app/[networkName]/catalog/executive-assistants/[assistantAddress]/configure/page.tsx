@@ -121,12 +121,12 @@ export default function ExecutiveAssistantConfigurePage({
     // todo if URD is set, show URDSetup
     return (
       <TransactionSelector
-        assintantAddress={params.assistantAddress as string}
+        assistantAddress={params.assistantAddress as string}
       />
     );
 
     // if(missing permissions or !urd) {
-    return <URDSetup />;
+    // return <URDSetup />;
     // }
   };
 

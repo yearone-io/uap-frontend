@@ -9,18 +9,32 @@ import {
   GridItem,
   Input,
   Text,
+  useToast,
   VStack,
 } from '@chakra-ui/react';
 import TransactionTypeBlock, {
   transactionTypeMap,
 } from './TransactionTypeBlock';
+import { BrowserProvider, Eip1193Provider } from 'ethers';
+import {
+  customEncodeAddresses,
+  generateMappingKey,
+} from '@/utils/configDataKeyValueStore';
+import { ERC725__factory } from '@/types';
+import {
+  useWeb3ModalAccount,
+  useWeb3ModalProvider,
+} from '@web3modal/ethers/react';
 
-const TransactionSelector: React.FC = () => {
+const TransactionSelector = (props: { assistantAddress: string }) => {
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
   const [destinationAddress, setDestinationAddress] = useState<string>('');
   const [isValidAddress, setIsValidAddress] = useState<boolean>(true);
+  const toast = useToast({ position: 'bottom-left' });
+  const { walletProvider } = useWeb3ModalProvider();
+  const { address } = useWeb3ModalAccount();
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -29,6 +43,46 @@ const TransactionSelector: React.FC = () => {
     // Basic Ethereum address validation
     const isValid = /^0x[a-fA-F0-9]{40}$/.test(value);
     setIsValidAddress(isValid);
+  };
+
+  const handleSubmitConfig = async () => {
+    const provider = new BrowserProvider(walletProvider as Eip1193Provider);
+
+    try {
+      const upAddress = address as string;
+      const signer = await provider.getSigner(upAddress);
+
+      // Separate keys and values into two arrays
+      const dataKeys = selectedTransactions.map(typeId =>
+        generateMappingKey('UAPTypeConfig', typeId)
+      );
+      const dataValues = selectedTransactions.map(() =>
+        customEncodeAddresses([props.assistantAddress])
+      );
+
+      const UP = ERC725__factory.connect(upAddress, signer);
+      // Call setDataBatch with two arrays
+      const tx = await UP.connect(signer).setDataBatch(dataKeys, dataValues);
+
+      await tx.wait();
+
+      toast({
+        title: 'Success',
+        description: 'UAPTypeConfig has been set successfully.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      console.error('Error setting UAPTypeConfig', error);
+      toast({
+        title: 'Error',
+        description: `Error setting UAPTypeConfig: ${error.message}`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -47,8 +101,8 @@ const TransactionSelector: React.FC = () => {
           >
             <VStack spacing={2} align="stretch">
               {Object.entries(transactionTypeMap).map(
-                ([key, { label, typeName, icon, iconPath }]) => (
-                  <Checkbox key={key} value={key}>
+                ([key, { id, label, typeName, icon, iconPath }]) => (
+                  <Checkbox key={key} value={id}>
                     <TransactionTypeBlock
                       label={label}
                       typeName={typeName}
@@ -82,16 +136,17 @@ const TransactionSelector: React.FC = () => {
             </Text>
           )}
         </GridItem>
-        {/* <Button
-              size="sm"
-              bg="orange.500"
-              color="white"
-              _hover={{ bg: 'orange.600' }}
-              _active={{ bg: 'orange.700' }}
-              isDisabled={!isValidAddress || destinationAddress === ''}
-            >
-              Save
-        </Button> */}
+        <Button
+          size="sm"
+          bg="orange.500"
+          color="white"
+          _hover={{ bg: 'orange.600' }}
+          _active={{ bg: 'orange.700' }}
+          isDisabled={!isValidAddress || destinationAddress === ''}
+          onClick={handleSubmitConfig}
+        >
+          Save
+        </Button>
       </Grid>
     </Box>
   );

@@ -20,6 +20,7 @@ import { getChainIdByUrlName } from '@/utils/universalProfile';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { doesControllerHaveMissingPermissions } from '@/utils/configDataKeyValueStore';
 import TransactionSelector from '@/components/SetupAssistant';
+import { useProfile } from '@/contexts/ProfileContext';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -29,26 +30,37 @@ export default function ExecutiveAssistantConfigurePage({
   const { networkName } = params;
   const networkUrlId = getChainIdByUrlName(params.networkName);
   const { open } = useWeb3Modal();
+  const { mainUPController } = useProfile();
+  const [isMissingPermissions, setIsMissingPermissions] = React.useState(false);
 
   const { address, chainId: walletNetworkId } = useWeb3ModalAccount();
   // todo validate that id from url is a valid assistant id
 
   useEffect(() => {
-    if (!address) {
+    console.log('ssss mainUPController', mainUPController);
+
+    if (!address || !mainUPController) {
       return;
     }
     // todo:
     // check if there are missing permissions for urd even if installed, on page load
-    // const hasMissingPermissions = async () => {
-    // const missingPermissions = await doesControllerHaveMissingPermissions(
-    //     mainUPController, // TODO: where to get this from?
-    //     address
-    //   );
-    //   return missingPermissions.length > 0;
-    // }
+    const getMissingPermissions = async () => {
+      try {
+        const missingPermissions = await doesControllerHaveMissingPermissions(
+          mainUPController, // TODO: where to get this from?
+          address
+        );
+        console.log('mainUPController', mainUPController);
+        console.log('missingPermissions', missingPermissions);
+        setIsMissingPermissions(missingPermissions.length > 0);
+      } catch (error) {
+        console.error('Error checking permissions', error);
+      }
+    };
 
+    getMissingPermissions();
     // check if URD is installed on page load
-  }, []);
+  }, [address, mainUPController, setIsMissingPermissions]);
 
   const breadCrumbs = (
     <>
@@ -118,16 +130,15 @@ export default function ExecutiveAssistantConfigurePage({
       );
     }
 
-    // todo if URD is set, show URDSetup
+    if (!mainUPController || isMissingPermissions) {
+      return <URDSetup />;
+    }
+
     return (
       <TransactionSelector
         assistantAddress={params.assistantAddress as string}
       />
     );
-
-    // if(missing permissions or !urd) {
-    // return <URDSetup />;
-    // }
   };
 
   return (

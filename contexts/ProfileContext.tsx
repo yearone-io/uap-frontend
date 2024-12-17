@@ -55,7 +55,7 @@ const initialProfileContextValue: ProfileContextType = {
   setIssuedAssets: () => {},
   issuedAssets: [],
   mainUPController: undefined,
-  setMainUPController: () => {},
+  setMainUPController: () => {}, // todo do we need a disconnect?
 };
 
 // Set up the empty React context

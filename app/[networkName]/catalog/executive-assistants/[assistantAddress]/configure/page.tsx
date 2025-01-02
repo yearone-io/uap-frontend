@@ -1,15 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import {
-  Box,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Button,
-  Flex,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, Flex, Text, VStack } from '@chakra-ui/react';
 import AssistantInfo from '@/components/AssistantInfo';
 import { forwarderAssistant } from '@/constants/dummyData';
 import URDSetup from '@/components/URDSetup';
@@ -24,6 +15,7 @@ import {
 } from '@/utils/configDataKeyValueStore';
 import { useProfile } from '@/contexts/ProfileContext';
 import SetupAssistant from '@/components/SetupAssistant';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -83,49 +75,24 @@ export default function ExecutiveAssistantConfigurePage({
     setIsMissingPermissions,
   ]);
 
-  const breadCrumbs = (
-    <>
-      <Breadcrumb
-        separator="/"
-        color={'uap.orange'}
-        fontFamily={'Tomorrow'}
-        fontWeight={600}
-      >
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">#</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href={`${networkName}/catalog`} ml={2} mr={2}>
-            Catalog
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink
-            href={`/${networkName}/catalog/executive-assistants`}
-            ml={2}
-            mr={2}
-          >
-            Executive Assistants
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink
-            href={`/${networkName}/catalog/executive-assistants/${params.assistantAddress}`}
-            ml={2}
-            mr={2}
-          >
-            Assistant {params.assistantAddress}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrentPage>
-          <BreadcrumbLink href="" ml={2} mr={2}>
-            Configure
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-    </>
-  );
-
+  const breadCrumbs = Breadcrumbs({
+    items: [
+      { name: 'UPAC', href: '/' },
+      { name: 'Catalog', href: `/${networkName}/catalog` },
+      {
+        name: 'Executives',
+        href: `/${networkName}/catalog/executive-assistants`,
+      },
+      {
+        name: `Assistant ${params.assistantAddress}`,
+        href: `/${networkName}/catalog/executive-assistants/${params.assistantAddress}`,
+      },
+      {
+        name: 'Configure',
+        href: `/${networkName}/catalog/executive-assistants/${params.assistantAddress}/configure`,
+      },
+    ],
+  });
   const renderConfigureBody = () => {
     if (!walletNetworkId || !address) {
       return <SignInBox boxText={'Sign in to set UAPTypeConfig'} />;

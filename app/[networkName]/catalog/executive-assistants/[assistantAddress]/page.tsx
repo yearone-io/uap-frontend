@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import ScreeningOptionCard from '@/components/ScreeningOptionCard';
 import AssistantInfo from '@/components/AssistantInfo';
 import SupportedTransactions from '@/components/SupportedTransactions';
 import {
@@ -8,6 +7,7 @@ import {
   forwarderAssistant,
 } from '@/constants/dummyData';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import AssistantSmallCard from '@/components/AssistantSmallCard';
 
 const ExecutiveAssistantPage: React.FC<{
   params: { networkName: string; assistantAddress: string };
@@ -54,7 +54,7 @@ const ExecutiveAssistantPage: React.FC<{
             </Text>
           </Flex>
 
-          <ScreeningOptionCard screener={curationCheckerAssistant} />
+          <AssistantSmallCard assistant={curationCheckerAssistant} />
         </Flex>
         <Box border="1px" borderColor="gray.200" />
       </Flex>

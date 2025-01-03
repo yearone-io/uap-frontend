@@ -1,26 +1,10 @@
 import React from 'react';
 import { Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
+import { ExecutiveAssistant, ScreenerAssistant } from '@/constants/CustomTypes';
 
-type Link = {
-  name: string;
-  url: string;
-};
-
-type ExecutiveAssistant = {
-  address: string;
-  name: string;
-  description: string;
-  iconPath: string;
-  links: Link[];
-  assistantType: 'Executive';
-  creatorAddress: string;
-  supportedTransactionTypes: string[];
-  configParams: { destinationAddress: string };
-};
-
-const AssistantInfo: React.FC<{ assistant: ExecutiveAssistant }> = ({
-  assistant,
-}) => {
+const AssistantInfo: React.FC<{
+  assistant: ExecutiveAssistant | ScreenerAssistant;
+}> = ({ assistant }) => {
   return (
     <Flex
       p={4}

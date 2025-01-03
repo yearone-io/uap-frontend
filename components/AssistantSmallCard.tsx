@@ -4,8 +4,8 @@ import { ExecutiveAssistant, ScreenerAssistant } from '@/constants/CustomTypes';
 
 // todo: link: hidratation issue
 const AssistantSmallCard: React.FC<{
-  screener: ExecutiveAssistant | ScreenerAssistant;
-}> = ({ screener }) => {
+  assistant: ExecutiveAssistant | ScreenerAssistant;
+}> = ({ assistant }) => {
   return (
     <Flex
       border="1px solid #2C5765"
@@ -18,17 +18,17 @@ const AssistantSmallCard: React.FC<{
       <Image
         boxSize="50px"
         borderRadius="full"
-        src={screener.iconPath}
-        alt={`${screener.name} Logo`}
+        src={assistant.iconPath}
+        alt={`${assistant.name} Logo`}
       />
       <Box ml={4}>
         <Text fontSize="lg" fontWeight="bold" mb={1}>
-          {screener.name}
+          {assistant.name}
         </Text>
         <Text fontSize="sm" color="gray.600" mb={2}>
           By:{' '}
           <a
-            href={screener.links[0].url}
+            href={assistant.links[0].url}
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontWeight: 'bold', color: '#E53E3E' }}
@@ -45,10 +45,10 @@ const AssistantSmallCard: React.FC<{
           bg="transparent"
           textTransform="none"
         >
-          {screener.assistantType} Assistant
+          {assistant.assistantType} Assistant
         </Badge>
         <Text fontSize="sm" color="gray.600">
-          {screener.description}
+          {assistant.description}
         </Text>
       </Box>
     </Flex>

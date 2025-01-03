@@ -62,8 +62,8 @@ const LandingBox = () => {
         </Text>
       </VStack>
       <Flex mt="20px" gap="5">
-        <AssistantSmallCard screener={curationCheckerAssistant} />
-        <AssistantSmallCard screener={forwarderAssistant} />
+        <AssistantSmallCard assistant={curationCheckerAssistant} />
+        <AssistantSmallCard assistant={forwarderAssistant} />
       </Flex>
     </Flex>
   );

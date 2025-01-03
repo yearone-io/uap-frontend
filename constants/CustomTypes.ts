@@ -9,11 +9,11 @@ export type AbstractAssistant = {
   iconPath: string;
   links: Link[];
   creatorAddress: string;
+  supportedTransactionTypes: string[];
 };
 
 export type ExecutiveAssistant = AbstractAssistant & {
   assistantType: 'Executive';
-  supportedTransactionTypes: string[];
   configParams: { destinationAddress: string };
 };
 

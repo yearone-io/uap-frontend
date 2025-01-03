@@ -22,6 +22,7 @@ export const curationCheckerAssistant: ScreenerAssistant = {
   iconPath: 'assets/assistants/curation-checker.svg',
   links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
   assistantType: 'Screener',
+  supportedTransactionTypes: ['LSP7Tokens', 'LSP8Tokens', 'LYX'],
   creatorAddress: '0x...',
   configParams: { curatedListAddress: '0x...' },
 };

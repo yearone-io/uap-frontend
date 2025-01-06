@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Image, Text } from '@chakra-ui/react';
 import { ExecutiveAssistant, ScreenerAssistant } from '@/constants/CustomTypes';
 
 const AssistantInfo: React.FC<{
@@ -8,28 +8,23 @@ const AssistantInfo: React.FC<{
   return (
     <Flex
       p={4}
-      flexDirection={['column', 'row']} // Stack vertically on small screens
-      alignItems={['flex-start', 'center']} // Adjust alignment based on screen size
-      w="100%" // Full width for better responsiveness
+      flexDirection={['column', 'row']}
+      alignItems={['flex-start', 'center']}
+      w="100%"
     >
       <Image
-        boxSize={['40px', '50px']} // Adjust size for small and larger screens
+        boxSize={['40px', '50px']}
         borderRadius="full"
         src={assistant.iconPath}
         alt={`${assistant.name} Logo`}
         mb={[2, 0]} // Add margin-bottom on small screens
       />
       <Box ml={[0, 4]} mt={[2, 0]} w="100%">
-        <Flex
-          alignItems={['flex-start', 'center']} // Adjust alignment
-          flexWrap="wrap"
-        >
+        <Flex alignItems={['flex-start', 'center']} flexWrap="wrap" gap={5}>
           <Text fontSize={['md', 'lg']} fontWeight="bold" mb={[1, 0]}>
             {assistant.name}
           </Text>
           <Badge
-            ml={[0, 4]} // Remove margin-left on small screens
-            mt={[2, 0]} // Add margin-top on small screens
             fontSize="0.8em"
             borderRadius="md"
             border="1px solid"
@@ -44,7 +39,7 @@ const AssistantInfo: React.FC<{
         <Text fontSize={['sm', 'md']} color="gray.600">
           {assistant.description}
         </Text>
-        <Text fontSize={['sm', 'md']} color="gray.600" mb={2}>
+        <Text fontSize={['sm', 'md']} color="gray.600" mb={4}>
           By:{' '}
           <a
             href={assistant.links[0].url}
@@ -55,6 +50,16 @@ const AssistantInfo: React.FC<{
             Year One
           </a>
         </Text>
+        {/* Orange Button at the End */}
+          <Button
+            as="a"
+            href='/catalog'
+            colorScheme="orange"
+            variant="solid"
+            size="sm"
+          >
+            View Details
+          </Button>
       </Box>
     </Flex>
   );

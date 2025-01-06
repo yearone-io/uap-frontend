@@ -34,7 +34,7 @@ export default function CatalogPage({
           flex="1"
           w="100%"
           flexDirection={['column', 'column', 'row']} // Stack on smaller screens
-          maxWidth="800px"
+          maxWidth="1400px"
         >
           <Box flex="1">
             <Box

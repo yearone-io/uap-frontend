@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Box, Flex, Image, Text, Link, Button } from '@chakra-ui/react';
+import { Badge, Box, Flex, Image, Text, Button } from '@chakra-ui/react';
 import { ExecutiveAssistant, ScreenerAssistant } from '@/constants/CustomTypes';
 import { getNetwork } from '@/utils/utils';
 
@@ -27,27 +27,33 @@ const AssistantSmallCard = ({
       border="1px solid #2C5765"
       borderRadius="10px"
       p={4}
-      flexDirection="row"
+      flexDirection={['column', 'row']} // Stacked on small screens
       alignItems="center"
-      maxWidth="400px"
+      maxWidth={['100%', '400px']}
+      w="100%"
+      minHeight="250px" // Ensures all cards have the same height
     >
       <Image
-        boxSize="50px"
+        boxSize={['40px', '50px']} // Smaller image on small screens
         borderRadius="full"
         src={assistant.iconPath}
         alt={`${assistant.name} Logo`}
+        mb={[4, 0]} // Margin bottom for stacked layout
       />
       <Flex
-        ml={4}
-        flexDirection={'column'}
-        justifyContent="center"
-        alignContent="center"
+        ml={[0, 4]}
+        flexDirection="column"
+        justifyContent="space-between" // Ensures content is evenly spaced
+        alignItems={['center', 'flex-start']} // Center on small screens
+        textAlign={['center', 'left']} // Center text on small screens
+        w="100%"
+        h="100%" // Ensure content stretches to fill the height
       >
         <Box>
-          <Text fontSize="lg" fontWeight="bold" mb={1}>
+          <Text fontSize={['md', 'lg']} fontWeight="bold" mb={1}>
             {assistant.name}
           </Text>
-          <Text fontSize="sm" color="gray.600" mb={2}>
+          <Text fontSize={['sm', 'md']} color="gray.600" mb={2}>
             By:{' '}
             <a
               href={assistant.links[0].url}
@@ -59,29 +65,30 @@ const AssistantSmallCard = ({
             </a>
           </Text>
           <Badge
-            fontSize="0.8em"
+            fontSize={['0.7em', '0.8em']} // Smaller font size on small screens
             borderRadius="md"
             border="1px solid"
             borderColor="uap.font"
             color="uap.font"
             bg="transparent"
             textTransform="none"
+            mb={2}
           >
             {assistant.assistantType} Assistant
           </Badge>
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize={['sm', 'md']} color="gray.600">
             {assistant.description}
           </Text>
         </Box>
         {includeLink && (
           <Button
-            mt="2"
+            mt="4"
             as="a"
             href={link}
             colorScheme="orange"
             variant="solid"
             size="sm"
-            width={'200px'}
+            width={['100%', '200px']} // Full width on small screens
           >
             View Details
           </Button>

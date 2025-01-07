@@ -1,9 +1,13 @@
 'use client';
 import React from 'react';
-import { Button, Flex, Image, Text, VStack } from '@chakra-ui/react';
-import Link from 'next/link';
 import { useAppKitAccount } from '@reown/appkit/react';
 import { getUrlNameByChainId } from '@/utils/universalProfile';
+import { Flex, Image, Text, VStack, Wrap, WrapItem } from '@chakra-ui/react';
+import {
+  curationCheckerAssistant,
+  forwarderAssistant,
+} from '@/constants/dummyData';
+import AssistantSmallCard from './AssistantSmallCard';
 
 const LandingBox = () => {
   const { isConnected, caipAddress } = useAppKitAccount();
@@ -13,12 +17,14 @@ const LandingBox = () => {
 
   return (
     <Flex
-      minHeight={'inherit'}
-      alignItems={'center'}
-      justifyContent={'center'}
-      w={'100%'}
+      minHeight="inherit"
+      alignItems="center"
+      justifyContent="center"
+      flexDirection="column"
+      w="100%"
+      p={[4, 6, 8]} // Add padding for small to larger screens
     >
-      <VStack textAlign="center" spacing={0}>
+      <VStack textAlign="center" spacing={4}>
         <Image
           src="/logo-uap.png"
           alt="UAP logo"
@@ -26,8 +32,12 @@ const LandingBox = () => {
         />
         <Text
           as="h1"
-          fontFamily={'Tomorrow'}
-          fontSize="5xl"
+          fontFamily="Tomorrow"
+          fontSize={{
+            base: '3xl',
+            sm: '4xl',
+            md: '5xl',
+          }}
           fontWeight="500"
           color="uap.grey"
         >
@@ -47,9 +57,9 @@ const LandingBox = () => {
         <Text
           lineHeight="34px"
           fontSize={{
-            base: 'lg',
-            sm: 'xl',
-            md: '2xl',
+            base: 'md',
+            sm: 'lg',
+            md: 'xl',
           }}
           color="uap.grey"
           fontFamily="Montserrat"
@@ -58,21 +68,24 @@ const LandingBox = () => {
         >
           Engage your personal digital assistant
         </Text>
-        <Flex gap={4} mt="30px">
-          <Link href={`/${urlName}/urd`}>
-            <Button
-              color={'uap.grey'}
-              borderRadius="10px"
-              border="1px solid var(--chakra-colors-uap-grey)"
-              fontFamily={'Montserrat'}
-              fontWeight={500}
-              backgroundColor={'uap.yellow'}
-            >
-              Configure
-            </Button>
-          </Link>
-        </Flex>
       </VStack>
+      {/* Adjust Assistant Cards */}
+      <Wrap
+        mt="20px"
+        spacing={5}
+        justify="center"
+        w="100%" // Full width for cards
+      >
+        <WrapItem>
+          <AssistantSmallCard
+            assistant={curationCheckerAssistant}
+            includeLink
+          />
+        </WrapItem>
+        <WrapItem>
+          <AssistantSmallCard assistant={forwarderAssistant} includeLink />
+        </WrapItem>
+      </Wrap>
     </Flex>
   );
 };

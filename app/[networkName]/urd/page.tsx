@@ -48,7 +48,7 @@ const UAPConfigPage = ({ params }: { params: { networkName: string } }) => {
   const networkUrlId = getChainIdByUrlName(params.networkName);
   const toast = useToast({ position: 'bottom-left' });
   const { address, caipAddress, isConnected } = useAppKitAccount();
-  const walletNetworkId = caipAddress?.split(':')[1];
+  const walletNetworkId = caipAddress ? Number(caipAddress?.split(':')[1]) : undefined;
   const { walletProvider } = useAppKitProvider('eip155');
   const { open } = useAppKit();
   const [isUserConnected, setIsUserConnected] = useState<boolean>(false);

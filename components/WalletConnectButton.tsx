@@ -15,18 +15,19 @@ import {
 } from '@chakra-ui/react';
 import {
   useDisconnect,
-  useWeb3Modal,
-  useWeb3ModalAccount,
-} from '@web3modal/ethers/react';
+  useAppKit,
+  useAppKitAccount,
+} from '@reown/appkit/react';
 import { formatAddress, getNetwork } from '@/utils/utils';
 import { useProfile } from '@/contexts/ProfileContext';
 import Link from 'next/link';
 import { getUrlNameByChainId } from '@/utils/universalProfile';
 
 export default function WalletConnectButton() {
-  const { open } = useWeb3Modal();
+  const { open } = useAppKit();
   const { disconnect } = useDisconnect();
-  const { address, isConnected, chainId } = useWeb3ModalAccount();
+  const { address, isConnected, caipAddress } = useAppKitAccount();
+  const chainId = caipAddress?.split(':')[1];
 
   const { profile } = useProfile();
   const [networkIcon, setNetworkIcon] = useState<string>();
@@ -84,7 +85,7 @@ export default function WalletConnectButton() {
 
   const getProfileUrl = () => {
     if (!chainId || !address) return '/'; // lint
-    const networkUrlName = getUrlNameByChainId(chainId);
+    const networkUrlName = getUrlNameByChainId(Number(chainId));
     return `/${networkUrlName}/profile/${address}`;
   };
 

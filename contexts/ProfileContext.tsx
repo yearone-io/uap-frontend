@@ -7,9 +7,9 @@ import React, {
   useState,
 } from 'react';
 import {
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from '@web3modal/ethers/react';
+  useAppKitAccount,
+  useAppKitProvider,
+} from '@reown/appkit/react';
 import lsp3ProfileSchema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json' assert { type: 'json' };
 import { ERC725, ERC725JSONSchema } from '@erc725/erc725.js';
 
@@ -70,7 +70,7 @@ export function useProfile() {
 export function ProfileProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { address } = useWeb3ModalAccount();
+  const { address } = useAppKitAccount();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [issuedAssets, setIssuedAssets] = useState<string[]>([]);
   const [mainUPController, setMainUPController] = useState<

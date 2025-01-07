@@ -20,10 +20,10 @@ import {
 } from 'ethers';
 import ERC725 from '@erc725/erc725.js';
 import {
-  useWeb3Modal,
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from '@web3modal/ethers/react';
+  useAppKit,
+  useAppKitAccount,
+  useAppKitProvider,
+} from '@reown/appkit/react';
 import { getNetwork } from '@/utils/utils';
 import SignInBox from '@/components/SignInBox';
 import ConfiguredAssistants from '@/components/ConfiguredAssistants';
@@ -49,11 +49,12 @@ const UAPConfigPage = ({ params }: { params: { networkName: string } }) => {
   const toast = useToast({ position: 'bottom-left' });
   const {
     address,
-    chainId: walletNetworkId,
+    caipAddress,
     isConnected,
-  } = useWeb3ModalAccount();
-  const { walletProvider } = useWeb3ModalProvider();
-  const { open } = useWeb3Modal();
+  } = useAppKitAccount();
+  const walletNetworkId = caipAddress?.split(':')[1];
+  const { walletProvider } = useAppKitProvider('eip155');
+  const { open } = useAppKit();
   const [isUserConnected, setIsUserConnected] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [typeId, setTypeId] = useState<string>('');

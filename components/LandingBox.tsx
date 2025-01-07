@@ -2,11 +2,12 @@
 import React from 'react';
 import { Button, Flex, Image, Text, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
-import { useWeb3ModalAccount } from '@web3modal/ethers/react';
+import { useAppKitAccount } from '@reown/appkit/react';
 import { getUrlNameByChainId } from '@/utils/universalProfile';
 
 const LandingBox = () => {
-  const { isConnected, chainId } = useWeb3ModalAccount();
+  const { isConnected, caipAddress } = useAppKitAccount();
+  const chainId = Number(caipAddress?.split(':')[1]);
   const networkId = isConnected && chainId ? chainId : 42;
   const urlName = getUrlNameByChainId(networkId);
 

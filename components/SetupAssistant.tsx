@@ -154,6 +154,8 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
             Enter the address towards which you would like to forward the asset:
           </Text>
         </GridItem>
+        {
+          /*
         <GridItem>
           <Flex alignItems="left">
             <Input
@@ -170,13 +172,14 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
             </Text>
           )}
         </GridItem>
+        */
+        }
         <Button
           size="sm"
           bg="orange.500"
           color="white"
           _hover={{ bg: 'orange.600' }}
           _active={{ bg: 'orange.700' }}
-          isDisabled={!isValidAddress || destinationAddress === ''}
           onClick={handleSubmitConfig}
         >
           Save

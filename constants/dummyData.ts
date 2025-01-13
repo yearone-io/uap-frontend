@@ -25,6 +25,6 @@ export const curationCheckerAssistant: ScreenerAssistant = {
   assistantType: 'Screener',
   supportedTransactionTypes: ['LSP7Tokens', 'LSP8Tokens', 'LYX'],
   creatorAddress: '0x...',
-  configParams: { curatedListAddress: '0x...' },
+  configParams: [{ name: 'curatedListAddress', type: 'address' }],
   chainId: 4201,
 };

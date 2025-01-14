@@ -28,7 +28,7 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 
-const SetupAssistant = (props: { assistantAddress: string }) => {
+const SetupBurntPixAssistant = (props: { assistantAddress: string }) => {
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -196,4 +196,4 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
   );
 };
 
-export default SetupAssistant;
+export default SetupBurntPixAssistant;

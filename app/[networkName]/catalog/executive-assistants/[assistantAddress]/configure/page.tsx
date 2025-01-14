@@ -18,9 +18,9 @@ import {
   isDelegateAlreadySet,
 } from '@/utils/configDataKeyValueStore';
 import { useProfile } from '@/contexts/ProfileContext';
-import SetupAssistant from '@/components/SetupAssistant';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { BrowserProvider, Eip1193Provider } from 'ethers';
+import SetupBurntPixAssistant from '@/components/SetupBurntPixAssistant';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -133,10 +133,7 @@ export default function ExecutiveAssistantConfigurePage({
         </Flex>
       );
     }
-    console.log('renderConfigureBody');
-    console.log('isMissingPermissions', isMissingPermissions);
-    console.log('mainUPController', mainControllerData?.mainUPController);
-    console.log('isURDInstalled', isURDInstalled);
+
     if (
       !mainControllerData?.mainUPController ||
       isMissingPermissions ||
@@ -147,7 +144,7 @@ export default function ExecutiveAssistantConfigurePage({
     }
 
     return (
-      <SetupAssistant assistantAddress={params.assistantAddress as string} />
+      <SetupBurntPixAssistant assistantAddress={params.assistantAddress as string} />
     );
   };
 

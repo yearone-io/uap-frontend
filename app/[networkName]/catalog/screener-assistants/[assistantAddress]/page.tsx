@@ -37,7 +37,7 @@ export default function AssistantPage({
         mt={4}
       >
         <Box flex="1" w={'100%'} maxWidth="800px">
-          CATALOG SCREENER ASSISTANT PAGE
+          Soon...
         </Box>
       </Flex>
     </>

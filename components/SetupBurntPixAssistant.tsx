@@ -12,7 +12,6 @@ import {
 
 import { BrowserProvider, Eip1193Provider } from 'ethers';
 import {
-  customEncodeAddresses,
   generateMappingKey,
   toggleUniveralAssistantsSubscribe,
 } from '@/utils/configDataKeyValueStore';
@@ -24,11 +23,11 @@ import {
 import { useNetwork } from '@/contexts/NetworkContext';
 
 const SetupAssistant = (props: { assistantAddress: string }) => {
-  const [burnPixAddress, setBurnPixAddress] = useState<string>('');
+  const [burntPixAddress, setBurntPixAddress] = useState<string>('');
   const [isValidAddress, setIsValidAddress] = useState<boolean>(true);
 
   // --- New state fields ---
-  const [burnPixId, setBurnPixId] = useState<string>('');
+  const [burntPixId, setBurntPixId] = useState<string>('');
   const [numIterations, setNumIterations] = useState<string>('');
 
   const toast = useToast({ position: 'bottom-left' });
@@ -39,7 +38,7 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setBurnPixAddress(value);
+    setBurntPixAddress(value);
 
     // Basic Ethereum address validation
     const isValid = /^0x[a-fA-F0-9]{40}$/.test(value);
@@ -48,7 +47,7 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
 
   // Handler for Burn Pix ID (alphanumeric)
   const handleBurnPixIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBurnPixId(e.target.value);
+    setBurntPixId(e.target.value);
   };
 
   // Handler for number of iterations (integer only)
@@ -64,16 +63,15 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
     try {
       const upAddress = address as string;
       const signer = await provider.getSigner(upAddress);
-
-
-      // const dataKeyForBurnPixId = generateMappingKey('BurnPixId', burnPixId);
-      // const dataKeyForNumIterations = generateMappingKey('NumIterations', numIterations);
-      // const dataValues = [burnPixId, numIterations];
-      // const UP = ERC725__factory.connect(upAddress, signer);
-      // const tx = await UP.setDataBatch(
-      //   [dataKeyForBurnPixId, dataKeyForNumIterations],
-      //   dataValues
-      // );
+      const dataKeyForBurntPixAddress = generateMappingKey('BurntPixAddress', burntPixAddress);
+      const dataKeyForBurntPixId = generateMappingKey('BurntPixId', burntPixId);
+      const dataKeyForNumIterations = generateMappingKey('NumIterations', numIterations);
+      const dataValues = [burntPixAddress, burntPixId, numIterations];
+      const UP = ERC725__factory.connect(upAddress, signer);
+      const tx = await UP.setDataBatch(
+        [dataKeyForBurntPixAddress, dataKeyForBurntPixId, dataKeyForNumIterations],
+        dataValues
+      );
       await tx.wait();
 
       toast({
@@ -136,7 +134,7 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
           <Flex alignItems="left">
             <Input
               placeholder="Enter address (e.g. 0x123...)"
-              value={burnPixAddress}
+              value={burntPixAddress}
               onChange={handleAddressChange}
               borderColor={isValidAddress ? 'gray.300' : 'red.500'}
               mr={2}
@@ -158,7 +156,7 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
         <GridItem>
           <Input
             placeholder="Enter Burn Pix ID"
-            value={burnPixId}
+            value={burntPixId}
             onChange={handleBurnPixIdChange}
           />
         </GridItem>
@@ -200,7 +198,7 @@ const SetupAssistant = (props: { assistantAddress: string }) => {
             _hover={{ bg: 'orange.600' }}
             _active={{ bg: 'orange.700' }}
             // Disable the Save button if address is invalid or empty
-            isDisabled={!isValidAddress || burnPixAddress === ''}
+            isDisabled={!isValidAddress || burntPixAddress === ''}
             onClick={handleSubmitConfig}
           >
             Save

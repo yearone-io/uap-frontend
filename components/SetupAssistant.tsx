@@ -35,9 +35,10 @@ type SetupAssistantProps = {
 
 const SetupAssistant: React.FC<SetupAssistantProps> = props => {
   const [burntPixId, setBurntPixId] = useState<string>('');
-  const [collectionAddress, setCollectionAddress] = useState<string>('');
   const [iters, setIters] = useState<string>('');
-
+  const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
+    []
+  );
   const toast = useToast({ position: 'bottom-left' });
   const { walletProvider } = useWeb3ModalProvider();
   const { address } = useWeb3ModalAccount();
@@ -68,14 +69,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
 
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
-      const typeConfigKey = generateMappingKey(
-        'UAPTypeConfig',
-        LSP1_TYPE_IDS.LSP0ValueReceived
-      );
-      dataKeys.push(typeConfigKey);
-      dataValues.push(customEncodeAddresses([props.assistantAddress]));
+      selectedTransactions.forEach(txTypeId => {
+        const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
+        dataKeys.push(typeConfigKey);
+        dataValues.push(customEncodeAddresses([props.assistantAddress]));
+      });
 
-      if (!burntPixId || !collectionAddress || !iters) {
+      if (!burntPixId || !iters) {
         toast({
           title: 'Incomplete data',
           description:
@@ -98,16 +98,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
         });
         return;
       }
-      if (!/^0x[0-9a-fA-F]{40}$/.test(collectionAddress)) {
-        toast({
-          title: 'Invalid collection address',
-          description: 'Collection must be a valid Ethereum address.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
+    
       // todo: add validation for iters to be smaller than 1000 so incoming tx doesn't run out of gas
       if (isNaN(Number(iters))) {
         toast({
@@ -120,6 +111,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
         return;
       }
 
+      const collectionAddress = props.assistantAddress;
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         props.assistantAddress
@@ -149,6 +141,68 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
       toast({
         title: 'Error',
         description: `Error setting configuration: ${error.message}`,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  // todo test
+  const handleUnsubscribeAssistant = async () => {
+    if (!address) {
+      toast({
+        title: 'Not connected',
+        description: 'Please connect your wallet first.',
+        status: 'info',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    try {
+      const signer = await getSigner();
+      const upAddress = address;
+      const UP = ERC725__factory.connect(upAddress, signer);
+
+      const dataKeys: string[] = [];
+      const dataValues: string[] = [];
+      selectedTransactions.forEach(txTypeId => {
+        const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
+        dataKeys.push(typeConfigKey);
+        dataValues.push(customEncodeAddresses(['0x']));
+      });
+
+      const assistantSettingsKey = generateMappingKey(
+        'UAPExecutiveConfig',
+        props.assistantAddress
+      );
+      const abiCoder = new AbiCoder();
+      const settingsValue = abiCoder.encode(
+        ['address', 'bytes32', 'uint256'],
+        ['0x', '0x0000000000000000000000000000000000000000000000000000000000000000', 0]
+      );
+
+      // Push these to the batch
+      dataKeys.push(assistantSettingsKey);
+      dataValues.push(settingsValue);
+
+      // 3) setDataBatch
+      const tx = await UP.setDataBatch(dataKeys, dataValues);
+      await tx.wait();
+      toast({
+        title: 'Success',
+        description: 'Unsubscribed from Burnt Pix Refiner Assistant!',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      console.error('Error unsubscribing assistant', error);
+      toast({
+        title: 'Error',
+        description: `Error unsubscribing assistant: ${error.message}`,
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -200,28 +254,33 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
   return (
     <Box p={4}>
       <Grid templateColumns="1fr 2fr" gap={2} alignItems="start">
-        <GridItem colSpan={2}>
-          <Text fontWeight="bold" fontSize="lg" mb={2}>
-            1. Configure Which Transaction Types Will Call This Assistant
+      <GridItem>
+          <Text fontWeight="bold" fontSize="md">
+            Select a transaction type that you will engage this assistant for:
           </Text>
         </GridItem>
-
-        {/* Transaction Types */}
         <GridItem>
-          <Text>Transaction type</Text>
+          <CheckboxGroup
+            colorScheme="orange"
+            value={selectedTransactions}
+            onChange={(values: string[]) => setSelectedTransactions(values)}
+          >
+            <VStack  align="stretch" border="1px solid #E2E8F0" borderRadius='10px' p={6} width='fit-content'>
+              {Object.entries(transactionTypeMap).map(
+                ([key, { id, label, typeName, icon, iconPath }]) => (
+                  <Checkbox key={key} value={id}>
+                    <TransactionTypeBlock
+                      label={label}
+                      typeName={typeName}
+                      icon={icon}
+                      iconPath={iconPath}
+                    />
+                  </Checkbox>
+                )
+              )}
+            </VStack>
+          </CheckboxGroup>
         </GridItem>
-        <GridItem>
-          <VStack spacing={2} align="stretch">
-            <TransactionTypeBlock
-              label={transactionTypeMap.LYX.label}
-              typeName={transactionTypeMap.LYX.typeName}
-              icon={transactionTypeMap.LYX.icon}
-              iconPath={transactionTypeMap.LYX.iconPath}
-            />
-            )
-          </VStack>
-        </GridItem>
-
         <GridItem colSpan={2} mt={6}>
           <Text fontWeight="bold" fontSize="lg" mb={2}>
             1. Configure Burnt Pix Refiner Assistant Settings
@@ -236,19 +295,8 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
           <Input
             placeholder="0x1234... (64 chars)"
             value={burntPixId}
+            w={80}
             onChange={e => setBurntPixId(e.target.value)}
-          />
-        </GridItem>
-
-        {/* Collection */}
-        <GridItem>
-          <Text>Burnt Pix Collection Address:</Text>
-        </GridItem>
-        <GridItem>
-          <Input
-            placeholder="0xabc123..."
-            value={collectionAddress}
-            onChange={e => setCollectionAddress(e.target.value)}
           />
         </GridItem>
 
@@ -261,11 +309,39 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
             placeholder="e.g. 100"
             value={iters}
             onChange={e => setIters(e.target.value)}
+            w={20}
           />
         </GridItem>
 
         {/* Buttons */}
-        <GridItem>
+                
+        <GridItem mt={4}>
+          <Button
+            size="sm"
+            bg="orange.500"
+            color="white"
+            mr='2'
+            _hover={{ bg: 'orange.600' }}
+            _active={{ bg: 'orange.700' }}
+            onClick={handleUnsubscribeAssistant}
+          >
+            Unsubscribe Assistant
+          </Button>
+        
+          <Button
+            size="sm"
+            bg="orange.500"
+            color="white"
+            _hover={{ bg: 'orange.600' }}
+            _active={{ bg: 'orange.700' }}
+            onClick={handleUnsubscribe}
+          >
+            Unsubscribe URD
+          </Button>
+          
+        </GridItem>
+
+        <GridItem mt={4}>
           <Button
             size="sm"
             bg="orange.500"
@@ -277,18 +353,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
             Save
           </Button>
         </GridItem>
-        <GridItem>
-          <Button
-            size="sm"
-            bg="orange.500"
-            color="white"
-            _hover={{ bg: 'orange.600' }}
-            _active={{ bg: 'orange.700' }}
-            onClick={handleUnsubscribe}
-          >
-            Unsubscribe URD
-          </Button>
-        </GridItem>
+
       </Grid>
     </Box>
   );

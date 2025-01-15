@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -49,6 +49,12 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
     const provider = new BrowserProvider(walletProvider as Eip1193Provider);
     return provider.getSigner(address!);
   };
+
+  // todo on page load, populate if the assistant is already subscribed
+  useEffect(() => {
+
+    
+  }, []);
 
   const handleSubmitConfig = async () => {
     if (!address) {

@@ -89,6 +89,8 @@ export default function ExecutiveAssistantConfigurePage({
     mainControllerData,
     network.protocolAddress,
     setIsMissingPermissions,
+    isConnected,
+    walletProvider
   ]);
 
   const breadCrumbs = Breadcrumbs({

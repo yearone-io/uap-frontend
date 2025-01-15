@@ -53,7 +53,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
   // todo on page load, populate if the assistant is already subscribed
   useEffect(() => {
 
-    
+
   }, []);
 
   const handleSubmitConfig = async () => {
@@ -117,7 +117,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
         return;
       }
 
-      const collectionAddress = props.assistantAddress;
+      const collectionAddress = 'TODO';
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         props.assistantAddress

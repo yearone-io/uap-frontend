@@ -50,10 +50,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
   };
 
   // todo on page load, populate if the assistant is already subscribed
-  useEffect(() => {
-
-
-  }, []);
+  useEffect(() => {}, []);
 
   const handleSubmitConfig = async () => {
     if (!address) {
@@ -103,7 +100,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
         });
         return;
       }
-    
+
       // todo: add validation for iters to be smaller than 1000 so incoming tx doesn't run out of gas
       if (isNaN(Number(iters))) {
         toast({
@@ -255,7 +252,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
   return (
     <Box p={4}>
       <Grid templateColumns="1fr 2fr" gap={2} alignItems="start">
-      <GridItem>
+        <GridItem>
           <Text fontWeight="bold" fontSize="md">
             Select a transaction type that you will engage this assistant for:
           </Text>
@@ -266,7 +263,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
             value={selectedTransactions}
             onChange={(values: string[]) => setSelectedTransactions(values)}
           >
-            <VStack  align="stretch" border="1px solid #E2E8F0" borderRadius='10px' p={6} width='fit-content'>
+            <VStack
+              align="stretch"
+              border="1px solid #E2E8F0"
+              borderRadius="10px"
+              p={6}
+              width="fit-content"
+            >
               {Object.entries(transactionTypeMap).map(
                 ([key, { id, label, typeName, icon, iconPath }]) => (
                   <Checkbox key={key} value={id}>
@@ -315,20 +318,20 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
         </GridItem>
 
         {/* Buttons */}
-                
+
         <GridItem mt={4}>
           <Button
             size="sm"
             bg="orange.500"
             color="white"
-            mr='2'
+            mr="2"
             _hover={{ bg: 'orange.600' }}
             _active={{ bg: 'orange.700' }}
             onClick={handleUnsubscribeAssistant}
           >
             Unsubscribe Assistant
           </Button>
-        
+
           <Button
             size="sm"
             bg="orange.500"
@@ -339,7 +342,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
           >
             Unsubscribe URD
           </Button>
-          
         </GridItem>
 
         <GridItem mt={4}>
@@ -354,7 +356,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = props => {
             Save
           </Button>
         </GridItem>
-
       </Grid>
     </Box>
   );

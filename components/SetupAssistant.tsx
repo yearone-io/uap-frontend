@@ -30,11 +30,6 @@ type SetupAssistantProps = {
   assistantAddress: string;
 };
 
-// TODO:
-// 1- figure out issue on test profile
-// 2- Review permissions on unsubscribing urd
-// 3- Need to unsubscribe assistants before uninstalling URD?
-
 const SetupAssistant: React.FC<SetupAssistantProps> = ({
   assistantAddress,
 }) => {
@@ -46,9 +41,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   const [isUpSubscribedToAssistant, setIsUpSubscribedToAssistant] =
     useState<boolean>(false);
   const [isLoadingTrans, setIsLoadingTrans] = useState<boolean>(true);
-
-  // For debugging leftover data:
-  // const [wipeTxTypeId, setWipeTxTypeId] = useState<string>('');
 
   const toast = useToast({ position: 'bottom-left' });
   const { walletProvider } = useWeb3ModalProvider();
@@ -374,60 +366,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   };
 
   // --------------------------------------------------------------------------
-  //  Wipe a single "bad" key (for debugging leftover data)
-  // --------------------------------------------------------------------------
-  // const handleWipeKey = async () => {
-  //   if (!address) {
-  //     toast({
-  //       title: 'Not connected',
-  //       description: 'Please connect your wallet first.',
-  //       status: 'info',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     });
-  //     return;
-  //   }
-  //   if (!/^0x[0-9A-Fa-f]{64}$/.test(wipeTxTypeId)) {
-  //     toast({
-  //       title: 'Bad TxType ID format',
-  //       description: 'Please provide a 32-byte hex (0x + 64 chars).',
-  //       status: 'error',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     const signer = await getSigner();
-  //     const upContract = ERC725__factory.connect(address, signer);
-
-  //     // If you use this ID to generate the key:
-  //     const keyToWipe = generateMappingKey('UAPTypeConfig', wipeTxTypeId);
-
-  //     const tx = await upContract.setData(keyToWipe, '0x');
-  //     await tx.wait();
-
-  //     toast({
-  //       title: 'Key Wiped',
-  //       description: `The leftover key for ${wipeTxTypeId} has been overwritten with 0x.`,
-  //       status: 'success',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     });
-  //   } catch (err: any) {
-  //     console.error('Error wiping key:', err);
-  //     toast({
-  //       title: 'Error',
-  //       description: `Error wiping key: ${err.message}`,
-  //       status: 'error',
-  //       duration: 5000,
-  //       isClosable: true,
-  //     });
-  //   }
-  // };
-
-  // --------------------------------------------------------------------------
   // Render
   // --------------------------------------------------------------------------
   return (
@@ -543,39 +481,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             Save
           </Button>
         </GridItem>
-
-        {/* Debug: Wipe a leftover key */}
-        {/* <GridItem colSpan={2} mt={8}>
-          <Text fontWeight="bold" fontSize="md" mb={2}>
-            Wipe a "Bad" TxType Key
-          </Text>
-          <Text fontSize="sm" mb={2}>
-            If you have leftover data in a certain transaction type key, enter
-            the 32-byte txTypeId (like "0x9c47...") below and click "Wipe Key"
-            to overwrite it with 0x.
-          </Text>
-        </GridItem>
-
-        <GridItem>
-          <Input
-            placeholder="0x9c4705... (64 chars)"
-            value={wipeTxTypeId}
-            onChange={e => setWipeTxTypeId(e.target.value)}
-            w="400px"
-          />
-        </GridItem>
-        <GridItem>
-          <Button
-            size="sm"
-            bg="red.500"
-            color="white"
-            _hover={{ bg: 'red.600' }}
-            _active={{ bg: 'red.700' }}
-            onClick={handleWipeKey}
-          >
-            Wipe Key
-          </Button>
-        </GridItem> */}
       </Grid>
     </Box>
   );

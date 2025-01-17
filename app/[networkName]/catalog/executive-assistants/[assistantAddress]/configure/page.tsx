@@ -33,9 +33,7 @@ export default function ExecutiveAssistantConfigurePage({
     params.assistantAddress,
     networkNameToIdMapping[networkName]
   );
-  if (!assistantInfo) {
-    return <Text>Assistant not found</Text>;
-  }
+
   const networkUrlId = getChainIdByUrlName(params.networkName);
   const { open } = useWeb3Modal();
   const { walletProvider } = useWeb3ModalProvider();
@@ -160,6 +158,10 @@ export default function ExecutiveAssistantConfigurePage({
       <SetupAssistant assistantAddress={params.assistantAddress as string} />
     );
   };
+
+  if (!assistantInfo) {
+    return <Text>Assistant not found</Text>;
+  }
 
   return (
     <Box p={4} w="100%">

@@ -58,4 +58,4 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
 export const networkNameToIdMapping: { [key: string]: number } = {
   [CHAINS.LUKSO]: 42,
   [CHAINS.LUKSO_TESTNET]: 4201,
-} ;
+};

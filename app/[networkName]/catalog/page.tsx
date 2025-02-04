@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import AssistantInfo from '@/components/AssistantInfo';
-import { burntPixRefinerTestnet } from "@/constants/assistantsConfig";
+import { burntPixRefinerTestnet } from '@/constants/assistantsConfig';
 
 export default function CatalogPage({
   params,

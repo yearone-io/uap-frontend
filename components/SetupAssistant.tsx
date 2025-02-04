@@ -38,7 +38,9 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   const DONATION_PERCENTAGE = 1;
   const [burntPixId, setBurntPixId] = useState<string>('');
   const [iters, setIters] = useState<string>('');
-  const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
+    []
+  );
   const [isUpSubscribedToAssistant, setIsUpSubscribedToAssistant] =
     useState<boolean>(false);
   const [isLoadingTrans, setIsLoadingTrans] = useState<boolean>(true);
@@ -122,11 +124,10 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           setBurntPixId(pixId);
           setIters(iterationCount.toString());
           setIsUpSubscribedToAssistant(true);
-          
+
           // TODO Donation checkbox should reflect the current donation configuration.
           // Check if the DOnation assistant is set and update the checkbox accordingly
-          setIsSaveChecked(true); 
-
+          setIsSaveChecked(true);
         } else {
           setIsUpSubscribedToAssistant(false);
           setIsSaveChecked(true); // default to true (if it is not being edited)
@@ -226,10 +227,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       dataValues.push(settingsValue);
 
       // Donation Assistant:
-      if (selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
-          isSaveChecked) {
+      if (
+        selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
+        isSaveChecked
+      ) {
         // Donation Assistant address needs to be set with a configuration of the donation percentage and the destination address
-        const donationAssitantAddress = '0x0326D8d0427f785AB755dd4E3A6cEd1f99a86A13';
+        const donationAssitantAddress =
+          '0x0326D8d0427f785AB755dd4E3A6cEd1f99a86A13';
         const destinationAddress = '0x1234567890123456789012345678901234567890';
         const donationAssistantConfigKey = generateMappingKey(
           'UAPExecutiveConfig',

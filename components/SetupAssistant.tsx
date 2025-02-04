@@ -233,8 +233,8 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       ) {
         // Donation Assistant address needs to be set with a configuration of the donation percentage and the destination address
         const donationAssitantAddress =
-          '0x0326D8d0427f785AB755dd4E3A6cEd1f99a86A13';
-        const destinationAddress = '0x1234567890123456789012345678901234567890';
+          '0x51abDe764f6ccA1beAB04e9c864b95d28Bb92116';
+        const destinationAddress = '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009';
         const donationAssistantConfigKey = generateMappingKey(
           'UAPExecutiveConfig',
           donationAssitantAddress
@@ -360,6 +360,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
     try {
       setIsLoadingTrans(true);
       const provider = new BrowserProvider(walletProvider as Eip1193Provider);
+      // todo unsubscribe Donation assistant
       await toggleUniveralAssistantsSubscribe(
         provider,
         address,
@@ -472,7 +473,10 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             This GridItem is rendered only if the LSP0 type is selected.
         */}
         {selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) && (
-          <GridItem colSpan={2} mt={4}>
+            <GridItem colSpan={2} mt={4}>
+              <Text fontWeight="bold" fontSize="lg" mb={2}>
+                2. Configure Donation Assistant Settings
+            </Text>
             <Flex>
               Donate 1% of the transaction value to the Year One Team
               <Checkbox

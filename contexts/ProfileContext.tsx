@@ -39,8 +39,8 @@ interface MainControllerData {
 interface ProfileContextType {
   profile: Profile | null;
   setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
-  setIssuedAssets: React.Dispatch<React.SetStateAction<string[]>>;
   issuedAssets: string[];
+  setIssuedAssets: React.Dispatch<React.SetStateAction<string[]>>;
   mainControllerData: MainControllerData | null;
   setMainControllerData: React.Dispatch<
     React.SetStateAction<MainControllerData | null>
@@ -50,13 +50,12 @@ interface ProfileContextType {
 const initialProfileContextValue: ProfileContextType = {
   profile: null,
   setProfile: () => {},
-  setIssuedAssets: () => {},
   issuedAssets: [],
+  setIssuedAssets: () => {},
   mainControllerData: null,
   setMainControllerData: () => {},
 };
 
-// Set up the empty React context
 const ProfileContext = createContext<ProfileContextType>(
   initialProfileContextValue
 );
@@ -66,38 +65,44 @@ export function useProfile() {
 }
 
 export function ProfileProvider({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+                                  children,
+                                }: Readonly<{ children: React.ReactNode }>) {
   const { address } = useWeb3ModalAccount();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [issuedAssets, setIssuedAssets] = useState<string[]>([]);
   const [mainControllerData, setMainControllerData] =
     useState<MainControllerData | null>(null);
 
-  // Load profile and controller data from local storage on initial render
+  // 1) Load both profile and controller data from local storage
   useEffect(() => {
-    const loadProfileFromLocalStorage = () => {
-      const storedProfileData = localStorage.getItem('profileData');
-      return storedProfileData ? JSON.parse(storedProfileData) : null;
-    };
+    // If no address, just clear
+    if (!address) {
+      setProfile(null);
+      setMainControllerData(null);
+      return;
+    }
 
-    const loadMainControllerDataFromLocalStorage = () => {
-      const storedData = localStorage.getItem('mainControllerData');
-      return storedData ? JSON.parse(storedData) : null;
-    };
-
-    const storedProfile = loadProfileFromLocalStorage();
-    if (storedProfile && storedProfile.account === address) {
-      setProfile(storedProfile.data);
+    const storedProfileData = localStorage.getItem('profileData');
+    if (storedProfileData) {
+      const parsed = JSON.parse(storedProfileData);
+      if (parsed.account === address) {
+        setProfile(parsed.data);
+      } else {
+        setProfile(null);
+      }
     } else {
       setProfile(null);
     }
 
-    const storedControllerData = loadMainControllerDataFromLocalStorage();
-    setMainControllerData(storedControllerData);
+    const storedControllerData = localStorage.getItem('mainControllerData');
+    if (storedControllerData) {
+      setMainControllerData(JSON.parse(storedControllerData));
+    } else {
+      setMainControllerData(null);
+    }
   }, [address]);
 
-  // Save `mainControllerData` to local storage when it changes
+  // 2) Whenever mainControllerData changes, write to local storage (or remove)
   useEffect(() => {
     if (mainControllerData) {
       localStorage.setItem(
@@ -109,13 +114,13 @@ export function ProfileProvider({
     }
   }, [mainControllerData]);
 
-  // Context properties
-  const contextProperties = useMemo(
+  // Collect values in a memo to avoid re-creating the context on every render
+  const contextValue = useMemo(
     () => ({
       profile,
       setProfile,
-      setIssuedAssets,
       issuedAssets,
+      setIssuedAssets,
       mainControllerData,
       setMainControllerData,
     }),
@@ -123,7 +128,7 @@ export function ProfileProvider({
   );
 
   return (
-    <ProfileContext.Provider value={contextProperties}>
+    <ProfileContext.Provider value={contextValue}>
       {children}
     </ProfileContext.Provider>
   );

@@ -236,7 +236,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         dataKeys.push(typeConfigKey);
         const singleAddressEncoded = abiCoder.encode(
           ['address'],
-          [assistantAddress]
+          [donationAssistantAddress]
         );
         dataValues.push(singleAddressEncoded);
       });
@@ -250,8 +250,8 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         ['address', 'bytes32', 'uint256'],
         [network.burntPixCollectionAddress, burntPixId, Number(iters)]
       );
-      dataKeys.push(assistantSettingsKey);
-      dataValues.push(settingsValue);
+      // dataKeys.push(assistantSettingsKey);
+      // dataValues.push(settingsValue);
 
       // Save Donation Assistant configuration only if the donation checkbox is not disabled
       // (i.e. donation assistant is not already configured) and the checkbox is checked.
@@ -272,7 +272,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         dataKeys.push(donationAssistantConfigKey);
         dataValues.push(donationAssistantSettingsValue);
       }
-
       // Write all configurations in one transaction.
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();

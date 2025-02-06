@@ -150,7 +150,7 @@ export default function ExecutiveAssistantConfigurePage({
       !isURDInstalled
     ) {
       // TODO: pass isMissingPermissions to URDSetup if needed
-      return <URDSetup />;
+      return <URDSetup extensionHasPermissions={!isMissingPermissions} />;
     }
 
     return <SetupAssistant assistantAddress={params.assistantAddress} />;

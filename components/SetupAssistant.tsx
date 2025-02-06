@@ -48,6 +48,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   const { address } = useWeb3ModalAccount();
   const { network } = useNetwork();
 
+  // Helper function to pad an Ethereum address into a 32-byte hex string.
+  const convertAddressToBytes32 = (addr: string): string => {
+    // addr is expected to be in the format "0x" + 40 hex characters.
+    // We pad it on the left with zeros to reach 66 characters total.
+    return '0x' + '0'.repeat(24) + addr.slice(2);
+  };
+
   // Ethers helper
   const getSigner = async () => {
     if (!walletProvider || !address)
@@ -164,7 +171,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
     if (!/^0x[0-9A-Fa-f]{64}$/.test(burntPixId)) {
       toast({
         title: 'Invalid burntPixId',
-        description: 'Must be 32-byte hex (0x + 64).',
+        description: 'Must be 32-byte hex (0x + 64 characters).',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -415,6 +422,20 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             placeholder="Enter NFT id"
             value={burntPixId}
             onChange={e => setBurntPixId(e.target.value)}
+            // onBlur: if the input is a 42-character Ethereum address, convert it
+            onBlur={() => {
+              if (/^0x[0-9A-Fa-f]{40}$/.test(burntPixId)) {
+                setBurntPixId(convertAddressToBytes32(burntPixId));
+              }
+            }}
+            // onPaste: automatically convert a pasted Ethereum address
+            onPaste={e => {
+              const pastedData = e.clipboardData.getData('text');
+              if (/^0x[0-9A-Fa-f]{40}$/.test(pastedData)) {
+                e.preventDefault(); // Prevent the default paste behavior
+                setBurntPixId(convertAddressToBytes32(pastedData));
+              }
+            }}
             w="70%"
           />
         </Flex>

@@ -71,7 +71,7 @@ const LandingBox = ({ networkName }: { networkName: CHAINS }) => {
       >
         {
           networkConfig.assistants.map(assistant => (
-            <WrapItem>
+            <WrapItem key={assistant.address}>
               <AssistantSmallCard key={assistant.address} assistant={assistant} includeLink />
             </WrapItem>
           ))

@@ -17,6 +17,7 @@ import TransactionTypeBlock, {
 } from './TransactionTypeBlock';
 import { AbiCoder, BrowserProvider, Eip1193Provider } from 'ethers';
 import {
+  customEncodeAddresses,
   generateMappingKey,
   toggleUniveralAssistantsSubscribe,
 } from '@/utils/configDataKeyValueStore';
@@ -205,11 +206,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         dataKeys.push(typeConfigKey);
 
         // Encode as a single address
-        const singleAddressEncoded = abiCoder.encode(
-          ['address'],
-          [assistantAddress]
-        );
-        dataValues.push(singleAddressEncoded);
+        dataValues.push(customEncodeAddresses([assistantAddress]));
       });
 
       // Also encode the assistant’s settings (collectionAddr, burntPixId, iters)

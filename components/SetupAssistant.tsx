@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   CheckboxGroup,
+  Flex,
   Grid,
   GridItem,
   Input,
@@ -16,6 +17,8 @@ import TransactionTypeBlock, {
 } from './TransactionTypeBlock';
 import { AbiCoder, BrowserProvider, Eip1193Provider } from 'ethers';
 import {
+  customDecodeAddresses,
+  customEncodeAddresses,
   generateMappingKey,
   toggleUniveralAssistantsSubscribe,
 } from '@/utils/configDataKeyValueStore';
@@ -26,25 +29,15 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 
-type ConfigParam = { name: string; type: string };
-
 type SetupAssistantProps = {
   assistantAddress: string;
-  configParams: ConfigParam[];
 };
 
 const SetupAssistant: React.FC<SetupAssistantProps> = ({
   assistantAddress,
-  configParams,
 }) => {
-  // Instead of separate states for each field, we store them in an object.
-  const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    configParams.forEach(param => {
-      initial[param.name] = '';
-    });
-    return initial;
-  });
+  const [burntPixId, setBurntPixId] = useState<string>('');
+  const [iters, setIters] = useState<string>('');
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -57,7 +50,14 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   const { address } = useWeb3ModalAccount();
   const { network } = useNetwork();
 
-  // Ethers helper to get a signer
+  // Helper function to pad an Ethereum address into a 32-byte hex string.
+  const convertAddressToBytes32 = (addr: string): string => {
+    // addr is expected to be in the format "0x" + 40 hex characters.
+    // We pad it on the left with zeros to reach 66 characters total.
+    return '0x' + '0'.repeat(24) + addr.slice(2);
+  };
+
+  // Ethers helper
   const getSigner = async () => {
     if (!walletProvider || !address)
       throw new Error('No wallet/address found!');
@@ -89,48 +89,50 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           assistantAddress
         );
 
-        // Fetch all keys in one call
+        // Fetch them all in one call
         const allData = await upContract.getDataBatch([
           ...allTypeConfigKeys,
           assistantConfigKey,
         ]);
-        // The first N entries are the transaction type config values;
-        // the last is the assistant config.
+        // The first N are the type config values; the last is assistant config
         const typeConfigValues = allData.slice(0, allTypeIds.length);
         const assistantConfigValue = allData[allTypeIds.length];
 
         const abiCoder = new AbiCoder();
         const newlySelectedTx: string[] = [];
 
-        // Decode each transaction type (stored as a single address)
+        // Decode each transaction type: single address
         typeConfigValues.forEach((encodedValue, index) => {
           if (!encodedValue || encodedValue === '0x') {
             return; // no address stored
           }
-          const storedAddress = abiCoder.decode(
-            ['address'],
-            encodedValue
-          )[0] as string;
+          // Decode as a single address (32 bytes expected)
+          const storedAddresses = customDecodeAddresses(encodedValue);
+          // todo: for now it will only have one address
+          const storedAddress = storedAddresses[0];
+
+          // If it matches our assistant’s address, we push that txTypeId
           if (storedAddress.toLowerCase() === assistantAddress.toLowerCase()) {
             newlySelectedTx.push(allTypeIds[index]);
           }
         });
 
-        // If an assistant config exists, decode it using the types from configParams.
+        // Decode the assistant config => (collectionAddr, burntPixId, iters)
         if (assistantConfigValue && assistantConfigValue !== '0x') {
-          const types = configParams.map(param => param.type);
-          const decoded = abiCoder.decode(types, assistantConfigValue);
-          const newFieldValues: Record<string, string> = {};
-          configParams.forEach((param, index) => {
-            // Use toString() to convert decoded BigNumbers (or similar) to strings
-            newFieldValues[param.name] = decoded[index].toString();
-          });
-          setFieldValues(newFieldValues);
+          const decoded = abiCoder.decode(
+            ['address', 'bytes32', 'uint256'],
+            assistantConfigValue
+          );
+          const pixId = decoded[1] as string;
+          const iterationCount = decoded[2] as any;
+          setBurntPixId(pixId);
+          setIters(iterationCount.toString());
           setIsUpSubscribedToAssistant(true);
         } else {
           setIsUpSubscribedToAssistant(false);
         }
 
+        // Update state with discovered subscriptions
         setSelectedTransactions(newlySelectedTx);
         setIsLoadingTrans(false);
       } catch (err) {
@@ -140,7 +142,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
     };
 
     loadExistingConfig();
-  }, [address, assistantAddress, configParams]);
+  }, [address, assistantAddress]);
 
   // --------------------------------------------------------------------------
   // Save config
@@ -157,39 +159,35 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       return;
     }
 
-    // Validate each field based on its Solidity type.
-    for (const param of configParams) {
-      const value = fieldValues[param.name];
-      if (!value) {
-        toast({
-          title: 'Incomplete data',
-          description: `Please fill in ${param.name}.`,
-          status: 'warning',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
-      if (param.type === 'bytes32' && !/^0x[0-9A-Fa-f]{64}$/.test(value)) {
-        toast({
-          title: `Invalid ${param.name}`,
-          description: 'Must be 32-byte hex (0x + 64 hex characters).',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
-      if (param.type.startsWith('uint') && isNaN(Number(value))) {
-        toast({
-          title: `Invalid ${param.name}`,
-          description: 'Please enter a valid number.',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
+    if (!burntPixId || !iters) {
+      toast({
+        title: 'Incomplete data',
+        description: 'Please fill in burntPixId and iterations.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+    if (!/^0x[0-9A-Fa-f]{64}$/.test(burntPixId)) {
+      toast({
+        title: 'Invalid burntPixId',
+        description: 'Must be 32-byte hex (0x + 64 characters).',
+        status: 'error',
+        duration: null,
+        isClosable: true,
+      });
+      return;
+    }
+    if (isNaN(Number(iters))) {
+      toast({
+        title: 'Invalid iterations',
+        description: 'Please enter a valid number.',
+        status: 'error',
+        duration: null,
+        isClosable: true,
+      });
+      return;
     }
 
     try {
@@ -202,31 +200,26 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       const abiCoder = new AbiCoder();
 
-      // For each selected transaction type, store the assistant’s address.
+      // For each selected transaction type, store the *single address*
       selectedTransactions.forEach(txTypeId => {
         const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
         dataKeys.push(typeConfigKey);
-        const encodedAddress = abiCoder.encode(['address'], [assistantAddress]);
-        dataValues.push(encodedAddress);
+
+        // Encode as a single address
+        dataValues.push(customEncodeAddresses([assistantAddress]));
       });
 
-      // Build the assistant settings using the generic config.
+      // Also encode the assistant’s settings (collectionAddr, burntPixId, iters)
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
       );
-      const types = configParams.map(param => param.type);
-      const values = configParams.map(param => {
-        // Example: if you want one of the fields (say "collectionAddr") to use a default value,
-        // you can override here. Otherwise, use the value from state.
-        if (param.name === 'collectionAddr') {
-          return network.burntPixCollectionAddress;
-        }
-        // For uint types, you might want to convert to a number or BigNumber if necessary.
-        return fieldValues[param.name];
-      });
-      const settingsValue = abiCoder.encode(types, values);
+      const settingsValue = abiCoder.encode(
+        ['address', 'bytes32', 'uint256'],
+        [network.burntPixCollectionAddress, burntPixId, Number(iters)]
+      );
       dataKeys.push(assistantSettingsKey);
+
       dataValues.push(settingsValue);
 
       // Write everything in one transaction
@@ -235,7 +228,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       toast({
         title: 'Success',
-        description: 'Assistant settings saved successfully!',
+        description: 'Burnt Pix Refiner Assistant settings saved successfully!',
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -249,7 +242,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         title: 'Error',
         description: `Error setting configuration: ${err.message}`,
         status: 'error',
-        duration: 5000,
+        duration: null,
         isClosable: true,
       });
     }
@@ -278,14 +271,14 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
 
-      // For each currently subscribed transaction type, clear the key.
+      // For each currently subscribed type, clear the key with '0x'
       selectedTransactions.forEach(txTypeId => {
         const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
         dataKeys.push(typeConfigKey);
         dataValues.push('0x');
       });
 
-      // Also clear the assistant config.
+      // Also clear the assistant config
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
@@ -298,30 +291,30 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       toast({
         title: 'Success',
-        description: 'Unsubscribed from Assistant!',
+        description: 'Unsubscribed from Burnt Pix Refiner Assistant!',
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
 
-      // Clear local UI state.
+      // Clear local UI state
       setSelectedTransactions([]);
-      // Reset the field values.
-      const cleared: Record<string, string> = {};
-      configParams.forEach(param => (cleared[param.name] = ''));
-      setFieldValues(cleared);
+      setBurntPixId('');
+      setIters('');
       setIsUpSubscribedToAssistant(false);
       setIsLoadingTrans(false);
     } catch (err: any) {
       setIsLoadingTrans(false);
       console.error('Error unsubscribing assistant', err);
-      toast({
-        title: 'Error',
-        description: `Error unsubscribing assistant: ${err.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      if(!err.message.includes("user rejected action")) {
+        toast({
+          title: 'Error',
+          description: `Error unsubscribing assistant: ${err.message}`,
+          status: 'error',
+          duration: null,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -359,24 +352,25 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         isClosable: true,
       });
 
-      // Clear local states.
+      // Clear local states
       setSelectedTransactions([]);
-      const cleared: Record<string, string> = {};
-      configParams.forEach(param => (cleared[param.name] = ''));
-      setFieldValues(cleared);
+      setBurntPixId('');
+      setIters('');
       setIsLoadingTrans(false);
-      // Refresh page.
+      // refresh page
       window.location.reload();
     } catch (err: any) {
       setIsLoadingTrans(false);
       console.error('Error uninstalling UAP:', err);
-      toast({
-        title: 'Error',
-        description: `Error uninstalling UAP: ${err.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      if(!err.message.includes("user rejected action")) {
+        toast({
+          title: 'Error',
+          description: `Error uninstalling UAP: ${err.message}`,
+          status: 'error',
+          duration: null,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -384,15 +378,16 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   // Render
   // --------------------------------------------------------------------------
   return (
-    <Box p={4}>
-      <Grid templateColumns="1fr 2fr" gap={2} alignItems="start">
-        {/* Transaction Types */}
-        <GridItem>
-          <Text fontWeight="bold" fontSize="md">
-            Select a transaction type that you will engage this assistant for:
+    <Flex p={6} flexDirection={'column'} gap={8}>
+      <Text fontWeight="bold" fontSize="lg">
+        Assistant Instructions
+      </Text>
+      <Flex gap={4} flexDirection={'column'}>
+        <Flex flexDirection={'row'} gap={4} maxWidth="550px">
+          <Text fontWeight="bold" fontSize="sm">
+            Select the transaction types that you will engage this assistant
+            for:
           </Text>
-        </GridItem>
-        <GridItem>
           <CheckboxGroup
             colorScheme="orange"
             value={selectedTransactions}
@@ -400,10 +395,10 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           >
             <VStack
               align="stretch"
-              border="1px solid #E2E8F0"
-              borderRadius="10px"
-              p={6}
-              width="fit-content"
+              border="1px solid var(--chakra-colors-uap-grey)"
+              borderRadius="xl"
+              py={2}
+              px={7}
             >
               {Object.entries(transactionTypeMap).map(
                 ([key, { id, label, typeName, icon, iconPath }]) => (
@@ -419,94 +414,70 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
               )}
             </VStack>
           </CheckboxGroup>
-        </GridItem>
-
-        {/* Assistant Settings */}
-        <GridItem colSpan={2} mt={6}>
-          <Text fontWeight="bold" fontSize="lg" mb={2}>
-            1. Configure Assistant Settings
+        </Flex>
+        <Flex flexDirection={'row'} gap={4} maxWidth="550px">
+          <Text fontWeight="bold" fontSize="sm">
+            BurntPix NFT id you want to refine:
           </Text>
-        </GridItem>
-
-        {configParams.map(param => (
-          <React.Fragment key={param.name}>
-            <GridItem>
-              <Text>
-                {param.name} ({param.type}):
-              </Text>
-            </GridItem>
-            <GridItem>
-              <Input
-                placeholder={param.name}
-                value={
-                  // If this is a field that should be pre-populated (e.g. collectionAddr)
-                  // you can override here. Otherwise, use the state.
-                  fieldValues[param.name] ||
-                  (param.name === 'collectionAddr'
-                    ? network.burntPixCollectionAddress
-                    : '')
-                }
-                onChange={e =>
-                  setFieldValues({
-                    ...fieldValues,
-                    [param.name]: e.target.value,
-                  })
-                }
-                // Example: you might set a smaller width for number fields.
-                w={param.type.startsWith('uint') ? 20 : 80}
-                // Optionally disable fields that should not be edited.
-                isDisabled={param.name === 'collectionAddr'}
-              />
-            </GridItem>
-          </React.Fragment>
-        ))}
-
-        {/* Action Buttons */}
-        <GridItem mt={4}>
-          {isUpSubscribedToAssistant && (
-            <Button
-              size="sm"
-              bg="orange.500"
-              color="white"
-              mr="2"
-              _hover={{ bg: 'orange.600' }}
-              _active={{ bg: 'orange.700' }}
-              onClick={handleUnsubscribeAssistant}
-              isLoading={isLoadingTrans}
-              isDisabled={isLoadingTrans}
-            >
-              Unsubscribe Assistant
-            </Button>
-          )}
-          <Button
-            size="sm"
-            bg="orange.500"
-            color="white"
-            _hover={{ bg: 'orange.600' }}
-            _active={{ bg: 'orange.700' }}
-            onClick={handleUnsubscribeURD}
-            isLoading={isLoadingTrans}
-            isDisabled={isLoadingTrans}
-          >
-            Unsubscribe URD
-          </Button>
-        </GridItem>
-        <GridItem mt={4}>
-          <Button
-            size="sm"
-            bg="orange.500"
-            color="white"
-            _hover={{ bg: 'orange.600' }}
-            _active={{ bg: 'orange.700' }}
-            onClick={handleSubmitConfig}
-            isLoading={isLoadingTrans}
-            isDisabled={isLoadingTrans}
-          >
-            Save
-          </Button>
-        </GridItem>
-      </Grid>
-    </Box>
+          <Input
+            placeholder="Enter NFT id"
+            value={burntPixId}
+            onChange={e => setBurntPixId(e.target.value)}
+            // onBlur: if the input is a 42-character Ethereum address, convert it
+            onBlur={() => {
+              if (/^0x[0-9A-Fa-f]{40}$/.test(burntPixId)) {
+                setBurntPixId(convertAddressToBytes32(burntPixId));
+              }
+            }}
+            // onPaste: automatically convert a pasted Ethereum address
+            onPaste={e => {
+              const pastedData = e.clipboardData.getData('text');
+              if (/^0x[0-9A-Fa-f]{40}$/.test(pastedData)) {
+                e.preventDefault(); // Prevent the default paste behavior
+                setBurntPixId(convertAddressToBytes32(pastedData));
+              }
+            }}
+            w="70%"
+          />
+        </Flex>
+        <Flex flexDirection={'row'} gap={4} maxWidth="550px">
+          <Text fontWeight="bold" fontSize="sm">
+            Number of refinement iterations incoming transactions will
+            contribute:
+          </Text>
+          <Input
+            placeholder="e.g. 100"
+            value={iters}
+            onChange={e => setIters(e.target.value)}
+            w="70%"
+          />
+        </Flex>
+      </Flex>
+      <Flex gap={2}>
+        <Button
+          size="sm"
+          colorScheme="red"
+          variant={'outline'}
+          onClick={handleUnsubscribeURD}
+          isLoading={isLoadingTrans}
+          isDisabled={isLoadingTrans}
+        >
+          Unsubscribe Assistants
+        </Button>
+        <Button
+          size="sm"
+          bg="orange.500"
+          color="white"
+          _hover={{ bg: 'orange.600' }}
+          _active={{ bg: 'orange.700' }}
+          onClick={handleSubmitConfig}
+          isLoading={isLoadingTrans}
+          isDisabled={isLoadingTrans}
+        >
+          Save Assistant Settings
+        </Button>
+      </Flex>
+    </Flex>
   );
 };
 

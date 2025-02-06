@@ -157,7 +157,9 @@ export default function ExecutiveAssistantConfigurePage({
       return <URDSetup />;
     }
 
-    return <SetupAssistant assistantAddress={params.assistantAddress} />;
+    return <SetupAssistant assistantAddress={params.assistantAddress}
+                           configParams={assistantInfo.configParams}
+    />;
   };
 
   return (

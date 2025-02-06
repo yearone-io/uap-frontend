@@ -26,15 +26,25 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 
+type ConfigParam = { name: string; type: string };
+
 type SetupAssistantProps = {
   assistantAddress: string;
+  configParams: ConfigParam[];
 };
 
 const SetupAssistant: React.FC<SetupAssistantProps> = ({
   assistantAddress,
+  configParams,
 }) => {
-  const [burntPixId, setBurntPixId] = useState<string>('');
-  const [iters, setIters] = useState<string>('');
+  // Instead of separate states for each field, we store them in an object.
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    configParams.forEach(param => {
+      initial[param.name] = '';
+    });
+    return initial;
+  });
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -47,7 +57,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   const { address } = useWeb3ModalAccount();
   const { network } = useNetwork();
 
-  // Ethers helper
+  // Ethers helper to get a signer
   const getSigner = async () => {
     if (!walletProvider || !address)
       throw new Error('No wallet/address found!');
@@ -79,51 +89,48 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           assistantAddress
         );
 
-        // Fetch them all in one call
+        // Fetch all keys in one call
         const allData = await upContract.getDataBatch([
           ...allTypeConfigKeys,
           assistantConfigKey,
         ]);
-        // The first N are the type config values; the last is assistant config
+        // The first N entries are the transaction type config values;
+        // the last is the assistant config.
         const typeConfigValues = allData.slice(0, allTypeIds.length);
         const assistantConfigValue = allData[allTypeIds.length];
 
         const abiCoder = new AbiCoder();
         const newlySelectedTx: string[] = [];
 
-        // Decode each transaction type: single address
+        // Decode each transaction type (stored as a single address)
         typeConfigValues.forEach((encodedValue, index) => {
           if (!encodedValue || encodedValue === '0x') {
             return; // no address stored
           }
-          // Decode as a single address (32 bytes expected)
           const storedAddress = abiCoder.decode(
             ['address'],
             encodedValue
           )[0] as string;
-
-          // If it matches our assistant’s address, we push that txTypeId
           if (storedAddress.toLowerCase() === assistantAddress.toLowerCase()) {
             newlySelectedTx.push(allTypeIds[index]);
           }
         });
 
-        // Decode the assistant config => (collectionAddr, burntPixId, iters)
+        // If an assistant config exists, decode it using the types from configParams.
         if (assistantConfigValue && assistantConfigValue !== '0x') {
-          const decoded = abiCoder.decode(
-            ['address', 'bytes32', 'uint256'],
-            assistantConfigValue
-          );
-          const pixId = decoded[1] as string;
-          const iterationCount = decoded[2] as any;
-          setBurntPixId(pixId);
-          setIters(iterationCount.toString());
+          const types = configParams.map(param => param.type);
+          const decoded = abiCoder.decode(types, assistantConfigValue);
+          const newFieldValues: Record<string, string> = {};
+          configParams.forEach((param, index) => {
+            // Use toString() to convert decoded BigNumbers (or similar) to strings
+            newFieldValues[param.name] = decoded[index].toString();
+          });
+          setFieldValues(newFieldValues);
           setIsUpSubscribedToAssistant(true);
         } else {
           setIsUpSubscribedToAssistant(false);
         }
 
-        // Update state with discovered subscriptions
         setSelectedTransactions(newlySelectedTx);
         setIsLoadingTrans(false);
       } catch (err) {
@@ -133,7 +140,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
     };
 
     loadExistingConfig();
-  }, [address, assistantAddress]);
+  }, [address, assistantAddress, configParams]);
 
   // --------------------------------------------------------------------------
   // Save config
@@ -150,35 +157,39 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       return;
     }
 
-    if (!burntPixId || !iters) {
-      toast({
-        title: 'Incomplete data',
-        description: 'Please fill in burntPixId and iterations.',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-    if (!/^0x[0-9A-Fa-f]{64}$/.test(burntPixId)) {
-      toast({
-        title: 'Invalid burntPixId',
-        description: 'Must be 32-byte hex (0x + 64).',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-    if (isNaN(Number(iters))) {
-      toast({
-        title: 'Invalid iterations',
-        description: 'Please enter a valid number.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
+    // Validate each field based on its Solidity type.
+    for (const param of configParams) {
+      const value = fieldValues[param.name];
+      if (!value) {
+        toast({
+          title: 'Incomplete data',
+          description: `Please fill in ${param.name}.`,
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      if (param.type === 'bytes32' && !/^0x[0-9A-Fa-f]{64}$/.test(value)) {
+        toast({
+          title: `Invalid ${param.name}`,
+          description: 'Must be 32-byte hex (0x + 64 hex characters).',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      if (param.type.startsWith('uint') && isNaN(Number(value))) {
+        toast({
+          title: `Invalid ${param.name}`,
+          description: 'Please enter a valid number.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
     }
 
     try {
@@ -191,30 +202,31 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       const abiCoder = new AbiCoder();
 
-      // For each selected transaction type, store the *single address*
+      // For each selected transaction type, store the assistant’s address.
       selectedTransactions.forEach(txTypeId => {
         const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
         dataKeys.push(typeConfigKey);
-
-        // Encode as a single address
-        const singleAddressEncoded = abiCoder.encode(
-          ['address'],
-          [assistantAddress]
-        );
-        dataValues.push(singleAddressEncoded);
+        const encodedAddress = abiCoder.encode(['address'], [assistantAddress]);
+        dataValues.push(encodedAddress);
       });
 
-      // Also encode the assistant’s settings (collectionAddr, burntPixId, iters)
+      // Build the assistant settings using the generic config.
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
       );
-      const settingsValue = abiCoder.encode(
-        ['address', 'bytes32', 'uint256'],
-        [network.burntPixCollectionAddress, burntPixId, Number(iters)]
-      );
+      const types = configParams.map(param => param.type);
+      const values = configParams.map(param => {
+        // Example: if you want one of the fields (say "collectionAddr") to use a default value,
+        // you can override here. Otherwise, use the value from state.
+        if (param.name === 'collectionAddr') {
+          return network.burntPixCollectionAddress;
+        }
+        // For uint types, you might want to convert to a number or BigNumber if necessary.
+        return fieldValues[param.name];
+      });
+      const settingsValue = abiCoder.encode(types, values);
       dataKeys.push(assistantSettingsKey);
-
       dataValues.push(settingsValue);
 
       // Write everything in one transaction
@@ -223,7 +235,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       toast({
         title: 'Success',
-        description: 'Burnt Pix Refiner Assistant settings saved successfully!',
+        description: 'Assistant settings saved successfully!',
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -266,14 +278,14 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
 
-      // For each currently subscribed type, clear the key with '0x'
+      // For each currently subscribed transaction type, clear the key.
       selectedTransactions.forEach(txTypeId => {
         const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
         dataKeys.push(typeConfigKey);
         dataValues.push('0x');
       });
 
-      // Also clear the assistant config
+      // Also clear the assistant config.
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
@@ -286,16 +298,18 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       toast({
         title: 'Success',
-        description: 'Unsubscribed from Burnt Pix Refiner Assistant!',
+        description: 'Unsubscribed from Assistant!',
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
 
-      // Clear local UI state
+      // Clear local UI state.
       setSelectedTransactions([]);
-      setBurntPixId('');
-      setIters('');
+      // Reset the field values.
+      const cleared: Record<string, string> = {};
+      configParams.forEach(param => (cleared[param.name] = ''));
+      setFieldValues(cleared);
       setIsUpSubscribedToAssistant(false);
       setIsLoadingTrans(false);
     } catch (err: any) {
@@ -345,12 +359,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         isClosable: true,
       });
 
-      // Clear local states
+      // Clear local states.
       setSelectedTransactions([]);
-      setBurntPixId('');
-      setIters('');
+      const cleared: Record<string, string> = {};
+      configParams.forEach(param => (cleared[param.name] = ''));
+      setFieldValues(cleared);
       setIsLoadingTrans(false);
-      // refresh page
+      // Refresh page.
       window.location.reload();
     } catch (err: any) {
       setIsLoadingTrans(false);
@@ -409,37 +424,46 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         {/* Assistant Settings */}
         <GridItem colSpan={2} mt={6}>
           <Text fontWeight="bold" fontSize="lg" mb={2}>
-            1. Configure Burnt Pix Refiner Assistant Settings
+            1. Configure Assistant Settings
           </Text>
         </GridItem>
 
-        <GridItem>
-          <Text>The id of the burnt pix you want to refine:</Text>
-        </GridItem>
-        <GridItem>
-          <Input
-            placeholder="0x1234... (64 chars)"
-            value={burntPixId}
-            w={80}
-            onChange={e => setBurntPixId(e.target.value)}
-          />
-        </GridItem>
-
-        <GridItem>
-          <Text>Iterations:</Text>
-        </GridItem>
-        <GridItem>
-          <Input
-            placeholder="e.g. 100"
-            value={iters}
-            onChange={e => setIters(e.target.value)}
-            w={20}
-          />
-        </GridItem>
+        {configParams.map(param => (
+          <React.Fragment key={param.name}>
+            <GridItem>
+              <Text>
+                {param.name} ({param.type}):
+              </Text>
+            </GridItem>
+            <GridItem>
+              <Input
+                placeholder={param.name}
+                value={
+                  // If this is a field that should be pre-populated (e.g. collectionAddr)
+                  // you can override here. Otherwise, use the state.
+                  fieldValues[param.name] ||
+                  (param.name === 'collectionAddr'
+                    ? network.burntPixCollectionAddress
+                    : '')
+                }
+                onChange={e =>
+                  setFieldValues({
+                    ...fieldValues,
+                    [param.name]: e.target.value,
+                  })
+                }
+                // Example: you might set a smaller width for number fields.
+                w={param.type.startsWith('uint') ? 20 : 80}
+                // Optionally disable fields that should not be edited.
+                isDisabled={param.name === 'collectionAddr'}
+              />
+            </GridItem>
+          </React.Fragment>
+        ))}
 
         {/* Action Buttons */}
         <GridItem mt={4}>
-          {isUpSubscribedToAssistant ? (
+          {isUpSubscribedToAssistant && (
             <Button
               size="sm"
               bg="orange.500"
@@ -453,7 +477,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             >
               Unsubscribe Assistant
             </Button>
-          ) : null}
+          )}
           <Button
             size="sm"
             bg="orange.500"

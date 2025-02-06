@@ -1,3 +1,6 @@
+import { ExecutiveAssistant } from "@/constants/CustomTypes";
+import { burntPixRefinerMainnet, burntPixRefinerTestnet } from "@/constants/assistantsConfig";
+
 interface ChainInfo {
   name: string;
   displayName: string;
@@ -15,6 +18,7 @@ interface ChainInfo {
   icon: string;
   universalEverything: string;
   luksoSiteName: string;
+  assistants: ExecutiveAssistant[];
 }
 
 export enum CHAINS {
@@ -40,6 +44,9 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     icon: '/lyx_icon_mainnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'mainnet',
+    assistants: [
+      burntPixRefinerMainnet
+    ],
   },
   '4201': {
     name: 'LUKSO Testnet',
@@ -58,6 +65,9 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     icon: '/lyx_icon_testnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'testnet',
+    assistants: [
+      burntPixRefinerTestnet
+    ],
   },
 };
 

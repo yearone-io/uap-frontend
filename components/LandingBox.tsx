@@ -3,17 +3,11 @@ import React from 'react';
 import { Flex, Image, Text, VStack, Wrap, WrapItem } from '@chakra-ui/react';
 
 import AssistantSmallCard from '@/components/AssistantSmallCard';
-import {
-  burntPixRefinerMainnet,
-  burntPixRefinerTestnet,
-} from '@/constants/assistantsConfig';
-import { CHAINS } from '@/constants/supportedNetworks';
+import { CHAINS, networkNameToIdMapping, supportedNetworks } from "@/constants/supportedNetworks";
 
 const LandingBox = ({ networkName }: { networkName: CHAINS }) => {
-  const burntPixRefiner =
-    networkName === CHAINS.LUKSO_TESTNET
-      ? burntPixRefinerTestnet
-      : burntPixRefinerMainnet;
+
+  const networkConfig = supportedNetworks[networkNameToIdMapping[networkName]];
   return (
     <Flex
       minHeight="inherit"
@@ -75,9 +69,13 @@ const LandingBox = ({ networkName }: { networkName: CHAINS }) => {
         justify="center"
         w="100%" // Full width for cards
       >
-        <WrapItem>
-          <AssistantSmallCard assistant={burntPixRefiner} includeLink />
-        </WrapItem>
+        {
+          networkConfig.assistants.map(assistant => (
+            <WrapItem>
+              <AssistantSmallCard assistant={assistant} includeLink />
+            </WrapItem>
+          ))
+        }
       </Wrap>
     </Flex>
   );

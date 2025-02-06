@@ -17,6 +17,7 @@ import TransactionTypeBlock, {
 } from './TransactionTypeBlock';
 import { AbiCoder, BrowserProvider, Eip1193Provider } from 'ethers';
 import {
+  customDecodeAddresses,
   customEncodeAddresses,
   generateMappingKey,
   toggleUniveralAssistantsSubscribe,
@@ -106,10 +107,9 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             return; // no address stored
           }
           // Decode as a single address (32 bytes expected)
-          const storedAddress = abiCoder.decode(
-            ['address'],
-            encodedValue
-          )[0] as string;
+          const storedAddresses = customDecodeAddresses(encodedValue);
+          // todo: for now it will only have one address
+          const storedAddress = storedAddresses[0];
 
           // If it matches our assistant’s address, we push that txTypeId
           if (storedAddress.toLowerCase() === assistantAddress.toLowerCase()) {

@@ -13,6 +13,8 @@ interface ChainInfo {
   defaultURDUP: string;
   hasUPSupport: boolean;
   icon: string;
+  universalEverything: string;
+  luksoSiteName: string;
 }
 
 export enum CHAINS {
@@ -36,6 +38,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     burntPixCollectionAddress: '0x',
     hasUPSupport: true,
     icon: '/lyx_icon_mainnet.svg',
+    universalEverything: 'https://universaleverything.io',
+    luksoSiteName: 'mainnet',
   },
   '4201': {
     name: 'LUKSO Testnet',
@@ -52,6 +56,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     defaultURDUP: '0x7870C5B8BC9572A8001C3f96f7ff59961B23500D',
     hasUPSupport: true,
     icon: '/lyx_icon_testnet.svg',
+    universalEverything: 'https://universaleverything.io',
+    luksoSiteName: 'testnet',
   },
 };
 

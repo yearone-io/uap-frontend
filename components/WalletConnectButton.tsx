@@ -105,6 +105,7 @@ export default function WalletConnectButton() {
           console.log('Signature:', signature);
         } catch (error) {
           console.error('Error signing the message:', error);
+          disconnect();
           // If error, allow future sign attempts
           signTriggeredRef.current = false;
         }

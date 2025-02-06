@@ -189,7 +189,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       });
       return;
     }
-
+  
     if (!burntPixId || !iters) {
       toast({
         title: 'Incomplete data',
@@ -220,50 +220,61 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       });
       return;
     }
-
+  
     try {
       setIsLoadingTrans(true);
       const signer = await getSigner();
       const upContract = ERC725__factory.connect(address, signer);
       const abiCoder = new AbiCoder();
-
+  
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
-
-      // Save the burn‑pix assistant configuration for each selected transaction type.
+  
+      // ===============================
+      // TYPE CONFIGURATION
+      // ===============================
+      // For most transaction types, we write a single address (the burn‑pix assistant).
+      // However, for LSP0ValueReceived we want to combine the assistants.
       selectedTransactions.forEach(txTypeId => {
-        const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
-        dataKeys.push(typeConfigKey);
-        const singleAddressEncoded = abiCoder.encode(
-          ['address'],
-          [donationAssistantAddress] // needs the 2 assistants
-        );
-        dataValues.push(singleAddressEncoded);
+        if (txTypeId !== LSP1_TYPE_IDS.LSP0ValueReceived) {
+          // For other types, simply encode the burn‑pix assistant address.
+          const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
+          dataKeys.push(typeConfigKey);
+          const encodedValue = abiCoder.encode(['address'], [assistantAddress]);
+          dataValues.push(encodedValue);
+        }
       });
-
-      // Save the burn‑pix assistant's settings (collectionAddr, burntPixId, iters).
-      const assistantSettingsKey = generateMappingKey(
-        'UAPExecutiveConfig',
-        assistantAddress
-      );
+  
+      // For LSP0ValueReceived, combine both assistants if donation is enabled.
+      if (selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived)) {
+        const typeConfigKey = generateMappingKey('UAPTypeConfig', LSP1_TYPE_IDS.LSP0ValueReceived);
+        let assistants: string[] = [assistantAddress]; // always include burn‑pix assistant
+        if (!donationCheckboxDisabled && isSaveChecked) {
+          assistants.push(donationAssistantAddress);
+        }
+        // Use the custom encoder to pack a uint16 length + the addresses
+        const encodedAssistants = abiCoder.encode(['address[]'], [assistants]);
+        dataKeys.push(typeConfigKey);
+        dataValues.push(encodedAssistants);
+      }
+  
+      // ===============================
+      // EXECUTIVE CONFIGURATION
+      // ===============================
+      // Save burn‑pix assistant settings
+      const assistantSettingsKey = generateMappingKey('UAPExecutiveConfig', assistantAddress);
       const settingsValue = abiCoder.encode(
         ['address', 'bytes32', 'uint256'],
         [network.burntPixCollectionAddress, burntPixId, Number(iters)]
       );
-      // dataKeys.push(assistantSettingsKey);
-      // dataValues.push(settingsValue);
-
-      // Save Donation Assistant configuration only if the donation checkbox is not disabled
-      // (i.e. donation assistant is not already configured) and the checkbox is checked.
-      if (
-        !donationCheckboxDisabled &&
-        selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
-        isSaveChecked
-      ) {
-        const donationAssistantConfigKey = generateMappingKey(
-          'UAPExecutiveConfig',
-          donationAssistantAddress
-        );
+      dataKeys.push(assistantSettingsKey);
+      dataValues.push(settingsValue);
+  
+      // Save donation assistant configuration if applicable.
+      if (!donationCheckboxDisabled &&
+          selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
+          isSaveChecked) {
+        const donationAssistantConfigKey = generateMappingKey('UAPExecutiveConfig', donationAssistantAddress);
         const destinationAddress = '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009';
         const donationAssistantSettingsValue = abiCoder.encode(
           ['address', 'uint256'],
@@ -272,10 +283,11 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         dataKeys.push(donationAssistantConfigKey);
         dataValues.push(donationAssistantSettingsValue);
       }
+  
       // Write all configurations in one transaction.
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
-
+  
       toast({
         title: 'Success',
         description: 'Burnt Pix Refiner Assistant settings saved successfully!',
@@ -297,6 +309,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       });
     }
   };
+  
 
   // --------------------------------------------------------------------------
   // Unsubscribe only this Assistant

@@ -45,13 +45,15 @@ const URDSetup: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Error updating permissions', error);
-      toast({
-        title: 'Error',
-        description: `Error giving UP Extension permissions: ${error.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      if(!error.message.includes("user rejected action")) {
+        toast({
+          title: 'Error',
+          description: `Error giving UP Extension permissions: ${error.message}`,
+          status: 'error',
+          duration: null,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -77,13 +79,15 @@ const URDSetup: React.FC = () => {
         'Error subscribing to UAP Universal Receiver Delegate',
         error
       );
-      toast({
-        title: 'Error',
-        description: `EError subscribing to UAP Universal Receiver Delegate: ${error.message}`,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      if(!error.message.includes("user rejected action")) {
+        toast({
+          title: 'Error',
+          description: `EError subscribing to UAP Universal Receiver Delegate: ${error.message}`,
+          status: 'error',
+          duration: null,
+          isClosable: true,
+        });
+      }
     }
   };
 

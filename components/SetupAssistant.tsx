@@ -29,7 +29,14 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
-
+import {
+  // ...other imports
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 type SetupAssistantProps = {
   assistantAddress: string;
 };
@@ -41,6 +48,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   // This is the donation assistant address used to build the key.
   // (It may be different from the value stored on-chain.)
   const donationAssistantAddress = '0x51abDe764f6ccA1beAB04e9c864b95d28Bb92116';
+  const destinationAddress = '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009';
 
   const [burntPixId, setBurntPixId] = useState<string>('');
   const [iters, setIters] = useState<string>('');
@@ -382,9 +390,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         // Use the custom encoder to pack a uint16 length + the addresses
         // const encodedAssistants = abiCoder.encode(['address[]'], [assistants]);
         // dataValues.push(encodedAssistants);
-        dataValues.push(
-          customEncodeAddresses(assistants)
-        );
+        dataValues.push(customEncodeAddresses(assistants));
       }
 
       // ===============================
@@ -412,7 +418,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           'UAPExecutiveConfig',
           donationAssistantAddress
         );
-        const destinationAddress = '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009';
         const donationAssistantSettingsValue = abiCoder.encode(
           ['address', 'uint256'],
           [destinationAddress, DONATION_PERCENTAGE]
@@ -771,7 +776,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         </Flex>
       </Flex>
       <Flex gap={2}>
-        <Button
+        {/* <Button
           size="sm"
           colorScheme="red"
           variant={'outline'}
@@ -780,7 +785,31 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           isDisabled={isLoadingTrans}
         >
           Unsubscribe Assistants
-        </Button>
+        </Button> */}
+        <Menu>
+          <MenuButton
+            as={Button}
+            size="sm"
+            colorScheme="red"
+            variant="outline"
+            rightIcon={<ChevronDownIcon />}
+            isLoading={isLoadingTrans}
+            isDisabled={isLoadingTrans}
+          >
+            Unsubscribe Assistants
+          </MenuButton>
+          <MenuList>
+            <MenuItem onClick={() => alert('not implemented')}>
+              Unsubscribe Burnt Pix Assistant
+            </MenuItem>
+            <MenuItem onClick={() => alert('not implemented')}>
+              Unsubscribe Donation Assistant
+            </MenuItem>
+            <MenuItem onClick={handleUnsubscribeURD}>
+              Unsubscribe Protocol
+            </MenuItem>
+          </MenuList>
+        </Menu>
         <Button
           size="sm"
           bg="orange.500"

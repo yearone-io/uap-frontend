@@ -35,11 +35,13 @@ type ConfigParam = {
 type SetupAssistantProps = {
   assistantAddress: string;
   configParams: ConfigParam[];
+  supportedTransactionTypes: string[]; // only these types will be rendered
 };
 
 const SetupAssistant: React.FC<SetupAssistantProps> = ({
                                                          assistantAddress,
                                                          configParams,
+                                                         supportedTransactionTypes
                                                        }) => {
   // Instead of separate state variables, we hold all configurable fields in one object.
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
@@ -406,8 +408,11 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
               py={2}
               px={7}
             >
-              {Object.entries(transactionTypeMap).map(
-                ([key, { id, label, typeName, icon, iconPath }]) => (
+              {Object.entries(transactionTypeMap)
+                .filter(([key, { id }]) =>
+                  supportedTransactionTypes.includes(id)
+                )
+                .map(([key, { id, label, typeName, icon, iconPath }]) => (
                   <Checkbox key={key} value={id}>
                     <TransactionTypeBlock
                       label={label}
@@ -416,8 +421,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
                       iconPath={iconPath}
                     />
                   </Checkbox>
-                )
-              )}
+                ))}
             </VStack>
           </CheckboxGroup>
         </Flex>
@@ -450,7 +454,10 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
               }}
               onPaste={(e) => {
                 const pastedData = e.clipboardData.getData('text');
-                if (param.type === 'bytes32' && /^0x[0-9A-Fa-f]{40}$/.test(pastedData)) {
+                if (
+                  param.type === 'bytes32' &&
+                  /^0x[0-9A-Fa-f]{40}$/.test(pastedData)
+                ) {
                   e.preventDefault();
                   setFieldValues({
                     ...fieldValues,

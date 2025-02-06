@@ -46,8 +46,9 @@ export default function CatalogPage({
                     borderColor="uap.font"
                     borderRadius={10}
                     p={4}
+                    key={assistant.address}
                   >
-                  <AssistantInfo key={assistant.address} assistant={assistant} includeLink />
+                  <AssistantInfo  assistant={assistant} includeLink />
                   </Box>
                 ))
               }

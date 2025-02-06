@@ -1,5 +1,5 @@
 import { ExecutiveAssistant } from "@/constants/CustomTypes";
-import { burntPixRefinerMainnet, burntPixRefinerTestnet } from "@/constants/assistantsConfig";
+import { burntPixRefinerMainnet, burntPixRefinerTestnet, donationAssistantTestnet } from "@/constants/assistantsConfig";
 
 interface ChainInfo {
   name: string;
@@ -63,7 +63,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'testnet',
     assistants: [
-      burntPixRefinerTestnet
+      burntPixRefinerTestnet,
+      donationAssistantTestnet
     ],
   },
 };

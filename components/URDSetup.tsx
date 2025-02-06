@@ -69,11 +69,6 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
         isClosable: true,
       });
 
-      // Wait for the transaction to be confirmed (if applicable)
-      if (tx.wait) {
-        await tx.wait();
-      }
-
       toast({
         title: 'Success',
         description: 'Permissions granted.',
@@ -125,11 +120,6 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
         duration: 5000,
         isClosable: true,
       });
-
-      // Wait for the transaction to be confirmed (if applicable)
-      if (tx.wait) {
-        await tx.wait();
-      }
 
       toast({
         title: 'Success',

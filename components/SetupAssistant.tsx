@@ -39,54 +39,62 @@ type SetupAssistantProps = {
 };
 
 const SetupAssistant: React.FC<SetupAssistantProps> = ({
-                                                         assistantAddress,
-                                                         configParams,
-                                                         supportedTransactionTypes
-                                                       }) => {
-  // Instead of separate state variables, we hold all configurable fields in one object.
-  const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    configParams.forEach((param) => {
-      initial[param.name] = "";
-    });
-    return initial;
-  });
-  const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
-  const [isUpSubscribedToAssistant, setIsUpSubscribedToAssistant] =
-    useState<boolean>(false);
-  const [isLoadingTrans, setIsLoadingTrans] = useState<boolean>(true);
-
+  assistantAddress,
+  configParams,
+  supportedTransactionTypes,
+}) => {
   const toast = useToast({ position: 'bottom-left' });
   const { walletProvider } = useWeb3ModalProvider();
   const { address } = useWeb3ModalAccount();
   const { network } = useNetwork();
 
-  // Helper: Convert an Ethereum address (42-character hex) to a padded 32-byte hex string.
-  const convertAddressToBytes32 = (addr: string): string => {
-    // "0x" + 40 hex characters becomes padded to 66 characters (0x + 64 hex)
-    return '0x' + '0'.repeat(24) + addr.slice(2);
-  };
+  // Configuration field values
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    configParams.forEach((param) => {
+      initial[param.name] = '';
+    });
+    return initial;
+  });
 
-  // Ethers helper: get the signer.
+  // Which transaction types currently have this assistant
+  const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
+
+  // Each transaction-type ID -> array of addresses
+  const [typeConfigAddresses, setTypeConfigAddresses] = useState<
+    Record<string, string[]>
+  >({});
+
+  const [isUpSubscribedToAssistant, setIsUpSubscribedToAssistant] =
+    useState<boolean>(false);
+  const [isLoadingTrans, setIsLoadingTrans] = useState<boolean>(true);
+
+  // --------------------------------------------------------------------------
+  // Helpers
+  // --------------------------------------------------------------------------
   const getSigner = async () => {
-    if (!walletProvider || !address)
-      throw new Error('No wallet/address found!');
+    if (!walletProvider || !address) throw new Error('No wallet/address found!');
     const provider = new BrowserProvider(walletProvider as Eip1193Provider);
     return provider.getSigner(address);
   };
 
+  const convertAddressToBytes32 = (addr: string): string => {
+    return '0x' + '0'.repeat(24) + addr.slice(2);
+  };
+
   // --------------------------------------------------------------------------
-  // On Page Load, fetch existing configuration.
+  // On Page Load: fetch existing configuration
   // --------------------------------------------------------------------------
   useEffect(() => {
     if (!address) return;
 
     const loadExistingConfig = async () => {
       try {
+        setIsLoadingTrans(true);
         const signer = await getSigner();
         const upContract = ERC725__factory.connect(address, signer);
 
-        // Build the keys for each transaction type.
+        // Get keys for all transaction types
         const allTypeIds = Object.values(transactionTypeMap).map(
           (obj) => obj.id
         );
@@ -94,13 +102,13 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           generateMappingKey('UAPTypeConfig', id)
         );
 
-        // Build the key for the assistant config.
+        // Assistant's config key
         const assistantConfigKey = generateMappingKey(
           'UAPExecutiveConfig',
           assistantAddress
         );
 
-        // Fetch all keys in one call.
+        // Fetch them all
         const allData = await upContract.getDataBatch([
           ...allTypeConfigKeys,
           assistantConfigKey,
@@ -110,27 +118,37 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
         const abiCoder = new AbiCoder();
         const newlySelectedTx: string[] = [];
+        const newTypeConfigAddresses: Record<string, string[]> = {};
 
-        // For each transaction type, decode the stored address (using your custom decoder).
+        // Decode each transaction type's addresses
         typeConfigValues.forEach((encodedValue, index) => {
-          if (!encodedValue || encodedValue === '0x') return;
+          const typeId = allTypeIds[index];
+          if (!encodedValue || encodedValue === '0x') {
+            newTypeConfigAddresses[typeId] = [];
+            return;
+          }
           const storedAddresses = customDecodeAddresses(encodedValue);
-          // (For now we assume there is only one address stored.)
-          const storedAddress = storedAddresses[0];
+          newTypeConfigAddresses[typeId] = storedAddresses;
+
+          // If the assistant is in the array, mark this type as selected
           if (
-            storedAddress.toLowerCase() === assistantAddress.toLowerCase()
+            storedAddresses
+              .map((addr) => addr.toLowerCase())
+              .includes(assistantAddress.toLowerCase())
           ) {
-            newlySelectedTx.push(allTypeIds[index]);
+            newlySelectedTx.push(typeId);
           }
         });
 
-        // If the assistant config exists, decode it using the provided config types.
+        setTypeConfigAddresses(newTypeConfigAddresses);
+        setSelectedTransactions(newlySelectedTx);
+
+        // Decode assistant's config if present
         if (assistantConfigValue && assistantConfigValue !== '0x') {
           const types = configParams.map((param) => param.type);
           const decoded = abiCoder.decode(types, assistantConfigValue);
           const newFieldValues: Record<string, string> = {};
           configParams.forEach((param, index) => {
-            // Convert the decoded value to a string (e.g. for BigNumbers).
             newFieldValues[param.name] = decoded[index].toString();
           });
           setFieldValues(newFieldValues);
@@ -138,12 +156,10 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         } else {
           setIsUpSubscribedToAssistant(false);
         }
-
-        setSelectedTransactions(newlySelectedTx);
-        setIsLoadingTrans(false);
       } catch (err) {
-        setIsLoadingTrans(false);
         console.error('Failed to load existing config:', err);
+      } finally {
+        setIsLoadingTrans(false);
       }
     };
 
@@ -165,7 +181,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       return;
     }
 
-    // Validate that all fields are provided and meet basic type requirements.
+    // Validate fields
     for (const param of configParams) {
       const value = fieldValues[param.name];
       if (!value) {
@@ -209,29 +225,61 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       const dataValues: string[] = [];
       const abiCoder = new AbiCoder();
 
-      // For each selected transaction type, store the assistant’s address.
-      selectedTransactions.forEach((txTypeId) => {
-        const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
-        dataKeys.push(typeConfigKey);
-        dataValues.push(customEncodeAddresses([assistantAddress]));
-      });
+      // Update addresses for every transaction type
+      const allTypeIds = Object.values(transactionTypeMap).map(
+        (obj) => obj.id
+      );
+      const updatedTypeConfigAddresses = { ...typeConfigAddresses };
 
-      // Build the assistant settings using the generic config.
+      allTypeIds.forEach((typeId) => {
+        let addresses = [...(updatedTypeConfigAddresses[typeId] || [])];
+
+        if (supportedTransactionTypes.includes(typeId)) {
+          const existingIndex = addresses.findIndex(
+            (a) => a.toLowerCase() === assistantAddress.toLowerCase()
+          );
+          // If user selected it, ensure the assistant is in the array
+          if (selectedTransactions.includes(typeId)) {
+            if (existingIndex === -1) {
+              addresses.unshift(assistantAddress);
+            }
+          } else {
+            // If user un-selected it, remove from the array
+            if (existingIndex !== -1) {
+              addresses.splice(existingIndex, 1);
+            }
+          }
+        }
+
+        updatedTypeConfigAddresses[typeId] = addresses;
+
+        // Encode or clear
+        const typeConfigKey = generateMappingKey('UAPTypeConfig', typeId);
+        if (addresses.length === 0) {
+          dataKeys.push(typeConfigKey);
+          dataValues.push('0x');
+        } else {
+          dataKeys.push(typeConfigKey);
+          dataValues.push(customEncodeAddresses(addresses));
+        }
+      });
+      
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
       );
       const types = configParams.map((param) => param.type);
-      const values = configParams.map((param) => {
-        return fieldValues[param.name];
-      });
+      const values = configParams.map((param) => fieldValues[param.name]);
       const settingsValue = abiCoder.encode(types, values);
+
       dataKeys.push(assistantSettingsKey);
       dataValues.push(settingsValue);
 
-      // Write all configuration keys in one transaction.
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
+
+      setTypeConfigAddresses(updatedTypeConfigAddresses);
+      setIsUpSubscribedToAssistant(true);
 
       toast({
         title: 'Success',
@@ -241,7 +289,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         isClosable: true,
       });
       setIsLoadingTrans(false);
-      setIsUpSubscribedToAssistant(true);
     } catch (err: any) {
       setIsLoadingTrans(false);
       console.error('Error setting configuration', err);
@@ -256,7 +303,8 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   };
 
   // --------------------------------------------------------------------------
-  // Unsubscribe only this Assistant
+  // Unsubscribe *only* this Assistant from all transaction types
+  // (Do NOT remove or clear the assistant's UAPExecutiveConfig)
   // --------------------------------------------------------------------------
   const handleUnsubscribeAssistant = async () => {
     if (!address) {
@@ -277,44 +325,62 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
 
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
+      const updatedTypeConfigAddresses = { ...typeConfigAddresses };
 
-      // Clear each transaction type subscription.
-      selectedTransactions.forEach((txTypeId) => {
-        const typeConfigKey = generateMappingKey('UAPTypeConfig', txTypeId);
-        dataKeys.push(typeConfigKey);
-        dataValues.push('0x');
-      });
+      Object.entries(updatedTypeConfigAddresses).forEach(
+        ([typeId, addresses]) => {
+          const idx = addresses.findIndex(
+            (a) => a.toLowerCase() === assistantAddress.toLowerCase()
+          );
+          if (idx !== -1) {
+            addresses.splice(idx, 1);
+          }
 
-      // Clear the assistant config.
-      const assistantSettingsKey = generateMappingKey(
-        'UAPExecutiveConfig',
-        assistantAddress
+          const typeConfigKey = generateMappingKey('UAPTypeConfig', typeId);
+          if (addresses.length === 0) {
+            // If empty, set value to '0x'
+            dataKeys.push(typeConfigKey);
+            dataValues.push('0x');
+          } else {
+            dataKeys.push(typeConfigKey);
+            dataValues.push(customEncodeAddresses(addresses));
+          }
+        }
       );
-      dataKeys.push(assistantSettingsKey);
-      dataValues.push('0x');
+
+      // Note: We do *not* remove the assistant's UAPExecutiveConfig here,
+      // since we want to preserve settings if they resubscribe later.
+
+      if (dataKeys.length === 0) {
+        setIsLoadingTrans(false);
+        toast({
+          title: 'No Removal Needed',
+          description: 'Assistant was not found in any types to remove.',
+          status: 'info',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
+      
+      setTypeConfigAddresses(updatedTypeConfigAddresses);
+      setSelectedTransactions([]);
+      setIsLoadingTrans(false);
 
       toast({
         title: 'Success',
-        description: 'Unsubscribed from Assistant!',
+        description: 'Successfully removed this Assistant from all types!',
         status: 'success',
         duration: 5000,
         isClosable: true,
       });
-
-      // Clear the local UI state.
-      setSelectedTransactions([]);
-      const cleared: Record<string, string> = {};
-      configParams.forEach((param) => (cleared[param.name] = ''));
-      setFieldValues(cleared);
-      setIsUpSubscribedToAssistant(false);
-      setIsLoadingTrans(false);
     } catch (err: any) {
       setIsLoadingTrans(false);
-      console.error('Error unsubscribing assistant', err);
-      if (!err.message.includes("user rejected action")) {
+      console.error('Error unsubscribing this assistant', err);
+      if (!err.message.includes('user rejected action')) {
         toast({
           title: 'Error',
           description: `Error unsubscribing assistant: ${err.message}`,
@@ -349,7 +415,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
         address,
         network.protocolAddress,
         network.defaultURDUP,
-        true // uninstall
+        true
       );
 
       toast({
@@ -366,12 +432,11 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
       configParams.forEach((param) => (cleared[param.name] = ''));
       setFieldValues(cleared);
       setIsLoadingTrans(false);
-      // Refresh the page.
       window.location.reload();
     } catch (err: any) {
       setIsLoadingTrans(false);
       console.error('Error uninstalling UAP:', err);
-      if (!err.message.includes("user rejected action")) {
+      if (!err.message.includes('user rejected action')) {
         toast({
           title: 'Error',
           description: `Error uninstalling UAP: ${err.message}`,
@@ -384,14 +449,16 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
   };
 
   // --------------------------------------------------------------------------
-  // Render the component
+  // Render
   // --------------------------------------------------------------------------
   return (
     <Flex p={6} flexDirection="column" gap={8}>
       <Text fontWeight="bold" fontSize="lg">
         Assistant Instructions
       </Text>
+
       <Flex gap={4} flexDirection="column">
+        {/* Transaction Type Selection */}
         <Flex flexDirection="row" gap={4} maxWidth="550px">
           <Text fontWeight="bold" fontSize="sm">
             Select the transaction types that you will engage this assistant for:
@@ -409,9 +476,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
               px={7}
             >
               {Object.entries(transactionTypeMap)
-                .filter(([key, { id }]) =>
-                  supportedTransactionTypes.includes(id)
-                )
+                .filter(([_, { id }]) => supportedTransactionTypes.includes(id))
                 .map(([key, { id, label, typeName, icon, iconPath }]) => (
                   <Checkbox key={key} value={id}>
                     <TransactionTypeBlock
@@ -425,7 +490,6 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
             </VStack>
           </CheckboxGroup>
         </Flex>
-        {/* Dynamically render each configuration field */}
         {configParams.map((param) => (
           <Flex key={param.name} flexDirection="row" gap={4} maxWidth="550px">
             <Text fontWeight="bold" fontSize="sm">
@@ -440,19 +504,21 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
                   [param.name]: e.target.value,
                 })
               }
-              // For bytes32 fields, convert an Ethereum address (if pasted or on blur)
               onBlur={() => {
+                // Auto-convert address => bytes32 if needed
+                const val = fieldValues[param.name];
                 if (
                   param.type === 'bytes32' &&
-                  /^0x[0-9A-Fa-f]{40}$/.test(fieldValues[param.name])
+                  /^0x[0-9A-Fa-f]{40}$/.test(val)
                 ) {
                   setFieldValues({
                     ...fieldValues,
-                    [param.name]: convertAddressToBytes32(fieldValues[param.name]),
+                    [param.name]: convertAddressToBytes32(val),
                   });
                 }
               }}
               onPaste={(e) => {
+                // Same auto-conversion on paste
                 const pastedData = e.clipboardData.getData('text');
                 if (
                   param.type === 'bytes32' &&
@@ -470,6 +536,7 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           </Flex>
         ))}
       </Flex>
+
       <Flex gap={2}>
         <Button
           size="sm"
@@ -480,6 +547,16 @@ const SetupAssistant: React.FC<SetupAssistantProps> = ({
           isDisabled={isLoadingTrans}
         >
           Unsubscribe Assistants
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          colorScheme="orange"
+          onClick={handleUnsubscribeAssistant}
+          isLoading={isLoadingTrans}
+          isDisabled={isLoadingTrans || !isUpSubscribedToAssistant}
+        >
+          Unsubscribe This Assistant
         </Button>
         <Button
           size="sm"

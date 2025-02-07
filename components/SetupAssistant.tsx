@@ -237,13 +237,15 @@ const SetupAssistant: React.FC<{
     } catch (err: any) {
       setIsLoadingTrans(false);
       console.error('Error setting configuration', err);
-      toast({
-        title: 'Error',
-        description: `Error setting configuration: ${err.message}`,
-        status: 'error',
-        duration: null,
-        isClosable: true,
-      });
+      if (!err.message.includes('user rejected action')) {
+        toast({
+          title: 'Error',
+          description: `Error setting configuration: ${err.message}`,
+          status: 'error',
+          duration: null,
+          isClosable: true,
+        });
+      }
     }
   };
 
@@ -420,7 +422,13 @@ const SetupAssistant: React.FC<{
         </Flex>
         {/* Dynamically render each configuration field */}
         {configParams.map(param => (
-          <Flex key={param.name} flexDirection="row" gap={4} maxWidth="550px">
+          <Flex
+            key={param.name}
+            flexDirection="row"
+            gap={4}
+            maxWidth="550px"
+            display={param.hidden ? 'none' : undefined}
+          >
             <Text fontWeight="bold" fontSize="sm" w="70%">
               {param.description}
             </Text>

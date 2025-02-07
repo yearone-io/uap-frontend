@@ -24,7 +24,7 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
 };
 
 export const donationAssistantTestnet: ExecutiveAssistant = {
-  address: '0x0326D8d0427f785AB755dd4E3A6cEd1f99a86A13',
+  address: '0x4E88F07CA39EBcC589AF2C4f6f5246Df4c820536',
   name: 'Donation Assistant',
   description:
     'Donate LYX to an external wallet in every transaction that you sends you LYX.',

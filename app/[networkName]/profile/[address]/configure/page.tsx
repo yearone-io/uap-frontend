@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
-import { formatAddress } from '@/utils/utils';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -13,15 +12,6 @@ export default function ProfileConfigurePage({
 }) {
   const { address, networkName } = params;
   const network = getChainIdByUrlName(networkName);
-
-  const formatAddressForBreadcrumbs = (address: string | undefined) => {
-    const truncatedAddress = formatAddress(address ? address : '');
-    if (truncatedAddress === '0x') {
-      return '';
-    } else {
-      return truncatedAddress;
-    }
-  };
 
   const breadCrumbs = Breadcrumbs({
     items: [

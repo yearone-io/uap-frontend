@@ -16,9 +16,26 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
     LSP1_TYPE_IDS.LSP0ValueReceived,
   ],
   configParams: [
-    { name: 'iterations', type: 'uint256' },
     { name: 'collectionAddress', type: 'address' },
     { name: 'burntPixId', type: 'bytes32' },
+    { name: 'iterations', type: 'uint256' },
+  ],
+  chainId: 4201,
+};
+
+export const donationAssistantTestnet: ExecutiveAssistant = {
+  address: '0x4E88F07CA39EBcC589AF2C4f6f5246Df4c820536',
+  name: 'Donation Assistant',
+  description:
+    'Donate LYX to an external wallet in every transaction that you sends you LYX.',
+  iconPath: '/assistants/donations.jpg',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Executive',
+  creatorAddress: '0xfE67D89DeBEC38592aB2FeD217b8bbb28851DF88',
+  supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+  configParams: [
+    { name: 'destinationAddress', type: 'address' },
+    { name: 'donationPercentage', type: 'uint256' },
   ],
   chainId: 4201,
 };
@@ -49,6 +66,7 @@ const testnetAssistants: {
   [key: string]: ExecutiveAssistant | ScreenerAssistant;
 } = {
   [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
+  [donationAssistantTestnet.address.toLowerCase()]: donationAssistantTestnet,
 };
 
 const mainnetAssistants: {

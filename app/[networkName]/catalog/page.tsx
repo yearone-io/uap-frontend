@@ -8,7 +8,6 @@ import {
   supportedNetworks,
 } from '@/constants/supportedNetworks';
 
-
 export default function CatalogPage({
   params,
 }: {

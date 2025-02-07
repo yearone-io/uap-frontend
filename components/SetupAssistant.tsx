@@ -26,7 +26,6 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
-import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 const SetupAssistant: React.FC<{
   config: ExecutiveAssistant;
@@ -154,6 +153,22 @@ const SetupAssistant: React.FC<{
         } else {
           setIsUpSubscribedToAssistant(false);
         }
+
+        if (donationConfig) {
+          const donationAssistantSettingsKey = generateMappingKey(
+            'UAPExecutiveConfig',
+            donationConfig.donationAssistanAddress
+          );
+          const donationAssistantValue = await upContract.getData(
+            donationAssistantSettingsKey
+          );
+          if (donationAssistantValue && donationAssistantValue !== '0x') {
+            // Donation assistant is already configured:
+            // Disable the donation checkbox and mark it as checked.
+            setDonationCheckboxDisabled(true);
+            setIsDonatingChecked(true);
+          }
+        }
       } catch (err) {
         console.error('Failed to load existing config:', err);
       } finally {
@@ -276,7 +291,7 @@ const SetupAssistant: React.FC<{
           }
         }
       });
-
+      // todo what happens if it is already configured?
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
@@ -341,6 +356,7 @@ const SetupAssistant: React.FC<{
   // Unsubscribe *only* this Assistant from all transaction types
   // (Do NOT remove or clear the assistant's UAPExecutiveConfig)
   // --------------------------------------------------------------------------
+  // todo what happens with the donation??
   const handleUnsubscribeAssistant = async () => {
     if (!address) {
       toast({
@@ -608,6 +624,7 @@ const SetupAssistant: React.FC<{
           onClick={handleUnsubscribeURD}
           isLoading={isLoadingTrans}
           isDisabled={isLoadingTrans}
+          // todo this is not unsubscribing assistantes. they will back in place if URD is reinstalled
         >
           Unsubscribe Assistants
         </Button>

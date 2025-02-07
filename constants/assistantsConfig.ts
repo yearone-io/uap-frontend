@@ -4,7 +4,7 @@ import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 const yearOneDonatioMainnetAddress = '';
 const yearOneDonatioTestnetAddress =
   '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009';
-const yearOneDonationPercentage = 10;
+const yearOneDonationPercentage = 1; // 1%
 
 export const donationAssistantTestnet: ExecutiveAssistant = {
   address: '0x4E88F07CA39EBcC589AF2C4f6f5246Df4c820536',

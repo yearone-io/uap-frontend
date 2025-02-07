@@ -154,11 +154,6 @@ export default function ExecutiveAssistantConfigurePage({
       return <URDSetup extensionHasPermissions={!isMissingPermissions} />;
     }
 
-    // return <SetupAssistant assistantAddress={params.assistantAddress}
-    //                        configParams={assistantInfo.configParams}
-    //                        supportedTransactionTypes={assistantInfo.supportedTransactionTypes}
-    //                        donationconfig={assistantInfo.donationConfig}
-    // />;
     return <SetupAssistant config={assistantInfo as ExecutiveAssistant} />;
   };
 

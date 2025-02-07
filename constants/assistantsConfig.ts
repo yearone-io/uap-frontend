@@ -16,59 +16,26 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
     LSP1_TYPE_IDS.LSP0ValueReceived,
   ],
   configParams: [
-    {
-      name: 'collectionAddress',
-      type: 'address',
-      defaultValue: '0x12167f1c2713ac4f740b4700c4c72bc2de6c686f',
-      hidden: true,
-      description: '',
-    },
-    {
-      name: 'burntPixId',
-      type: 'bytes32',
-      hidden: false,
-      description: 'BurntPix NFT id you want to refine:',
-      placeholder: 'Enter NFT id',
-    },
-    {
-      name: 'iterations',
-      type: 'uint256',
-      defaultValue: '100',
-      hidden: false,
-      description:
-        'Number of refinement iterations incoming transactions will contribute:',
-      placeholder: 'e.g. 100',
-    },
+    { name: 'collectionAddress', type: 'address' },
+    { name: 'burntPixId', type: 'bytes32' },
+    { name: 'iterations', type: 'uint256' },
   ],
   chainId: 4201,
 };
 
 export const donationAssistantTestnet: ExecutiveAssistant = {
   address: '0x4E88F07CA39EBcC589AF2C4f6f5246Df4c820536',
-  name: 'Tip Assistant',
+  name: 'Donation Assistant',
   description:
-    'Tip LYX to an external wallet in every transaction that you sends you LYX.',
+    'Donate LYX to an external wallet in every transaction that you sends you LYX.',
   iconPath: '/assistants/donations.jpg',
   links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
   assistantType: 'Executive',
   creatorAddress: '0xfE67D89DeBEC38592aB2FeD217b8bbb28851DF88',
   supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
   configParams: [
-    {
-      name: 'destinationAddress',
-      type: 'address',
-      hidden: false,
-      description: 'The address you want to tip:',
-      placeholder: "Enter destination address"
-    },
-    {
-      name: 'donationPercentage',
-      type: 'uint256',
-      defaultValue: '10',
-      hidden: false,
-      description: 'Percentage of LYX to tip:',
-      placeholder: "e.g 10"
-    },
+    { name: 'destinationAddress', type: 'address' },
+    { name: 'donationPercentage', type: 'uint256' },
   ],
   chainId: 4201,
 };
@@ -88,30 +55,9 @@ export const burntPixRefinerMainnet: ExecutiveAssistant = {
     LSP1_TYPE_IDS.LSP0ValueReceived,
   ],
   configParams: [
-    {
-      name: 'collectionAddress',
-      type: 'address',
-      defaultValue: '',
-      hidden: true,
-      description: '',
-    },
-    {
-      name: 'burntPixId',
-      type: 'bytes32',
-      defaultValue: '',
-      hidden: false,
-      description: 'BurntPix NFT id you want to refine:',
-      placeholder: 'Enter NFT id',
-    },
-    {
-      name: 'iterations',
-      type: 'uint256',
-      defaultValue: '100',
-      hidden: false,
-      description:
-        'Number of refinement iterations incoming transactions will contribute:',
-      placeholder: 'e.g. 100',
-    },
+    { name: 'iterations', type: 'uint256' },
+    { name: 'collectionAddress', type: 'address' },
+    { name: 'burntPixId', type: 'bytes32' },
   ],
   chainId: 42,
 };

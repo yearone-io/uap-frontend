@@ -580,7 +580,7 @@ const SetupAssistant: React.FC<{
             />
           </Flex>
         ))}
-        {donationconfig && (
+        {donationConfig && (
           <Flex flexDirection={'row'} gap={4} maxWidth="550px">
             <Text fontWeight="bold" fontSize="sm">
               Donate 1% of the transactions value to the Year One Team

@@ -7,10 +7,7 @@ import {
   networkNameToIdMapping,
   supportedNetworks,
 } from '@/constants/supportedNetworks';
-import {
-  networkNameToIdMapping,
-  supportedNetworks,
-} from '@/constants/supportedNetworks';
+
 
 export default function CatalogPage({
   params,

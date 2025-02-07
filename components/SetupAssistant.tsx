@@ -269,13 +269,14 @@ const SetupAssistant: React.FC<{
           }
 
           // If this is a donation config, add the donation assistant address
+          // only for LSPOValueReceived type
           if (
             donationConfig &&
             isDonatingChecked &&
-            !donationCheckboxDisabled
+            !donationCheckboxDisabled &&
+            typeId === transactionTypeMap.LYX.id // Ensures it's the LSP0ValueReceived type
           ) {
-            const donationAssistantAddress =
-              donationConfig.donationAssistanAddress;
+            const donationAssistantAddress = donationConfig.donationAssistanAddress;
             const donationAssistantIndex = addresses.findIndex(
               a => a.toLowerCase() === donationAssistantAddress.toLowerCase()
             );

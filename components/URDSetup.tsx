@@ -1,6 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { Box, Button, HStack, Text, useToast, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Text,
+  useToast,
+  VStack,
+} from '@chakra-ui/react';
 import { BrowserProvider, Eip1193Provider } from 'ethers';
 import {
   toggleUniveralAssistantsSubscribe,
@@ -12,6 +20,7 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import { InfoIcon } from '@chakra-ui/icons';
 
 type URDSetupProps = {
   extensionHasPermissions: boolean;
@@ -157,6 +166,12 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
       </Text>
 
       <VStack spacing={6} align="stretch">
+        <Flex gap="2" alignItems="center">
+          <Text fontSize="0.9em" textAlign="center">
+            <InfoIcon color="gray.500" mb={'4px'} /> A fee of 0.5% will be
+            applied to LYX transactions when using the UAP protocol.
+          </Text>
+        </Flex>
         {/* Instruction 1 */}
         <HStack justifyContent="space-between" align="center">
           <Text fontSize="md" textAlign="left" fontWeight="semibold" flex="1">

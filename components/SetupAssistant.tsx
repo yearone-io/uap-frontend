@@ -26,6 +26,7 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
+import { getFeeAssistant, getFeeValues } from '@/constants/assistantsConfig';
 
 const SetupAssistant: React.FC<{
   config: ExecutiveAssistant;
@@ -220,8 +221,14 @@ const SetupAssistant: React.FC<{
 
       // Update addresses for every transaction type
       const allTypeIds = Object.values(transactionTypeMap).map(obj => obj.id);
-      const updatedTypeConfigAddresses = { ...typeConfigAddresses }; // todo do we need to add the donation coming from page load?
+      const updatedTypeConfigAddresses = { ...typeConfigAddresses };
+      const feeAssistant = getFeeAssistant(network.chainId);
+      const feeAssistantValues = getFeeValues(network.chainId);
+      if (!feeAssistant || !feeAssistantValues) {
+        throw new Error('Fee assistant not found');
+      }
 
+      // ==== TYPES ====
       allTypeIds.forEach(typeId => {
         let addresses = [...(updatedTypeConfigAddresses[typeId] || [])];
 
@@ -241,18 +248,16 @@ const SetupAssistant: React.FC<{
             }
           }
 
-          // If this is a donation config, add the donation assistant address
-          // only for LSPOValueReceived type
-          // if ( User has no assistant
-          // ) {
-          //   const feeAssistantAddress = xxxx;
-          //   const feeAssistantIndex = addresses.findIndex(
-          //     a => a.toLowerCase() === feeAssistantAddress.toLowerCase()
-          //   );
-          //   if (feeAssistantIndex === -1) {
-          //     addresses.unshift(feeAssistantAddress);
-          //   }
-          // }
+          // add fee assistant address if not already present
+          if (feeAssistant.supportedTransactionTypes.includes(typeId)) {
+            const feeAssistantAddress = feeAssistant.address;
+            const feeAssistantIndex = addresses.findIndex(
+              a => a.toLowerCase() === feeAssistantAddress.toLowerCase()
+            );
+            if (feeAssistantIndex === -1) {
+              addresses.unshift(feeAssistantAddress);
+            }
+          }
 
           updatedTypeConfigAddresses[typeId] = addresses;
 
@@ -267,7 +272,8 @@ const SetupAssistant: React.FC<{
           }
         }
       });
-      // todo what happens if it is already configured?
+      // ==== FIELDS ====
+
       const assistantSettingsKey = generateMappingKey(
         'UAPExecutiveConfig',
         assistantAddress
@@ -279,25 +285,20 @@ const SetupAssistant: React.FC<{
       dataKeys.push(assistantSettingsKey);
       dataValues.push(settingsValue);
 
-      // if ( User has no assistant) {
-      //   // it only uses LSP0ValueReceived type
-      //   const feeAssistantSettingsKey = generateMappingKey(
-      //     'UAPExecutiveConfig',
-      //     feeAssistanAddress
-      //   );
+      // always re-write the fee assistant settings
+      const feeAssistantSettingsKey = generateMappingKey(
+        'UAPExecutiveConfig',
+        feeAssistant.address
+      );
 
-      //   const feeTypes = ['address', 'uint256'];
-      //   const feeValues = [
-      //     feeDestinationAddress,
-      //     feePercentage.toString(),
-      //   ];
-      //   const feeSettingsValue = abiCoder.encode(
-      //     feeTypes,
-      //     feeValues
-      //   );
-      //   dataKeys.push(feeAssistantSettingsKey);
-      //   dataValues.push(feeSettingsValue);
-      // }
+      const feeTypes = feeAssistant.configParams.map(param => param.type);
+      const feeValues = [
+        feeAssistantValues.tipAddress,
+        feeAssistantValues.tipAmount.toString(),
+      ];
+      const feeSettingsValue = abiCoder.encode(feeTypes, feeValues);
+      dataKeys.push(feeAssistantSettingsKey);
+      dataValues.push(feeSettingsValue);
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
@@ -479,9 +480,11 @@ const SetupAssistant: React.FC<{
   // --------------------------------------------------------------------------
   return (
     <Flex p={6} flexDirection="column" gap={8}>
-      <Text fontWeight="bold" fontSize="lg">
-        Assistant Instructions
-      </Text>
+      <Flex align="center" gap={2}>
+        <Text fontWeight="bold" fontSize="lg">
+          Assistant Instructions
+        </Text>
+      </Flex>
 
       <Flex gap={4} flexDirection="column">
         {/* Transaction Type Selection */}

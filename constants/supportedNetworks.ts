@@ -2,7 +2,7 @@ import { ExecutiveAssistant } from '@/constants/CustomTypes';
 import {
   burntPixRefinerMainnet,
   burntPixRefinerTestnet,
-  donationAssistantTestnet,
+  tipAssistantTestnet,
 } from '@/constants/assistantsConfig';
 
 interface ChainInfo {
@@ -64,7 +64,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     icon: '/lyx_icon_testnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'testnet',
-    assistants: [burntPixRefinerTestnet, donationAssistantTestnet],
+    assistants: [burntPixRefinerTestnet, tipAssistantTestnet],
   },
 };
 

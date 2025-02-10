@@ -251,7 +251,8 @@ const SetupAssistant: React.FC<{
           }
 
           // only apply fee assistant if LSP0ValueReceived is selected
-          if (selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
+          if (
+            selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
             typeId === LSP1_TYPE_IDS.LSP0ValueReceived
           ) {
             const feeAssistantAddress = feeAssistant.address;

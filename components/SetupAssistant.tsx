@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Badge, // <-- Import Badge
   Button,
   Checkbox,
   CheckboxGroup,
@@ -36,7 +37,6 @@ const SetupAssistant: React.FC<{
     configParams,
   },
 }) => {
-  // Instead of separate state variables, we hold all configurable fields in one object.
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     configParams.forEach(param => {
@@ -56,7 +56,6 @@ const SetupAssistant: React.FC<{
   const { address } = useWeb3ModalAccount();
   const { network } = useNetwork();
 
-  // Each transaction-type ID -> array of addresses
   const [typeConfigAddresses, setTypeConfigAddresses] = useState<
     Record<string, string[]>
   >({});
@@ -295,7 +294,6 @@ const SetupAssistant: React.FC<{
 
   // --------------------------------------------------------------------------
   // Unsubscribe *only* this Assistant from all transaction types
-  // (Do NOT remove or clear the assistant's UAPExecutiveConfig)
   // --------------------------------------------------------------------------
   const handleUnsubscribeAssistant = async () => {
     if (!address) {
@@ -339,9 +337,7 @@ const SetupAssistant: React.FC<{
         }
       );
 
-      // Note: We do *not* remove the assistant's UAPExecutiveConfig here,
-      // since we want to preserve settings if they resubscribe later.
-
+      // We do *not* remove the assistant's UAPExecutiveConfig here
       if (dataKeys.length === 0) {
         setIsLoadingTrans(false);
         toast({
@@ -384,75 +380,33 @@ const SetupAssistant: React.FC<{
   };
 
   // --------------------------------------------------------------------------
-  // Unsubscribe the entire URD (Universal Assistant Protocol)
+  // Determine whether the assistant is considered "active"
+  // (Has settings + at least one transaction type subscription)
   // --------------------------------------------------------------------------
-  const handleUnsubscribeURD = async () => {
-    if (!address) {
-      toast({
-        title: 'Not connected',
-        description: 'Please connect your wallet first.',
-        status: 'info',
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    try {
-      setIsLoadingTrans(true);
-      const provider = new BrowserProvider(walletProvider as Eip1193Provider);
-      await toggleUniveralAssistantsSubscribe(
-        provider,
-        address,
-        network.protocolAddress,
-        network.defaultURDUP,
-        true
-      );
-
-      toast({
-        title: 'Success',
-        description: 'Universal Assistant Protocol uninstalled.',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
-
-      // Clear local states.
-      setSelectedTransactions([]);
-      const cleared: Record<string, string> = {};
-      configParams.forEach(param => (cleared[param.name] = ''));
-      setFieldValues(cleared);
-      setIsLoadingTrans(false);
-      window.location.reload();
-    } catch (err: any) {
-      setIsLoadingTrans(false);
-      console.error('Error uninstalling UAP:', err);
-      if (!err.message.includes('user rejected action')) {
-        toast({
-          title: 'Error',
-          description: `Error uninstalling UAP: ${err.message}`,
-          status: 'error',
-          duration: null,
-          isClosable: true,
-        });
-      }
-    }
-  };
+  const isActive = isUpSubscribedToAssistant && selectedTransactions.length > 0;
 
   // --------------------------------------------------------------------------
   // Render
   // --------------------------------------------------------------------------
   return (
     <Flex p={6} flexDirection="column" gap={8}>
-      <Text fontWeight="bold" fontSize="lg">
-        Assistant Instructions
-      </Text>
+      {/* Heading + ACTIVE/INACTIVE label */}
+      <Flex alignItems="center" gap={2}>
+        <Text fontWeight="bold" fontSize="lg">
+          Assistant Instructions
+        </Text>
+        {isActive ? (
+          <Badge colorScheme="green">ASSISTANT IS ACTIVE</Badge>
+        ) : (
+          <Badge colorScheme="yellow">ASSISTANT IS NOT ACTIVE</Badge>
+        )}
+      </Flex>
 
       <Flex gap={4} flexDirection="column">
         {/* Transaction Type Selection */}
         <Flex flexDirection="row" gap={4} maxWidth="550px">
           <Text fontWeight="bold" fontSize="sm">
-            Select the transaction types that you will engage this assistant
+            Select the transaction types that you will activate this assistant
             for:
           </Text>
           <CheckboxGroup
@@ -541,23 +495,13 @@ const SetupAssistant: React.FC<{
       <Flex gap={2}>
         <Button
           size="sm"
-          colorScheme="red"
-          variant="outline"
-          onClick={handleUnsubscribeURD}
-          isLoading={isLoadingTrans}
-          isDisabled={isLoadingTrans}
-        >
-          Unsubscribe Assistants
-        </Button>
-        <Button
-          size="sm"
           variant="outline"
           colorScheme="orange"
           onClick={handleUnsubscribeAssistant}
           isLoading={isLoadingTrans}
           isDisabled={isLoadingTrans || !isUpSubscribedToAssistant}
         >
-          Unsubscribe This Assistant
+          Inactivate Assistant
         </Button>
         <Button
           size="sm"
@@ -569,7 +513,7 @@ const SetupAssistant: React.FC<{
           isLoading={isLoadingTrans}
           isDisabled={isLoadingTrans}
         >
-          Save Assistant Settings
+          Save Activation Settings
         </Button>
       </Flex>
     </Flex>

@@ -140,24 +140,29 @@ const SetupAssistant: React.FC<{
         setTypeConfigAddresses(newTypeConfigAddresses);
         setSelectedTransactions(newlySelectedTx);
 
-        // Decode assistant's config if present
-        if (assistantConfigValue && assistantConfigValue !== '0x') {
-          const types = configParams.map(param => param.type);
-          const decoded = abiCoder.decode(types, assistantConfigValue);
-          const newFieldValues: Record<string, string> = {};
-          configParams.forEach((param, index) => {
-            newFieldValues[param.name] = decoded[index].toString();
-          });
-          setFieldValues(newFieldValues);
-          setIsUpSubscribedToAssistant(true);
-        } else {
-          setIsUpSubscribedToAssistant(false);
-        }
+        // find if the assistant is already configured
+        Object.values(newTypeConfigAddresses).forEach(addresses => {
+          if (
+            addresses
+              .map(addr => addr.toLowerCase())
+              .includes(assistantAddress.toLowerCase())
+          ) {
+            const types = configParams.map(param => param.type);
+            const decoded = abiCoder.decode(types, assistantConfigValue);
+            const newFieldValues: Record<string, string> = {};
+            configParams.forEach((param, index) => {
+              newFieldValues[param.name] = decoded[index].toString();
+            });
+            setFieldValues(newFieldValues);
+            setIsUpSubscribedToAssistant(true);
+          }
+        });
 
         if (donationConfig) {
           const donationAssistantAddress =
             donationConfig.donationAssistanAddress;
           let donationActive = false;
+          // Find if we have a donation config for the assistant
           Object.values(newTypeConfigAddresses).forEach(addresses => {
             if (
               addresses
@@ -167,12 +172,20 @@ const SetupAssistant: React.FC<{
               donationActive = true;
             }
           });
+          // if the donation assistant address is in the array, mark the donation as already set
           if (donationActive) {
             setDonationCheckboxDisabled(true);
             setIsDonatingChecked(true);
           } else {
+            // if it is not in the array, enable the donation checkbox
             setDonationCheckboxDisabled(false);
-            setIsDonatingChecked(false);
+            if (!isUpSubscribedToAssistant) {
+              // Set checkbox to true if no assistant is configured (default on creation)
+              setIsDonatingChecked(true);
+            } else {
+              // Set checkbox to false if the assistantAddress of this page is already configured
+              setIsDonatingChecked(false);
+            }
           }
         }
       } catch (err) {
@@ -275,7 +288,8 @@ const SetupAssistant: React.FC<{
             !donationCheckboxDisabled &&
             typeId === transactionTypeMap.LYX.id // Ensures it's the LSP0ValueReceived type
           ) {
-            const donationAssistantAddress = donationConfig.donationAssistanAddress;
+            const donationAssistantAddress =
+              donationConfig.donationAssistanAddress;
             const donationAssistantIndex = addresses.findIndex(
               a => a.toLowerCase() === donationAssistantAddress.toLowerCase()
             );

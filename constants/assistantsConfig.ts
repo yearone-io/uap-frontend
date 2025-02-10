@@ -38,6 +38,9 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
       description:
         'Number of refinement iterations incoming transactions will contribute:',
       placeholder: 'e.g. 100',
+      validate: (value: any) => {
+        return parseInt(value) >= 0;
+      }
     },
   ],
   chainId: 4201,
@@ -68,6 +71,9 @@ export const donationAssistantTestnet: ExecutiveAssistant = {
       hidden: false,
       description: 'Percentage of LYX to tip:',
       placeholder: 'e.g 10',
+      validate: (value: any) => {
+        return parseInt(value) > 0 && parseInt(value) <= 100;
+      }
     },
   ],
   chainId: 4201,
@@ -111,6 +117,9 @@ export const burntPixRefinerMainnet: ExecutiveAssistant = {
       description:
         'Number of refinement iterations incoming transactions will contribute:',
       placeholder: 'e.g. 100',
+      validate: (value: any) => {
+        return parseInt(value) >= 0;
+      }
     },
   ],
   chainId: 42,

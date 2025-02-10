@@ -47,6 +47,9 @@ const SetupAssistant: React.FC<{
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
+
+  const [error, setError] = useState<string>('');
+
   const [isUpSubscribedToAssistant, setIsUpSubscribedToAssistant] =
     useState<boolean>(false);
   const [isLoadingTrans, setIsLoadingTrans] = useState<boolean>(true);
@@ -161,14 +164,9 @@ const SetupAssistant: React.FC<{
   // Save configuration
   // --------------------------------------------------------------------------
   const handleSubmitConfig = async () => {
+    setError('');
     if (!address) {
-      toast({
-        title: 'Not connected',
-        description: 'Please connect your wallet first.',
-        status: 'info',
-        duration: 5000,
-        isClosable: true,
-      });
+      setError('Please connect your wallet first.');
       return;
     }
 
@@ -176,33 +174,19 @@ const SetupAssistant: React.FC<{
     for (const param of configParams) {
       const value = fieldValues[param.name];
       if (!value) {
-        toast({
-          title: 'Incomplete data',
-          description: `Please fill in ${param.name}.`,
-          status: 'warning',
-          duration: 5000,
-          isClosable: true,
-        });
+        setError(`Please fill in ${param.name}.`);
         return;
       }
       if (param.type === 'bytes32' && !/^0x[0-9A-Fa-f]{64}$/.test(value)) {
-        toast({
-          title: `Invalid ${param.name}`,
-          description: 'Must be 32-byte hex (0x + 64 characters).',
-          status: 'error',
-          duration: null,
-          isClosable: true,
-        });
+        setError(`Invalid ${param.name}. Must be 32-byte hex (0x + 64 characters).`);
         return;
       }
       if (param.type.startsWith('uint') && isNaN(Number(value))) {
-        toast({
-          title: `Invalid ${param.name}`,
-          description: 'Please enter a valid number.',
-          status: 'error',
-          duration: null,
-          isClosable: true,
-        });
+        return;
+      }
+      // Custom validation: If a validate function is provided, use it.
+      if (param.validate && !param.validate(value)) {
+        setError(`Invalid ${param.name} for "${param.description}". ${param.validationMessage ? param.validationMessage : ''}`);
         return;
       }
     }
@@ -447,7 +431,11 @@ const SetupAssistant: React.FC<{
       <Text fontWeight="bold" fontSize="lg">
         Assistant Instructions
       </Text>
-
+      {error && (
+        <Text color="red" fontSize="sm">
+          {error}
+        </Text>
+      )}
       <Flex gap={4} flexDirection="column">
         {/* Transaction Type Selection */}
         <Flex flexDirection="row" gap={4} maxWidth="550px">

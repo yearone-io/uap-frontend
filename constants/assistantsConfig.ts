@@ -22,7 +22,7 @@ export const tipAssistantTestnet: ExecutiveAssistant = {
     {
       name: 'tipAmount',
       type: 'uint256',
-      defaultValue: '10',
+      defaultValue: '2',
       hidden: false,
       description: 'Percentage of LYX to tip:',
       placeholder: 'e.g 10',
@@ -219,13 +219,13 @@ export const getFeeValues = (networkId: number) => {
   if (networkId === 42) {
     return {
       tipAddress: '',
-      tipAmount: 0.5,
+      tipAmount: 1,
     };
   }
   if (networkId === 4201) {
     return {
       tipAddress: '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009',
-      tipAmount: 0.5,
+      tipAmount: 1,
     };
   }
 };

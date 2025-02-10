@@ -166,12 +166,6 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
       </Text>
 
       <VStack spacing={6} align="stretch">
-        <Flex gap="2" alignItems="center">
-          <Text fontSize="0.9em" textAlign="center">
-            <InfoIcon color="gray.500" mb={'4px'} /> A fee of 0.5% will be
-            applied to LYX transactions when using the UAP protocol.
-          </Text>
-        </Flex>
         {/* Instruction 1 */}
         <HStack justifyContent="space-between" align="center">
           <Text fontSize="md" textAlign="left" fontWeight="semibold" flex="1">

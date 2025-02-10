@@ -219,13 +219,13 @@ export const getFeeValues = (networkId: number) => {
   if (networkId === 42) {
     return {
       tipAddress: '',
-      tipAmount: 1,
+      tipAmount: 1, // todo change to 0.5 
     };
   }
   if (networkId === 4201) {
     return {
       tipAddress: '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009',
-      tipAmount: 1,
+      tipAmount: 1, // todo change to 0.5
     };
   }
 };

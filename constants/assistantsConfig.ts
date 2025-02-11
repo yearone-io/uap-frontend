@@ -118,53 +118,6 @@ export const burntPixRefinerMainnet: ExecutiveAssistant = {
   chainId: 42,
 };
 
-export const feeAssistantTestnet: ExecutiveAssistant = {
-  assistantType: 'Executive',
-  address: '0x45aAfdD13B18477c0DC797d871AF32c40A5F0FCE',
-  name: '',
-  description: '',
-  iconPath: '',
-  links: [],
-  creatorAddress: '',
-  supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-  configParams: [
-    {
-      name: 'tipAddress',
-      type: 'address',
-      description: 'The address to receive fee',
-    },
-    {
-      name: 'tipAmount',
-      type: 'uint256',
-      description: 'Percentage of LYX ',
-    },
-  ],
-  chainId: 4201,
-};
-export const feeAssistantMainnet: ExecutiveAssistant = {
-  assistantType: 'Executive',
-  address: '', // todo UPDATE
-  name: '',
-  description: '',
-  iconPath: '',
-  links: [],
-  creatorAddress: '',
-  supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-  configParams: [
-    {
-      name: 'tipAddress',
-      type: 'address',
-      description: 'The address to receive fee',
-    },
-    {
-      name: 'tipAmount',
-      type: 'uint256',
-      description: 'Percentage of LYX ',
-    },
-  ],
-  chainId: 42,
-};
-
 const testnetAssistants: {
   [key: string]: ExecutiveAssistant | ScreenerAssistant;
 } = {
@@ -203,29 +156,4 @@ export const getAllAssistants = (
     return mainnetAssistants;
   }
   return {};
-};
-
-export const getFeeAssistant = (networkId: number) => {
-  if (networkId === 42) {
-    return feeAssistantMainnet;
-  }
-  if (networkId === 4201) {
-    return feeAssistantTestnet;
-  }
-  return null;
-};
-
-export const getFeeValues = (networkId: number) => {
-  if (networkId === 42) {
-    return {
-      tipAddress: '',
-      tipAmount: 1, // todo change to 0.5
-    };
-  }
-  if (networkId === 4201) {
-    return {
-      tipAddress: '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009',
-      tipAmount: 1, // todo change to 0.5
-    };
-  }
 };

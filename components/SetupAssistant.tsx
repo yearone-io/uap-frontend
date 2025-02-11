@@ -26,7 +26,6 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
-import { getFeeAssistant, getFeeValues } from '@/constants/assistantsConfig';
 import { InfoIcon } from '@chakra-ui/icons';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
@@ -224,11 +223,7 @@ const SetupAssistant: React.FC<{
       // Update addresses for every transaction type
       const allTypeIds = Object.values(transactionTypeMap).map(obj => obj.id);
       const updatedTypeConfigAddresses = { ...typeConfigAddresses };
-      const feeAssistant = getFeeAssistant(network.chainId);
-      const feeAssistantValues = getFeeValues(network.chainId);
-      if (!feeAssistant || !feeAssistantValues) {
-        throw new Error('Fee assistant not found');
-      }
+      const feesConfig = network.feesConfig;
 
       // ==== TYPES ====
       allTypeIds.forEach(typeId => {
@@ -255,12 +250,12 @@ const SetupAssistant: React.FC<{
             selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived) &&
             typeId === LSP1_TYPE_IDS.LSP0ValueReceived
           ) {
-            const feeAssistantAddress = feeAssistant.address;
             const feeAssistantIndex = addresses.findIndex(
-              a => a.toLowerCase() === feeAssistantAddress.toLowerCase()
+              a =>
+                a.toLowerCase() === feesConfig.feeAssistantAddress.toLowerCase()
             );
             if (feeAssistantIndex === -1) {
-              addresses.unshift(feeAssistantAddress);
+              addresses.unshift(feesConfig.feeAssistantAddress);
             }
           }
 
@@ -294,15 +289,12 @@ const SetupAssistant: React.FC<{
       if (selectedTransactions.includes(LSP1_TYPE_IDS.LSP0ValueReceived)) {
         const feeAssistantSettingsKey = generateMappingKey(
           'UAPExecutiveConfig',
-          feeAssistant.address
+          feesConfig.feeAssistantAddress
         );
-
-        const feeTypes = feeAssistant.configParams.map(param => param.type);
-        const feeValues = [
-          feeAssistantValues.tipAddress,
-          feeAssistantValues.tipAmount.toString(),
-        ];
-        const feeSettingsValue = abiCoder.encode(feeTypes, feeValues);
+        const feeSettingsValue = abiCoder.encode(
+          ['address', 'uint256'],
+          [feesConfig.feeAssistantAddress, feesConfig.feeAssistantAmount]
+        );
         dataKeys.push(feeAssistantSettingsKey);
         dataValues.push(feeSettingsValue);
       }

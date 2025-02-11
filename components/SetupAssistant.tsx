@@ -293,7 +293,7 @@ const SetupAssistant: React.FC<{
         );
         const feeSettingsValue = abiCoder.encode(
           ['address', 'uint256'],
-          [feesConfig.feeAssistantAddress, feesConfig.feeAssistantAmount]
+          [feesConfig.feeDestinationAddress, feesConfig.feeAssistantAmount]
         );
         dataKeys.push(feeAssistantSettingsKey);
         dataValues.push(feeSettingsValue);

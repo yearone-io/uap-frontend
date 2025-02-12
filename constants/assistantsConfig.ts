@@ -1,6 +1,38 @@
 import { ExecutiveAssistant, ScreenerAssistant } from './CustomTypes';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
+export const tipAssistantTestnet: ExecutiveAssistant = {
+  address: '0x912c9816aC5b7Ee8A02B5e8CFd66f04596Bdb6A9',
+  name: 'Tip Assistant',
+  description:
+    'Tip LYX to an external wallet in every transaction that you sends you LYX.',
+  iconPath: '/assistants/donations.jpg',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Executive',
+  creatorAddress: '0xfE67D89DeBEC38592aB2FeD217b8bbb28851DF88',
+  supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+  configParams: [
+    {
+      name: 'tipAddress',
+      type: 'address',
+      hidden: false,
+      description: 'The address you want to tip:',
+      placeholder: 'Enter destination address',
+    },
+    {
+      name: 'tipAmount',
+      type: 'uint256',
+      defaultValue: '2',
+      hidden: false,
+      description: 'Percentage of LYX to tip:',
+      placeholder: 'e.g 10',
+    },
+  ],
+  chainId: 4201,
+};
+
+// TODO tipAssistantMainnet
+
 export const burntPixRefinerTestnet: ExecutiveAssistant = {
   address: '0x8097f5E8236eFDCD743cd9615C6167685eD233ee',
   name: 'BurntPix Refiner',
@@ -40,39 +72,6 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
       placeholder: 'e.g. 100',
       validate: (value: any) => {
         return parseInt(value) >= 0;
-      }
-    },
-  ],
-  chainId: 4201,
-};
-
-export const donationAssistantTestnet: ExecutiveAssistant = {
-  address: '0x4E88F07CA39EBcC589AF2C4f6f5246Df4c820536',
-  name: 'Tip Assistant',
-  description:
-    'Tip LYX to an external wallet in every transaction that you sends you LYX.',
-  iconPath: '/assistants/donations.jpg',
-  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
-  assistantType: 'Executive',
-  creatorAddress: '0xfE67D89DeBEC38592aB2FeD217b8bbb28851DF88',
-  supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-  configParams: [
-    {
-      name: 'destinationAddress',
-      type: 'address',
-      hidden: false,
-      description: 'The address you want to tip:',
-      placeholder: 'Enter destination address',
-    },
-    {
-      name: 'donationPercentage',
-      type: 'uint256',
-      defaultValue: '10',
-      hidden: false,
-      description: 'Percentage of LYX to tip:',
-      placeholder: 'e.g 10',
-      validate: (value: any) => {
-        return parseInt(value) > 0 && parseInt(value) <= 100;
       }
     },
   ],
@@ -128,11 +127,13 @@ export const burntPixRefinerMainnet: ExecutiveAssistant = {
 const testnetAssistants: {
   [key: string]: ExecutiveAssistant | ScreenerAssistant;
 } = {
+  // DO NOT INCLUDE FEE ASSISTANT
   [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
-  [donationAssistantTestnet.address.toLowerCase()]: donationAssistantTestnet,
+  [tipAssistantTestnet.address.toLowerCase()]: tipAssistantTestnet,
 };
 
 const mainnetAssistants: {
+  // DO NOT INCLUDE FEE ASSISTANT
   [key: string]: ExecutiveAssistant | ScreenerAssistant;
 } = {};
 
@@ -151,6 +152,7 @@ export const getAssistant = (
 };
 
 export const getAllAssistants = (
+  // excluding fee assistant
   networkId: number
 ): { [key: string]: ExecutiveAssistant | ScreenerAssistant } => {
   if (networkId === 42) {

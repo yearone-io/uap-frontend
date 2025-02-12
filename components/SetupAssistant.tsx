@@ -86,7 +86,7 @@ const SetupAssistant: React.FC<{
         const upContract = ERC725__factory.connect(address, signer);
 
         // Build the keys for each transaction type.
-        const allTypeIds = Object.values(transactionTypeMap).map(obj => obj.id);
+        const allTypeIds = supportedTransactionTypes;
         const allTypeConfigKeys = allTypeIds.map(id =>
           generateMappingKey('UAPTypeConfig', id)
         );
@@ -218,7 +218,7 @@ const SetupAssistant: React.FC<{
       const abiCoder = new AbiCoder();
 
       // Update addresses for every transaction type
-      const allTypeIds = Object.values(transactionTypeMap).map(obj => obj.id);
+      const allTypeIds = supportedTransactionTypes
       const updatedTypeConfigAddresses = { ...typeConfigAddresses };
       const feesConfig = network.feesConfig;
 

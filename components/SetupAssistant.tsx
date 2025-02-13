@@ -365,12 +365,6 @@ const SetupAssistant: React.FC<{
         }
       );
 
-      // if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] length is 1 and it's the fee assistant, remove it
-      // console.log('yeee',updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived]);
-      // if (updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived].length === 1  && updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived][0].toLowerCase() === network.feesConfig.feeAssistantAddress.toLowerCase()) { 
-      //     alert('should remove fee assistant');
-      // }
-
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
 

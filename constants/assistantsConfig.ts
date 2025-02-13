@@ -26,6 +26,12 @@ export const tipAssistantTestnet: ExecutiveAssistant = {
       hidden: false,
       description: 'Percentage of LYX to tip:',
       placeholder: 'e.g 10',
+      validate: (value: any) => {
+        const number = parseInt(value);
+        return number > 0 && number <= 100 && value.indexOf('.') === -1;
+      },
+      validationMessage:
+        'Tip amount must be between 1 and 100 without decimals',
     },
   ],
   chainId: 4201,
@@ -70,6 +76,9 @@ export const burntPixRefinerTestnet: ExecutiveAssistant = {
       description:
         'Number of refinement iterations incoming transactions will contribute:',
       placeholder: 'e.g. 100',
+      validate: (value: any) => {
+        return parseInt(value) >= 0;
+      },
     },
   ],
   chainId: 4201,
@@ -113,47 +122,10 @@ export const burntPixRefinerMainnet: ExecutiveAssistant = {
       description:
         'Number of refinement iterations incoming transactions will contribute:',
       placeholder: 'e.g. 100',
+      validate: (value: any) => {
+        return parseInt(value) >= 0;
+      },
     },
   ],
   chainId: 42,
-};
-
-const testnetAssistants: {
-  [key: string]: ExecutiveAssistant | ScreenerAssistant;
-} = {
-  // DO NOT INCLUDE FEE ASSISTANT
-  [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
-  [tipAssistantTestnet.address.toLowerCase()]: tipAssistantTestnet,
-};
-
-const mainnetAssistants: {
-  // DO NOT INCLUDE FEE ASSISTANT
-  [key: string]: ExecutiveAssistant | ScreenerAssistant;
-} = {};
-
-export const getAssistant = (
-  address: string,
-  networkId: number
-): ExecutiveAssistant | ScreenerAssistant | null => {
-  console.log('getAssistant', address, networkId);
-  if (networkId === 4201) {
-    return testnetAssistants[address.toLowerCase()];
-  }
-  if (networkId === 42) {
-    return mainnetAssistants[address.toLowerCase()];
-  }
-  return null;
-};
-
-export const getAllAssistants = (
-  // excluding fee assistant
-  networkId: number
-): { [key: string]: ExecutiveAssistant | ScreenerAssistant } => {
-  if (networkId === 42) {
-    return testnetAssistants;
-  }
-  if (networkId === 4201) {
-    return mainnetAssistants;
-  }
-  return {};
 };

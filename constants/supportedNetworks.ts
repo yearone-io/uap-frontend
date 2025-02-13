@@ -21,7 +21,7 @@ interface ChainInfo {
   icon: string;
   universalEverything: string;
   luksoSiteName: string;
-  assistants: ExecutiveAssistant[];
+  assistants: { [key: string]: ExecutiveAssistant };
 }
 
 export enum CHAINS {
@@ -46,7 +46,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     icon: '/lyx_icon_mainnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'mainnet',
-    assistants: [burntPixRefinerMainnet],
+    assistants: {},
   },
   '4201': {
     name: 'LUKSO Testnet',
@@ -64,7 +64,10 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     icon: '/lyx_icon_testnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'testnet',
-    assistants: [burntPixRefinerTestnet, tipAssistantTestnet],
+    assistants: {
+      [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
+      [tipAssistantTestnet.address.toLowerCase()]: tipAssistantTestnet,
+    },
   },
 };
 

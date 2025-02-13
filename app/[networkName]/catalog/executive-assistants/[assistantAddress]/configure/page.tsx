@@ -20,8 +20,11 @@ import { useProfile } from '@/contexts/ProfileContext';
 import SetupAssistant from '@/components/SetupAssistant';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { BrowserProvider, Eip1193Provider } from 'ethers';
-import { getAssistant } from '@/constants/assistantsConfig';
-import { CHAINS, networkNameToIdMapping } from '@/constants/supportedNetworks';
+import {
+  CHAINS,
+  networkNameToIdMapping,
+  supportedNetworks,
+} from '@/constants/supportedNetworks';
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
 
 export default function ExecutiveAssistantConfigurePage({
@@ -30,10 +33,9 @@ export default function ExecutiveAssistantConfigurePage({
   params: { networkName: CHAINS; assistantAddress: string };
 }) {
   const { networkName } = params;
-  const assistantInfo = getAssistant(
-    params.assistantAddress,
-    networkNameToIdMapping[networkName]
-  );
+  const pageNetwork = supportedNetworks[networkNameToIdMapping[networkName]];
+  const assistantInfo =
+    pageNetwork.assistants[params.assistantAddress.toLowerCase()];
 
   // Call all hooks unconditionally
   const networkUrlId = getChainIdByUrlName(params.networkName);

@@ -72,7 +72,7 @@ const LandingBox = ({ networkName }: { networkName: CHAINS }) => {
         justify="center"
         w="100%" // Full width for cards
       >
-        {networkConfig.assistants.map(assistant => (
+        {Object.values(networkConfig.assistants).map(assistant => (
           <WrapItem key={assistant.address}>
             <AssistantSmallCard
               key={assistant.address}

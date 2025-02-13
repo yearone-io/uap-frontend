@@ -19,7 +19,7 @@ import {
   customEncodeAddresses,
   generateMappingKey,
 } from '@/utils/configDataKeyValueStore';
-import { ERC725__factory, ERC725 } from '@/types';
+import { ERC725__factory } from '@/types';
 import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
@@ -153,10 +153,6 @@ const SetupAssistant: React.FC<{
   const { walletProvider } = useWeb3ModalProvider();
   const { address } = useWeb3ModalAccount();
 
-  const [typeConfigAddresses, setTypeConfigAddresses] = useState<
-    Record<string, string[]>
-  >({});
-
   // --------------------------------------------------------------------------
   // Helpers
   // --------------------------------------------------------------------------
@@ -178,20 +174,15 @@ const SetupAssistant: React.FC<{
         setIsProcessingTransaction(true);
         const signer = await getSigner();
 
-        const {
-          typeConfigAddresses,
-          selectedConfigTypes,
-          isUPSubscribedToAssistant,
-          fieldValues,
-        } = await fetchAssistantConfig({
-          upAddress: address,
-          assistantAddress,
-          supportedTransactionTypes: assistantSupportedTransactionTypes,
-          configParams,
-          signer,
-        });
+        const { selectedConfigTypes, isUPSubscribedToAssistant, fieldValues } =
+          await fetchAssistantConfig({
+            upAddress: address,
+            assistantAddress,
+            supportedTransactionTypes: assistantSupportedTransactionTypes,
+            configParams,
+            signer,
+          });
 
-        setTypeConfigAddresses(typeConfigAddresses);
         setSelectedConfigTypes(selectedConfigTypes);
         setIsUPSubscribedToAssistant(isUPSubscribedToAssistant);
         setFieldValues(fieldValues);
@@ -323,8 +314,6 @@ const SetupAssistant: React.FC<{
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
-
-      setTypeConfigAddresses(updatedTypeConfigAddresses);
       setIsUPSubscribedToAssistant(true);
 
       toast({
@@ -412,8 +401,6 @@ const SetupAssistant: React.FC<{
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
-
-      setTypeConfigAddresses(updatedTypeConfigAddresses);
       setSelectedConfigTypes([]);
       setIsProcessingTransaction(false);
 

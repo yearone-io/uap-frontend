@@ -22,11 +22,6 @@ interface ChainInfo {
   universalEverything: string;
   luksoSiteName: string;
   assistants: ExecutiveAssistant[];
-  feesConfig: {
-    feeAssistantAddress: string;
-    feeAssistantAmount: string;
-    feeDestinationAddress: string;
-  };
 }
 
 export enum CHAINS {
@@ -52,11 +47,6 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'mainnet',
     assistants: [burntPixRefinerMainnet],
-    feesConfig: {
-      feeAssistantAddress: '0x',
-      feeAssistantAmount: '0',
-      feeDestinationAddress: '0x',
-    },
   },
   '4201': {
     name: 'LUKSO Testnet',
@@ -68,18 +58,13 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
     explorer: 'https://explorer.execution.testnet.lukso.network/',
     token: 'LYXt',
-    protocolAddress: '0xc3F4196fbe74E7257Cb4A5c92aaD1E21186d7cAE',
+    protocolAddress: '0xf1646062D4ccb7b5edf461c76c45D0cAda1E9fc7',
     defaultURDUP: '0x7870C5B8BC9572A8001C3f96f7ff59961B23500D',
     hasUPSupport: true,
     icon: '/lyx_icon_testnet.svg',
     universalEverything: 'https://universaleverything.io',
     luksoSiteName: 'testnet',
     assistants: [burntPixRefinerTestnet, tipAssistantTestnet],
-    feesConfig: {
-      feeAssistantAddress: '0x45aAfdD13B18477c0DC797d871AF32c40A5F0FCE',
-      feeAssistantAmount: '1',
-      feeDestinationAddress: '0x9b071Fe3d22EAd27E2CDFA1Afec7EAa3c3F32009',
-    },
   },
 };
 

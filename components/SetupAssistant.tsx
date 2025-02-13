@@ -27,7 +27,6 @@ import {
 import { useNetwork } from '@/contexts/NetworkContext';
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
 import { InfoIcon } from '@chakra-ui/icons';
-import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 const SetupAssistant: React.FC<{
   config: ExecutiveAssistant;
@@ -212,7 +211,6 @@ const SetupAssistant: React.FC<{
 
       // TODO: refetch type config addresses to ensure we have the latest
       const updatedTypeConfigAddresses = { ...typeConfigAddresses };
-      const feesConfig = network.feesConfig;
 
       // ==== TYPES ====
       assistantSupportedTransactionTypes.forEach(typeId => {
@@ -229,19 +227,6 @@ const SetupAssistant: React.FC<{
         } else {
           if (currentAssistantIndex !== -1) {
             currentTypeAddresses.splice(currentAssistantIndex, 1);
-          }
-        }
-        // only apply fee assistant if LSP0ValueReceived is selected
-        if (
-          typeId === LSP1_TYPE_IDS.LSP0ValueReceived &&
-          selectedConfigTypes.includes(LSP1_TYPE_IDS.LSP0ValueReceived)
-        ) {
-          const feeAssistantIndex = currentTypeAddresses.findIndex(
-            a =>
-              a.toLowerCase() === feesConfig.feeAssistantAddress.toLowerCase()
-          );
-          if (feeAssistantIndex === -1) {
-            currentTypeAddresses.push(feesConfig.feeAssistantAddress);
           }
         }
 
@@ -268,21 +253,6 @@ const SetupAssistant: React.FC<{
       const assistantConfigValue = abiCoder.encode(types, values);
       dataKeys.push(assistantConfigKey);
       dataValues.push(assistantConfigValue);
-
-      // always re-write the fee assistant settings
-      if (selectedConfigTypes.includes(LSP1_TYPE_IDS.LSP0ValueReceived)) {
-        const feeAssistantSettingsKey = generateMappingKey(
-          'UAPExecutiveConfig',
-          feesConfig.feeAssistantAddress
-        );
-        const feeSettingsValue = abiCoder.encode(
-          ['address', 'uint256'],
-          [feesConfig.feeDestinationAddress, feesConfig.feeAssistantAmount]
-        );
-        dataKeys.push(feeAssistantSettingsKey);
-        dataValues.push(feeSettingsValue);
-      }
-      // todo: if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] is empty, overwrite the fee assistant settings with 0x
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
@@ -354,8 +324,6 @@ const SetupAssistant: React.FC<{
           }
         }
       );
-      // todo: if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] is empty, overwrite the fee assistant settings with 0x
-      // todo: set the assistantConfigKey to 0x
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();

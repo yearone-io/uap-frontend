@@ -1,6 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { Box, Button, HStack, Text, useToast, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Text,
+  useToast,
+  VStack,
+} from '@chakra-ui/react';
 import { BrowserProvider, Eip1193Provider } from 'ethers';
 import {
   toggleUniveralAssistantsSubscribe,
@@ -12,6 +20,7 @@ import {
 } from '@web3modal/ethers/react';
 import { useNetwork } from '@/contexts/NetworkContext';
 import { useProfile } from '@/contexts/ProfileContext';
+import { InfoIcon } from '@chakra-ui/icons';
 
 type URDSetupProps = {
   extensionHasPermissions: boolean;
@@ -28,7 +37,9 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
   // State to track loading/transaction status for each action
   const [isUpdatingPermissions, setIsUpdatingPermissions] = useState(false);
   const [isInstallingProtocol, setIsInstallingProtocol] = useState(false);
-  const [hasExtensionPermissions, setHasExtensionPermissions] = useState(extensionHasPermissions);
+  const [hasExtensionPermissions, setHasExtensionPermissions] = useState(
+    extensionHasPermissions
+  );
 
   const handleUpdateBECPermissions = async () => {
     const upAddress = address as string;
@@ -73,7 +84,7 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
       setHasExtensionPermissions(true);
     } catch (error: any) {
       console.error('Error updating permissions', error);
-      if(!error.message.includes("user rejected action")) {
+      if (!error.message.includes('user rejected action')) {
         toast({
           title: 'Error',
           description: `Error giving UP Extension permissions: ${error.message}`,
@@ -133,7 +144,7 @@ const URDSetup: React.FC<URDSetupProps> = ({ extensionHasPermissions }) => {
         'Error subscribing to UAP Universal Receiver Delegate',
         error
       );
-      if(!error.message.includes("user rejected action")) {
+      if (!error.message.includes('user rejected action')) {
         toast({
           title: 'Error',
           description: `EError subscribing to UAP Universal Receiver Delegate: ${error.message}`,

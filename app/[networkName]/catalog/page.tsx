@@ -43,7 +43,7 @@ export default function CatalogPage({
             >
               Executive Assistants
             </Box>
-            {networkConfig.assistants.map(assistant => (
+            {Object.values(networkConfig.assistants).map(assistant => (
               <Box
                 border="1px solid"
                 borderColor="uap.font"

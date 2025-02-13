@@ -282,7 +282,14 @@ const SetupAssistant: React.FC<{
         dataKeys.push(feeAssistantSettingsKey);
         dataValues.push(feeSettingsValue);
       }
-      // todo: if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] is empty, overwrite the fee assistant settings with 0x
+      // if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] length is 1 and it's the fee assistant, remove it
+      console.log('yoooo',updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived]);
+      if (updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived].length === 1  && updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived][0].toLowerCase() === network.feesConfig.feeAssistantAddress.toLowerCase()) { 
+      
+        alert('should remove fee assistant');
+        alert('should not re-add fee assistant'
+        )
+      }
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();
@@ -352,10 +359,17 @@ const SetupAssistant: React.FC<{
             dataKeys.push(typeConfigKey);
             dataValues.push(customEncodeAddresses(addresses));
           }
+          if (typeId === LSP1_TYPE_IDS.LSP0ValueReceived && address.length === 1 && addresses[0].toLowerCase() === network.feesConfig.feeAssistantAddress.toLowerCase()) {
+            alert('should remove fee assistant');
+          }
         }
       );
-      // todo: if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] is empty, overwrite the fee assistant settings with 0x
-      // todo: set the assistantConfigKey to 0x
+
+      // if updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived] length is 1 and it's the fee assistant, remove it
+      // console.log('yeee',updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived]);
+      // if (updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived].length === 1  && updatedTypeConfigAddresses[LSP1_TYPE_IDS.LSP0ValueReceived][0].toLowerCase() === network.feesConfig.feeAssistantAddress.toLowerCase()) { 
+      //     alert('should remove fee assistant');
+      // }
 
       const tx = await upContract.setDataBatch(dataKeys, dataValues);
       await tx.wait();

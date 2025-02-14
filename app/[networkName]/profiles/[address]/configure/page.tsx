@@ -1,10 +1,18 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Box, Flex, Button, useToast, Text, Avatar } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Button,
+  useToast,
+  Text,
+  Avatar,
+  Link as ChakraLink,
+} from '@chakra-ui/react';
+import NextLink from 'next/link';
 import ReadConfiguredAssistants from '@/components/ReadConfiguredAssistants';
 import Breadcrumbs from '@/components/Breadcrumbs';
-
 import { BrowserProvider, Eip1193Provider } from 'ethers';
 import {
   customDecodeAddresses,
@@ -12,7 +20,6 @@ import {
   unsubscribeFromUapURD,
 } from '@/utils/configDataKeyValueStore';
 import { ERC725__factory } from '@/types';
-
 import {
   useWeb3ModalAccount,
   useWeb3ModalProvider,
@@ -31,32 +38,22 @@ export default function ProfilePage({
   const { address: profileAddress, networkName } = params;
   const { network } = useNetwork();
   const chainId = networkNameToIdMapping[networkName];
-
-  // Web3 / state
   const toast = useToast({ position: 'bottom-left' });
   const { address: walletAddress, isConnected } = useWeb3ModalAccount();
   const { walletProvider } = useWeb3ModalProvider();
 
-  // Whether we have any subscribed assistants
   const [hasAnyAssistants, setHasAnyAssistants] = useState(false);
-
-  // Loading state for unsubscribe transaction
   const [isLoading, setIsLoading] = useState(false);
-  const [profileName, setProfileName] = useState<string>(
-    formatAddress(profileAddress)
-  );
+  const [profileName, setProfileName] = useState(formatAddress(profileAddress));
   const [profileAvatar, setProfileAvatar] = useState<string | null>(null);
 
-  // Read-only flag
-  const isReadOnly = useMemo(() => {
-    // If user is NOT connected, or wallet doesn't match the profile
-    return (
+  const isReadOnly = useMemo(
+    () =>
       !isConnected ||
-      walletAddress?.toLowerCase() !== profileAddress.toLowerCase()
-    );
-  }, [isConnected, walletAddress, profileAddress]);
+      walletAddress?.toLowerCase() !== profileAddress.toLowerCase(),
+    [isConnected, walletAddress, profileAddress]
+  );
 
-  // Fetch profile info (avatar and name)
   useEffect(() => {
     getProfileBasicInfo(chainId, profileAddress).then(profileData => {
       setProfileName(profileData.upName || formatAddress(profileAddress));
@@ -64,42 +61,33 @@ export default function ProfilePage({
     });
   }, [chainId, profileAddress]);
 
-  // Breadcrumbs
   const breadCrumbs = Breadcrumbs({
     items: [
       { name: 'UP Assistants', href: '/' },
       {
         name: 'Profiles',
-        href: `/${networkName}/profiles/${profileAddress}`,
+        href: `/${networkName}/profiles/${profileAddress}/configure`,
       },
       {
         name: `${profileName}`,
-        href: `/${networkName}/profiles/${profileAddress}`,
+        href: `/${networkName}/profiles/${profileAddress}/configure`,
       },
     ],
   });
 
-  // --------------------------------------------------------------------------
-  // Check if user is subscribed to any assistants
-  // --------------------------------------------------------------------------
   useEffect(() => {
     if (!profileAddress || !walletProvider || !walletAddress) return;
-
-    const checkAssistants = async () => {
+    const fetchAssistants = async () => {
       try {
         setIsLoading(true);
         const provider = new BrowserProvider(walletProvider as Eip1193Provider);
         const signer = await provider.getSigner(walletAddress);
         const upContract = ERC725__factory.connect(profileAddress, signer);
-
-        // We'll read all transaction-type keys
-        const allTypeIds = Object.values(transactionTypeMap).map(obj => obj.id);
+        const allTypeIds = Object.values(transactionTypeMap).map(o => o.id);
         const allKeys = allTypeIds.map(id =>
           generateMappingKey('UAPTypeConfig', id)
         );
-
         const rawValues = await upContract.getDataBatch(allKeys);
-
         for (const encodedVal of rawValues) {
           if (encodedVal && encodedVal !== '0x') {
             const addresses = customDecodeAddresses(encodedVal);
@@ -110,8 +98,6 @@ export default function ProfilePage({
             }
           }
         }
-
-        // If no addresses found
         setHasAnyAssistants(false);
       } catch (err) {
         console.error('Error checking assistants:', err);
@@ -119,13 +105,9 @@ export default function ProfilePage({
         setIsLoading(false);
       }
     };
-
-    checkAssistants();
+    fetchAssistants();
   }, [profileAddress, walletProvider, walletAddress]);
 
-  // --------------------------------------------------------------------------
-  // Unsubscribe from all assistants
-  // --------------------------------------------------------------------------
   const handleProtocolUnsubscribe = async () => {
     if (!walletAddress || !profileAddress) {
       toast({
@@ -137,7 +119,6 @@ export default function ProfilePage({
       });
       return;
     }
-
     try {
       setIsLoading(true);
       const provider = new BrowserProvider(walletProvider as Eip1193Provider);
@@ -171,15 +152,12 @@ export default function ProfilePage({
     }
   };
 
-  // --------------------------------------------------------------------------
-  // Render
-  // --------------------------------------------------------------------------
   return (
     <>
       {breadCrumbs}
       <Flex w="100%" flexDirection="column" gap={4} mt={4}>
         <Box w="100%" maxWidth="800px">
-          <Flex flexDirection={'row'} alignItems={'center'} gap={2}>
+          <Flex flexDirection="row" alignItems="center" gap={2}>
             {profileAvatar && (
               <Avatar
                 border="1px solid var(--chakra-colors-uap-grey)"
@@ -195,32 +173,56 @@ export default function ProfilePage({
               Assistants
             </Text>
           </Flex>
-          <ReadConfiguredAssistants
-            upAddress={profileAddress}
-            networkId={network.chainId}
-          />
+          {!hasAnyAssistants && !isLoading && isConnected && (
+            <Box
+              bg="gray.100"
+              p={4}
+              mt={4}
+              borderRadius="md"
+              border="1px solid"
+              borderColor="gray.200"
+            >
+              <Text>
+                Looks like you’re not engaging any UP! Assistants.
+                <ChakraLink
+                  as={NextLink}
+                  href={`/${networkName}/catalog`}
+                  color="blue.500"
+                  textDecoration="underline"
+                  ml={1}
+                >
+                  Visit our Assistant Catalog
+                </ChakraLink>
+                to find a helpful friend!
+              </Text>
+            </Box>
+          )}
+          {hasAnyAssistants && (
+            <ReadConfiguredAssistants
+              upAddress={profileAddress}
+              networkId={network.chainId}
+            />
+          )}
         </Box>
-
         <Box w="100%" maxWidth="800px">
-          {/* If read-only, show a note that the page is read-only */}
-          {isReadOnly && (
+          {isReadOnly && isConnected && (
             <Text fontSize="sm" color="red.500" mb={2}>
               This page is in read-only mode. Connect with the correct wallet to
               manage this profile.
             </Text>
           )}
-
           <Flex alignItems="center" gap={3} mt={8} flexWrap="wrap">
-            {/* Disable or hide this button when read-only */}
-            <Button
-              size="sm"
-              colorScheme="red"
-              onClick={handleProtocolUnsubscribe}
-              isLoading={isLoading}
-              isDisabled={isReadOnly || !hasAnyAssistants || isLoading}
-            >
-              Unsubscribe From All
-            </Button>
+            {hasAnyAssistants && (
+              <Button
+                size="sm"
+                colorScheme="red"
+                onClick={handleProtocolUnsubscribe}
+                isLoading={isLoading}
+                isDisabled={isReadOnly || !hasAnyAssistants || isLoading}
+              >
+                Unsubscribe From All
+              </Button>
+            )}
           </Flex>
         </Box>
       </Flex>

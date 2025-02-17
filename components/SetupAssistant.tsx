@@ -106,15 +106,14 @@ async function fetchAssistantConfig({
   const isUPSubscribedToAssistant = previouslySelectedTypes.length > 0;
 
   // Decode the assistant’s own config for the custom fields
-  let fetchedFieldValues: Record<string, string> | undefined = {};
+  let fetchedFieldValues: Record<string, string> | undefined = undefined;
   if (assistantConfigValue !== '0x') {
+    fetchedFieldValues = {};
     const types = configParams.map(param => param.type);
     const decoded = abiCoder.decode(types, assistantConfigValue);
     configParams.forEach((param, index) => {
       fetchedFieldValues![param.name] = decoded[index].toString();
     });
-  } else {
-    fetchedFieldValues = undefined;
   }
 
   return {

@@ -2,7 +2,7 @@ import { ExecutiveAssistant, ScreenerAssistant } from './CustomTypes';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 export const tipAssistantTestnet: ExecutiveAssistant = {
-  address: '0x912c9816aC5b7Ee8A02B5e8CFd66f04596Bdb6A9',
+  address: '0xe5dCa3C7f340aC7DDedbAAa572a5418784f7E371',
   name: 'Tip Assistant',
   description:
     'Tip LYX to an external wallet in every transaction that you sends you LYX.',
@@ -40,7 +40,7 @@ export const tipAssistantTestnet: ExecutiveAssistant = {
 // TODO tipAssistantMainnet
 
 export const burntPixRefinerTestnet: ExecutiveAssistant = {
-  address: '0xA52d78067089f07f9492e173E2fA76E712201e3D',
+  address: '0xC48FBeF5510Aa6BaFe287b241a7BDcF64d7ea1AC',
   name: 'BurntPix Refiner',
   description:
     'Make transactions directed at you contribute iterations to a BurntPix of your choice.',

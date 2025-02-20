@@ -4,7 +4,7 @@ import { CHAINS } from '@/constants/supportedNetworks';
 
 export default function HomePage() {
   // This will perform a server-side redirect to '/lukso'
-  permanentRedirect(`/${CHAINS.LUKSO_TESTNET}`);
+  permanentRedirect(`/${CHAINS.LUKSO}`);
   // The component returns nothing since redirect() never allows further rendering.
   return null;
 }

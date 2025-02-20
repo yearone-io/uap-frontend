@@ -18,7 +18,7 @@ export default function Footer() {
   const currentNetwork =
     networkNameFromUrl.toLowerCase() === 'lukso-testnet'
       ? 'lukso-testnet'
-      : 'lukso';
+      : '/';
 
   // When the network selection changes, redirect the user to the new network's home page.
   const handleNetworkChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

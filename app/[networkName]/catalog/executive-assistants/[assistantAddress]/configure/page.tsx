@@ -1,13 +1,8 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Button, Flex, Spinner, Text, VStack } from '@chakra-ui/react';
 import AssistantInfo from '@/components/AssistantInfo';
 import URDSetup from '@/components/URDSetup';
-import {
-  useWeb3Modal,
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from '@web3modal/ethers/react';
 import SignInBox from '@/components/SignInBox';
 import { getNetwork } from '@/utils/utils';
 import { getChainIdByUrlName } from '@/utils/universalProfile';
@@ -15,16 +10,15 @@ import {
   doesControllerHaveMissingPermissions,
   isUAPInstalled,
 } from '@/utils/configDataKeyValueStore';
-import { useProfile } from '@/contexts/ProfileContext';
 import SetupAssistant from '@/components/SetupAssistant';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { BrowserProvider, Eip1193Provider } from 'ethers';
+import { BrowserProvider } from 'ethers';
 import {
   CHAINS,
   networkNameToIdMapping,
   supportedNetworks,
 } from '@/constants/supportedNetworks';
-import { ExecutiveAssistant } from '@/constants/CustomTypes';
+import { useProfile } from '@/contexts/ProfileProvider';
 
 export default function ExecutiveAssistantConfigurePage({
   params,
@@ -36,70 +30,64 @@ export default function ExecutiveAssistantConfigurePage({
   const assistantInfo =
     network.assistants[params.assistantAddress.toLowerCase()];
 
-  // Call all hooks unconditionally
   const networkUrlId = getChainIdByUrlName(params.networkName);
-  const { open } = useWeb3Modal();
-  const { walletProvider } = useWeb3ModalProvider();
-  const { mainControllerData } = useProfile();
-  const [isMissingPermissions, setIsMissingPermissions] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [isURDInstalled, setIsURDInstalled] = React.useState(false);
-  const {
-    address,
-    chainId: walletNetworkId,
-    isConnected,
-  } = useWeb3ModalAccount();
+  const { profileDetailsData, isConnected, chainId, switchNetwork } =
+    useProfile();
+  const [isMissingPermissions, setIsMissingPermissions] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isURDInstalled, setIsURDInstalled] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!address) {
+  const address = profileDetailsData?.upWallet;
+
+  const checkURDInstalled = useCallback(async () => {
+    if (!isConnected || !address || !window.lukso) {
+      setError('User disconnected or wallet not available');
+      setIsLoading(false);
       return;
     }
+    try {
+      const provider = new BrowserProvider(window.lukso);
+      const urdInstalled = await isUAPInstalled(
+        provider,
+        address,
+        network.protocolAddress
+      );
+      setIsURDInstalled(urdInstalled);
+    } catch (error) {
+      console.error('Error checking assistant installation', error);
+      setError('Failed to check assistant installation');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [address, network.protocolAddress, isConnected]);
 
-    const checkURDInstalled = async () => {
-      if (!isConnected) {
-        alert('User disconnected');
-        return;
-      }
-      try {
-        const provider = new BrowserProvider(walletProvider as Eip1193Provider);
-        const urdInstalled = await isUAPInstalled(
-          provider,
-          address,
-          network.protocolAddress
-        );
-        setIsURDInstalled(urdInstalled);
-      } catch (error) {
-        console.error('Error checking assistant installation', error);
-      }
-    };
+  const checkPermissions = useCallback(async () => {
+    if (!address || !profileDetailsData?.mainUPController) {
+      setIsLoading(false);
+      return;
+    }
+    try {
+      setError(null);
+      const missingPermissions = await doesControllerHaveMissingPermissions(
+        profileDetailsData.mainUPController,
+        address
+      );
+      setIsMissingPermissions(missingPermissions.length > 0);
+    } catch (error) {
+      console.error('Error checking permissions', error);
+      setError('Failed to check permissions');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [address, profileDetailsData]);
 
+  useEffect(() => {
+    setIsLoading(true);
+    checkPermissions();
     checkURDInstalled();
-  }, [address, network.protocolAddress, isConnected, walletProvider]);
+  }, [checkPermissions, checkURDInstalled]);
 
-  useEffect(() => {
-    if (!address || !mainControllerData?.mainUPController) {
-      return;
-    }
-
-    const getMissingPermissions = async () => {
-      try {
-        const missingPermissions = await doesControllerHaveMissingPermissions(
-          mainControllerData.mainUPController,
-          address
-        );
-        setIsMissingPermissions(missingPermissions.length > 0);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error checking permissions', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getMissingPermissions();
-  }, [address, mainControllerData]);
-
-  // Now that all hooks have been called, conditionally render if assistantInfo is missing.
   if (!assistantInfo) {
     return <Text>Assistant not found</Text>;
   }
@@ -121,11 +109,11 @@ export default function ExecutiveAssistantConfigurePage({
   });
 
   const renderConfigureBody = () => {
-    if (!walletNetworkId || !address) {
+    if (!isConnected || !address) {
       return <SignInBox boxText={'Sign in to configure an Assistant'} />;
     }
 
-    if (walletNetworkId !== networkUrlId) {
+    if (chainId && chainId !== networkUrlId) {
       return (
         <Flex
           height="100%"
@@ -135,11 +123,11 @@ export default function ExecutiveAssistantConfigurePage({
           pt={4}
         >
           <VStack>
-            <Text>You’re connected to {getNetwork(walletNetworkId).name}.</Text>
+            <Text>You’re connected to {getNetwork(chainId).name}.</Text>
             <Text>
               Please change network to {getNetwork(networkUrlId).name}
             </Text>
-            <Button onClick={() => open({ view: 'Networks' })}>
+            <Button onClick={() => switchNetwork(networkUrlId)}>
               Change network
             </Button>
           </VStack>
@@ -151,8 +139,12 @@ export default function ExecutiveAssistantConfigurePage({
       return <Spinner size={'xl'} alignSelf={'center'} />;
     }
 
+    if (error) {
+      return <Text color="red.500">{error}</Text>;
+    }
+
     if (
-      !mainControllerData?.mainUPController ||
+      !profileDetailsData?.mainUPController ||
       isMissingPermissions ||
       !isURDInstalled
     ) {
@@ -164,7 +156,7 @@ export default function ExecutiveAssistantConfigurePage({
       );
     }
 
-    return <SetupAssistant config={assistantInfo as ExecutiveAssistant} />;
+    return <SetupAssistant config={assistantInfo} />;
   };
 
   return (

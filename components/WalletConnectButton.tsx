@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -13,192 +13,290 @@ import {
   MenuItem,
   MenuList,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  Text,
 } from '@chakra-ui/react';
-import {
-  useDisconnect,
-  useWeb3Modal,
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from '@web3modal/ethers/react';
 import Link from 'next/link';
-import { SiweMessage } from 'siwe';
-import { BrowserProvider, Eip1193Provider, verifyMessage } from 'ethers';
-
+import { usePathname } from 'next/navigation';
 import { formatAddress, getNetwork } from '@/utils/utils';
 import { getUrlNameByChainId } from '@/utils/universalProfile';
-import { useProfile } from '@/contexts/ProfileContext';
+import { useProfile } from '@/contexts/ProfileProvider';
+import { getImageFromIPFS } from '@/utils/ipfs'; // Assuming this utility exists
+import { supportedNetworks } from '@/constants/supportedNetworks';
 
 export default function WalletConnectButton() {
-  const { open } = useWeb3Modal();
-  const { disconnect } = useDisconnect();
-  const { address, isConnected, chainId } = useWeb3ModalAccount();
-  const { walletProvider } = useWeb3ModalProvider();
+  const {
+    profileDetailsData,
+    isConnected,
+    chainId,
+    connectAndSign,
+    disconnect,
+    switchNetwork,
+  } = useProfile();
   const toast = useToast({ position: 'bottom-left' });
+  const connectTriggeredRef = useRef(false);
+  const pathname = usePathname();
+  const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+  const [mainImage, setMainImage] = useState<string | undefined>(undefined); // State for the main image
 
-  const { profile, mainControllerData, setMainControllerData } = useProfile();
+  const address = profileDetailsData?.upWallet;
+  const profile = profileDetailsData?.profile;
+  const isSigned = isConnected && !!profileDetailsData && !!profile;
 
-  // Determine if we already have a mainControllerData entry for the current wallet
-  const isSigned =
-    Boolean(isConnected) &&
-    Boolean(mainControllerData) &&
-    mainControllerData?.upWallet === address;
+  const buttonText =
+    isSigned && profile
+      ? profile.name || formatAddress(address ?? '')
+      : 'Sign In';
+  const buttonStyles =
+    isSigned && profile
+      ? { bg: '#DB7C3D', color: '#fff' }
+      : { bg: '#FFF8DD', color: '#053241' };
 
-  // Derived display variables
-  const buttonText = isConnected
-    ? profile?.name || formatAddress(address ?? '')
-    : 'Sign In';
+  // Safely handle profile image (fetch only if needed)
+  useEffect(() => {
+    if (
+      !isSigned ||
+      !profile ||
+      !profile.profileImage ||
+      profile.profileImage.length === 0
+    ) {
+      setMainImage(undefined); // Reset if no profile image
+      return;
+    }
 
-  const buttonStyles = isConnected
-    ? { background: '#DB7C3D', color: '#fff' }
-    : { background: '#FFF8DD', color: '#053241' };
+    const firstImage = profile.profileImage[0];
+    if (!firstImage || !firstImage.url) {
+      console.log('WalletConnectButton: No valid profile image URL found', {
+        profileImage: profile.profileImage,
+      });
+      setMainImage(undefined);
+      return;
+    }
 
-  const profileImage =
-    isConnected && profile?.mainImage ? (
-      <Avatar
-        size="sm"
-        border="1px solid #053241"
-        name={profile.name}
-        src={profile.mainImage}
-      />
-    ) : null;
+    const profileMainImage = firstImage.url;
+    getImageFromIPFS(profileMainImage, Number(chainId))
+      .then(image => {
+        setMainImage(image);
+      })
+      .catch(err => {
+        console.error(
+          'WalletConnectButton: Failed to fetch mainImage from IPFS:',
+          err
+        );
+        setMainImage(undefined);
+      });
+  }, [isSigned, profile, chainId]); // Depend on profile and chainId to trigger re-fetch
+
+  const profileImage = mainImage ? (
+    <Avatar
+      size="sm"
+      border="1px solid #053241"
+      name={profile?.name || ''}
+      src={mainImage}
+    />
+  ) : null;
 
   const currentNetwork = chainId ? getNetwork(chainId) : undefined;
   const networkIcon = currentNetwork?.icon;
   const networkName = currentNetwork?.name;
 
-  // We only want to run the sign-in once, so we use a ref to track if we've triggered it.
-  const signTriggeredRef = useRef(false);
+  const appChainId = pathname.includes(supportedNetworks['4201'].urlName)
+    ? 4201
+    : supportedNetworks['42'].urlName || pathname === '/'
+      ? 42
+      : 4201;
 
-  // Attempt to sign the SIWE message if connected but not yet signed
   useEffect(() => {
-    // Reset the ref if user disconnects
-    if (!isConnected) {
-      signTriggeredRef.current = false;
+    if (!isConnected || !chainId || !profileDetailsData) {
+      connectTriggeredRef.current = false;
+      setIsNetworkModalOpen(false);
+      return;
+    }
+    console.log('WalletConnectButton: Checking network mismatch', {
+      chainId,
+      appChainId,
+    });
+
+    if (chainId !== appChainId) {
+      setIsNetworkModalOpen(true);
+    } else {
+      setIsNetworkModalOpen(false);
+    }
+
+    if (isSigned || connectTriggeredRef.current || !address) {
       return;
     }
 
-    // If connected and not signed, run the signature flow once
-    if (isConnected && !isSigned && !signTriggeredRef.current) {
-      signTriggeredRef.current = true;
-      (async () => {
-        try {
-          const provider = new BrowserProvider(
-            walletProvider as Eip1193Provider
-          );
-          const siweMessage = new SiweMessage({
-            domain: window.location.host,
-            uri: window.location.origin,
-            address: address,
-            statement:
-              'Signing this message will enable the Universal Assistants Catalog to read your UP Browser Extension to manage Assistant configurations.',
-            version: '1',
-            chainId: chainId,
-            resources: [`${window.location.origin}/terms`],
-          }).prepareMessage();
+    connectTriggeredRef.current = true;
+  }, [isConnected, chainId, address, isSigned, profileDetailsData, appChainId]);
 
-          const signer = await provider.getSigner(address);
-          const signature = await signer.signMessage(siweMessage);
-          const mainUPController = verifyMessage(siweMessage, signature);
-
-          // Save the main controller data
-          setMainControllerData({
-            mainUPController,
-            upWallet: address as string,
-          });
-        } catch (error: any) {
-          console.error('Error signing the message:', error);
-          if (!error.message.includes('user rejected action')) {
-            toast({
-              title: 'Error',
-              description: `Error signing the message: ${error.message}`,
-              status: 'error',
-              duration: null,
-              isClosable: true,
-            });
-          }
-          disconnect();
-          // If error, allow future sign attempts
-          signTriggeredRef.current = false;
-        }
-      })();
-    }
-  }, [
-    isConnected,
-    isSigned,
-    chainId,
-    address,
-    walletProvider,
-    setMainControllerData,
-    disconnect,
-    toast,
-  ]);
-
-  // Build dynamic profile link
   const getProfileUrl = () => {
     if (!chainId || !address) return '/';
     const networkUrlName = getUrlNameByChainId(chainId);
     return `/${networkUrlName}/profiles/${address}`;
   };
 
-  // If user is signed/connected, show the menu; otherwise, show a connect button
+  const handleNetworkSwitch = async () => {
+    try {
+      const targetChainId = chainId === 42 ? 4201 : 42; // Toggle between Mainnet and Testnet
+      await switchNetwork(targetChainId);
+      toast({
+        title: 'Network Changed',
+        description: `Switched to ${supportedNetworks[targetChainId].displayName}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Network Switch Failed',
+        description: error.message,
+        status: 'error',
+        duration: null,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleSwitchToAppNetwork = async () => {
+    try {
+      await switchNetwork(appChainId);
+      setIsNetworkModalOpen(false);
+      toast({
+        title: 'Network Changed',
+        description: `Switched to ${supportedNetworks[appChainId].displayName}`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Network Switch Failed',
+        description: error.message,
+        status: 'error',
+        duration: null,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleConnect = async () => {
+    try {
+      if (chainId !== appChainId) {
+        switchNetwork(appChainId);
+        return;
+      }
+      const isComplete: boolean = await connectAndSign();
+      if (isComplete) {
+        toast({
+          title: 'Success',
+          description: 'Successfully signed in',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description:
+            'Failed to sign in; Check signature requests in UP! Extension.',
+          status: 'warning',
+          duration: null,
+          isClosable: true,
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: `Failed to sign in: ${error.message}`,
+        status: 'error',
+        duration: null,
+        isClosable: true,
+      });
+    }
+  };
+
   if (isSigned) {
     return (
-      <Menu>
-        <MenuButton
-          as={Button}
-          style={{
-            fontFamily: 'Montserrat',
-            fontWeight: 600,
-            border: '1px solid #053241',
-            borderRadius: 10,
-            ...buttonStyles,
-          }}
-          size="md"
-        >
-          <Flex gap={2} alignItems="center" justifyContent="center">
-            {profileImage}
-            {buttonText}
-          </Flex>
-        </MenuButton>
-        <MenuList>
-          <MenuItem as={Link} href={getProfileUrl()}>
-            Global Settings
-          </MenuItem>
-          <MenuDivider />
-          <MenuGroup>
-            <Flex
-              mx={4}
-              my={2}
-              fontWeight={600}
-              flexDirection="row"
-              gap={2}
-              alignItems="center"
-            >
-              <Box>Network:</Box>
-              {networkIcon && (
-                <Image height="20px" src={networkIcon} alt={networkName} />
-              )}
+      <>
+        <Menu>
+          <MenuButton
+            as={Button}
+            fontFamily="Montserrat"
+            fontWeight={600}
+            border="1px solid #053241"
+            borderRadius={10}
+            {...buttonStyles}
+            size="md"
+          >
+            <Flex gap={2} alignItems="center" justifyContent="center">
+              {profileImage}
+              {buttonText}
             </Flex>
-            <MenuItem onClick={() => open({ view: 'Networks' })}>
-              Change network
+          </MenuButton>
+          <MenuList>
+            <MenuItem as={Link} href={getProfileUrl()}>
+              Global Settings
             </MenuItem>
-            <MenuItem onClick={() => disconnect()}>Sign out</MenuItem>
-          </MenuGroup>
-        </MenuList>
-      </Menu>
+            <MenuDivider />
+            <MenuGroup>
+              <Flex
+                mx={4}
+                my={2}
+                fontWeight={600}
+                flexDirection="row"
+                gap={2}
+                alignItems="center"
+              >
+                <Box>Network:</Box>
+                {networkIcon && (
+                  <Image height="20px" src={networkIcon} alt={networkName} />
+                )}
+              </Flex>
+              <MenuItem onClick={handleNetworkSwitch}>Change network</MenuItem>
+              <MenuItem onClick={disconnect}>Sign out</MenuItem>
+            </MenuGroup>
+          </MenuList>
+        </Menu>
+        <Modal
+          isOpen={isNetworkModalOpen}
+          onClose={() => setIsNetworkModalOpen(false)}
+        >
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Network Mismatch</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text mb={4}>
+                Your wallet is connected to{' '}
+                {supportedNetworks[Number(chainId)]?.displayName} (Chain ID:{' '}
+                {chainId}), but the app is on{' '}
+                {supportedNetworks[Number(appChainId)]?.displayName} (Chain ID:{' '}
+                {appChainId}). Please switch your wallet network to continue.
+              </Text>
+              <Button colorScheme="blue" onClick={handleSwitchToAppNetwork}>
+                Switch to {supportedNetworks[Number(appChainId)]?.displayName}
+              </Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      </>
     );
   }
 
   return (
     <Button
-      style={{
-        fontFamily: 'Montserrat',
-        fontWeight: 600,
-        border: '1px solid #053241',
-        borderRadius: 10,
-        ...buttonStyles,
-      }}
-      onClick={() => open()}
+      fontFamily="Montserrat"
+      fontWeight={600}
+      border="1px solid #053241"
+      borderRadius={10}
+      {...buttonStyles}
+      onClick={handleConnect}
       size="md"
     >
       {buttonText}

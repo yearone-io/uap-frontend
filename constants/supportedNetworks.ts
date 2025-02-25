@@ -1,10 +1,10 @@
 import { ExecutiveAssistant } from '@/constants/CustomTypes';
 import {
   burntPixRefinerMainnet,
-  burntPixRefinerTestnet,
+  burntPixRefinerTestnet, forwarderAssistantMainnet, forwarderAssistantTestnet,
   tipAssistantMainnet,
-  tipAssistantTestnet,
-} from '@/constants/assistantsConfig';
+  tipAssistantTestnet
+} from "@/constants/assistantsConfig";
 
 interface ChainInfo {
   name: string;
@@ -36,7 +36,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     displayName: 'Lukso Mainnet',
     urlName: 'lukso',
     chainId: 42,
-    url: 'https://universalassitant.app',
+    url: 'https://upassistants.com',
     rpcUrl: 'https://42.rpc.thirdweb.com',
     ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
     explorer: 'https://explorer.execution.mainnet.lukso.network/',
@@ -50,6 +50,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     assistants: {
       [burntPixRefinerMainnet.address.toLowerCase()]: burntPixRefinerMainnet,
       [tipAssistantMainnet.address.toLowerCase()]: tipAssistantMainnet,
+      [forwarderAssistantMainnet.address.toLowerCase()]: forwarderAssistantMainnet,
     },
   },
   '4201': {
@@ -57,7 +58,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     displayName: 'Lukso Testnet',
     urlName: 'lukso-testnet',
     chainId: 4201,
-    url: 'https://testnet.universalassitant.app',
+    url: 'https://upassistants.com',
     rpcUrl: 'https://4201.rpc.thirdweb.com',
     ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
     explorer: 'https://explorer.execution.testnet.lukso.network/',
@@ -71,6 +72,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     assistants: {
       [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
       [tipAssistantTestnet.address.toLowerCase()]: tipAssistantTestnet,
+      [forwarderAssistantTestnet.address.toLowerCase()]: forwarderAssistantTestnet,
     },
   },
 };

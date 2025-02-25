@@ -97,7 +97,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         domain: window.location.host,
         uri: window.location.origin,
         address: upWallet,
-        statement: 'Sign in to Universal Assistants Catalog',
+        statement:
+          'Signing this message will enable the Universal Assistants Catalog to read your UP Browser Extension to manage Assistant configurations.',
         version: '1',
         chainId: currentChainId,
         resources: [`${window.location.origin}/terms`],

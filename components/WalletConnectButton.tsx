@@ -187,6 +187,10 @@ export default function WalletConnectButton() {
 
   const handleConnect = async () => {
     try {
+      if (chainId !== appChainId) {
+        switchNetwork(appChainId);
+        return;
+      }
       const isComplete: boolean = await connectAndSign();
       if (isComplete) {
         toast({

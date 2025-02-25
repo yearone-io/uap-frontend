@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Box, Button, HStack, Text, useToast, VStack } from '@chakra-ui/react';
 import { BrowserProvider } from 'ethers';
 import {
@@ -34,6 +34,10 @@ const URDSetup: React.FC<URDSetupProps> = ({
   const [hasExtensionPermissions, setHasExtensionPermissions] = useState(
     extensionHasPermissions
   );
+
+  useEffect(() => {
+    setHasExtensionPermissions(extensionHasPermissions);
+  }, [extensionHasPermissions]);
 
   const handleUpdateBECPermissions = async () => {
     if (!isConnected || !address) {
@@ -170,7 +174,9 @@ const URDSetup: React.FC<URDSetupProps> = ({
             _hover={{ bg: 'orange.600' }}
             _active={{ bg: 'orange.700' }}
             onClick={handleUpdateBECPermissions}
-            isDisabled={hasExtensionPermissions || !isConnected}
+            isDisabled={
+              (isConnected && hasExtensionPermissions) || !isConnected
+            }
             isLoading={isUpdatingPermissions}
           >
             Give Permissions

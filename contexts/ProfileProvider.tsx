@@ -92,8 +92,6 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       const accounts = await provider.send('eth_requestAccounts', []);
       const upWallet = accounts[0];
       const currentChainId = Number(await provider.send('eth_chainId', []));
-      setChainId(currentChainId);
-      setIsConnected(true);
 
       const siweMessage = new SiweMessage({
         domain: window.location.host,
@@ -125,6 +123,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         'profileDetailsData',
         JSON.stringify(newProfileData)
       );
+      setChainId(currentChainId);
+      setIsConnected(true);
       setProfileDetailsData(newProfileData);
       connectingRef.current = false;
       return true;

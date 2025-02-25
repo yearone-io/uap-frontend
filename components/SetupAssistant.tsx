@@ -131,7 +131,6 @@ const SetupAssistant: React.FC<{
     configParams,
   },
 }) => {
-  console.log('SetupAssistant in here');
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     configParams.forEach(param => {
@@ -147,7 +146,7 @@ const SetupAssistant: React.FC<{
     useState<boolean>(false);
 
   const toast = useToast({ position: 'bottom-left' });
-  const { profileDetailsData, isConnected } = useProfile();
+  const { profileDetailsData } = useProfile();
   const address = profileDetailsData?.upWallet;
 
   // --------------------------------------------------------------------------
@@ -418,7 +417,6 @@ const SetupAssistant: React.FC<{
   // --------------------------------------------------------------------------
   // Render
   // --------------------------------------------------------------------------
-  console.log('rendering SetupAssistant');
   return (
     <Flex p={6} flexDirection="column" gap={8}>
       <Flex alignItems="center" gap={2}>

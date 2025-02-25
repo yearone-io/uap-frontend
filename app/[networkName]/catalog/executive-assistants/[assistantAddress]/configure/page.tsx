@@ -33,7 +33,7 @@ export default function ExecutiveAssistantConfigurePage({
   const networkUrlId = getChainIdByUrlName(params.networkName);
   const { profileDetailsData, isConnected, chainId, switchNetwork } =
     useProfile();
-  const [isMissingPermissions, setIsMissingPermissions] = useState(false);
+  const [isMissingPermissions, setIsMissingPermissions] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isURDInstalled, setIsURDInstalled] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,13 +84,9 @@ export default function ExecutiveAssistantConfigurePage({
 
   useEffect(() => {
     setIsLoading(true);
-    checkURDInstalled();
-  }, [checkURDInstalled]);
-
-  useEffect(() => {
-    setIsLoading(true);
     checkPermissions();
-  }, [checkPermissions]);
+    checkURDInstalled();
+  }, [checkPermissions, checkURDInstalled]);
 
   if (!assistantInfo) {
     return <Text>Assistant not found</Text>;
@@ -147,11 +143,6 @@ export default function ExecutiveAssistantConfigurePage({
       return <Text color="red.500">{error}</Text>;
     }
 
-    console.log(
-      !profileDetailsData?.mainUPController,
-      isMissingPermissions,
-      !isURDInstalled
-    );
     if (
       !profileDetailsData?.mainUPController ||
       isMissingPermissions ||

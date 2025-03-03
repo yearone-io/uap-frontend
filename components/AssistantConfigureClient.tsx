@@ -15,7 +15,7 @@ import SetupAssistant from '@/components/SetupAssistant';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { BrowserProvider } from 'ethers';
 import {
-    CHAINS,
+  CHAINS,
   networkNameToIdMapping,
   supportedNetworks,
 } from '@/constants/supportedNetworks';

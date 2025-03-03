@@ -15,6 +15,7 @@ import SetupAssistant from '@/components/SetupAssistant';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { BrowserProvider } from 'ethers';
 import {
+    CHAINS,
   networkNameToIdMapping,
   supportedNetworks,
 } from '@/constants/supportedNetworks';
@@ -32,10 +33,6 @@ export default function ExecutiveAssistantConfigureClient({
   }; // Fallback to avoid undefined
   const assistantInfo =
     network.assistants[assistantAddress.toLowerCase()] || null;
-
-  if (!assistantInfo) {
-    return <div>Assistant not found</div>; // Basic fallback
-  }
   const networkUrlId = getChainIdByUrlName(networkName);
   const { profileDetailsData, isConnected, chainId, switchNetwork } =
     useProfile();
@@ -148,13 +145,17 @@ export default function ExecutiveAssistantConfigureClient({
       return (
         <URDSetup
           extensionHasPermissions={!isMissingPermissions}
-          networkName={networkName}
+          networkName={networkName as CHAINS}
         />
       );
     }
 
     return <SetupAssistant config={assistantInfo} />;
   };
+
+  if (!assistantInfo) {
+    return <div>Assistant not found</div>; // Basic fallback
+  }
 
   return (
     <Box p={4} w="100%">

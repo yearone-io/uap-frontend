@@ -15,9 +15,6 @@ export default function CatalogClient({
   networkName: string;
 }) {
   const networkId = networkNameToIdMapping[networkName];
-  if (!networkId) {
-    return <div>Network not supported</div>;
-  }
   const assistants = Object.values(supportedNetworks[networkId].assistants);
   const breadCrumbs = Breadcrumbs({
     items: [
@@ -25,6 +22,10 @@ export default function CatalogClient({
       { name: 'Catalog', href: `/${networkName}/catalog` },
     ],
   });
+
+  if (!networkId) {
+    return <div>Network not supported</div>;
+  }
 
   return (
     <>

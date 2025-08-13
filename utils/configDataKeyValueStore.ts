@@ -48,6 +48,10 @@ export const decodeExecDataValue = (execDataValue: string): [string, string] => 
 
 // Legacy address encoding/decoding functions (still needed for some operations)
 export function customEncodeAddresses(addresses: string[]): string {
+  if (addresses.length === 0) {
+    return '0x';
+  }
+  
   if (addresses.length > 65535) {
     throw new Error('Number of addresses exceeds uint16 capacity.');
   }
@@ -62,6 +66,12 @@ export function customEncodeAddresses(addresses: string[]): string {
 
 export function customDecodeAddresses(encoded: string): string[] {
   const data = encoded.startsWith('0x') ? encoded.substring(2) : encoded;
+  
+  // Handle empty bytes case
+  if (data === '' || data === '0') {
+    return [];
+  }
+  
   const numAddressesHex = data.substring(0, 4);
   const numAddresses = parseInt(numAddressesHex, 16);
 

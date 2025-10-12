@@ -38,6 +38,7 @@ export const notifierCurationScreenerTestnet: ScreenerAssistant = {
       type: 'address',
       description: 'Curated list contract address:',
       placeholder: 'Enter contract address (0x...)',
+      required: true,
       validate: (value: any) => {
         return ethers.isAddress(value);
       },
@@ -95,6 +96,7 @@ export const notifierCurationScreenerMainnet: ScreenerAssistant = {
       type: 'address',
       description: 'Curated list contract address:',
       placeholder: 'Enter contract address (0x...)',
+      required: true,
       validate: (value: any) => {
         return ethers.isAddress(value);
       },

@@ -54,10 +54,17 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
   // Validate NFT contract address
   useEffect(() => {
     const validateContract = async () => {
-      if (!curatedListAddress || !ethers.isAddress(curatedListAddress)) {
+      if (!curatedListAddress || curatedListAddress.trim() === '') {
         setValidationStatus('unknown');
         setContractInfo(null);
         setError('');
+        return;
+      }
+      
+      if (!ethers.isAddress(curatedListAddress)) {
+        setValidationStatus('invalid');
+        setContractInfo(null);
+        setError('Please enter a valid contract address');
         return;
       }
 
@@ -110,18 +117,26 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
     onCuratedListAddressChange(value);
   };
 
+  const handleAddressBlur = () => {
+    if (!curatedListAddress || curatedListAddress.trim() === '') {
+      setError('Contract address is required');
+      setValidationStatus('invalid');
+    }
+  };
+
   return (
     <VStack spacing={6} align="stretch">
       {/* Curated List Configuration */}
       <Box>
         <Text fontSize="sm" fontWeight="semibold" mb={3}>
-          Curated List Contract Address:
+          Curated List Contract Address: <Text as="span" color="red.500">*</Text>
         </Text>
         <VStack spacing={2} align="stretch">
           <HStack>
             <Input
               value={curatedListAddress}
               onChange={(e) => handleAddressChange(e.target.value)}
+              onBlur={handleAddressBlur}
               placeholder="Enter curated list contract address (0x...)"
               size="sm"
               isInvalid={validationStatus === 'invalid'}

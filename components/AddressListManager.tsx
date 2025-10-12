@@ -160,7 +160,7 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
         <HStack justify="space-between" align="center" mb={2}>
           <HStack>
             <Text fontSize="sm" fontWeight="semibold">
-              {listName} ({addresses.length} address{addresses.length !== 1 ? 'es' : ''})
+              {listName} ({addresses.length} address{addresses.length !== 1 ? 'es' : ''}) <Text as="span" color="red.500">*</Text>
             </Text>
             {addresses.length > 0 && (
               <Badge colorScheme={behavior === 'allow' ? 'green' : 'red'} size="sm">
@@ -189,7 +189,10 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
               borderRadius="lg"
               textAlign="center"
             >
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="red.500" fontWeight="semibold">
+                ⚠️ At least one address is required for screening to work
+              </Text>
+              <Text fontSize="xs" color="gray.600" mt={1}>
                 No addresses in {behavior} list
               </Text>
             </Box>

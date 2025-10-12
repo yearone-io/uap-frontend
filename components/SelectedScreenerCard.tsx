@@ -51,13 +51,34 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
 
   // Determine screener status
   const getScreenerStatus = () => {
-    // Check if screener is properly configured
-    let isConfigured = false;
+    // Check if screener is properly configured by validating required fields
+    let isConfigured = true;
     
-    if (screener.name === 'Address List Screener') {
-      isConfigured = config?.addresses && config.addresses.length > 0;
-    } else if (screener.name === 'Community Gate') {
-      isConfigured = config?.curatedListAddress && config.curatedListAddress.trim() !== '';
+    // Check all required fields
+    for (const param of screener.configParams) {
+      const isRequired = param.required !== false && param.type !== 'bool'; // Non-boolean fields are required by default
+      if (isRequired) {
+        const value = config?.[param.name];
+        if (param.type === 'address') {
+          // Address fields must be non-empty and valid
+          if (!value || typeof value !== 'string' || value.trim() === '') {
+            isConfigured = false;
+            break;
+          }
+        } else if (param.name === 'addresses') {
+          // Address lists must have at least one address
+          if (!Array.isArray(value) || value.length === 0) {
+            isConfigured = false;
+            break;
+          }
+        } else {
+          // Other fields just need to be non-empty
+          if (!value || (typeof value === 'string' && value.trim() === '')) {
+            isConfigured = false;
+            break;
+          }
+        }
+      }
     }
 
     if (isLoadedFromBlockchain) {

@@ -20,6 +20,7 @@ export type ConfigParam = {
   defaultValue?: string;
   placeholder?: string;
   hidden?: boolean;
+  required?: boolean; // For indicating required fields
   validate?: (value: any, upAddress: string) => boolean;
   validationMessage?: string;
   options?: { value: any; label: string }[]; // For radio button selections

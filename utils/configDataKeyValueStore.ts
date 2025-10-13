@@ -450,7 +450,9 @@ async function buildExecutiveConfig(
         const abiCoder = new AbiCoder()
         const types = screenerDef.configParams.map((p: any) => p.type)
         const values = screenerDef.configParams.map((p: any) => {
-          const value = screenerData[p.name] || p.defaultValue || ''
+          // Use nullish coalescing for proper handling of false/0
+          const value = screenerData[p.name] !== undefined ?
+            screenerData[p.name] : (p.defaultValue ?? '')
           return p.type.startsWith('uint') ? BigInt(value) : value
         })
         const encodedConfig = abiCoder.encode(types, values)

@@ -134,7 +134,10 @@ export const useScreenerManagement = (): UseScreenerManagementReturn => {
                   
                   const config: any = {}
                   screenerDef.configParams.forEach((param: any, index: number) => {
-                    config[param.name] = decoded[index].toString()
+                    const decodedValue = decoded[index]
+                    // Keep booleans as booleans, don't convert to string
+                    const finalValue = param.type === 'bool' ? Boolean(decodedValue) : decodedValue.toString()
+                    config[param.name] = finalValue
                   })
                   
                   // For Address List Screener, also load the addresses from the address list

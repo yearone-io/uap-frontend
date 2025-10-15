@@ -280,7 +280,9 @@ export const configureExecutiveAssistantWithUnifiedSystem = async (
           assistantConfigData,
           screenerConfig,
           networkId,
-          supportedNetworks
+          supportedNetworks,
+          typeId,
+          i  // Pass execution order for unique list naming
         )
         targetExecutives.push(executiveConfig)
       } else {
@@ -400,7 +402,9 @@ export const configureExecutiveAssistantWithUnifiedSystem = async (
       assistantConfigData,
       screenerConfig,
       networkId,
-      supportedNetworks
+      supportedNetworks,
+      typeId,
+      currentExecutives.length  // New assistant gets added at the end, so its execution order = current length
     )
     targetExecutives.push(newExecutiveConfig)
   }
@@ -425,7 +429,9 @@ async function buildExecutiveConfig(
     useANDLogic: boolean
   },
   networkId: number,
-  supportedNetworks: any
+  supportedNetworks: any,
+  typeId?: string,
+  executionOrder?: number
 ): Promise<any> {
   const config = {
     address: assistantAddress,
@@ -438,7 +444,8 @@ async function buildExecutiveConfig(
   }
 
   if (screenerConfig.enableScreeners && screenerConfig.selectedScreeners.length > 0) {
-    for (const screenerId of screenerConfig.selectedScreeners) {
+    for (let screenerIndex = 0; screenerIndex < screenerConfig.selectedScreeners.length; screenerIndex++) {
+      const screenerId = screenerConfig.selectedScreeners[screenerIndex]
       const [screenerAddress] = screenerId.split('_')
       const screenerData = screenerConfig.screenerConfigs[screenerId] || {}
       const screenerDef = supportedNetworks[networkId]?.screeners[screenerAddress.toLowerCase()]
@@ -463,16 +470,30 @@ async function buildExecutiveConfig(
 
       // Handle address lists for both Address List Screeners and Curated List Screeners (blocklist)
       if (screenerDef?.name === 'Address List Screener' && screenerData.addresses && screenerData.addresses.length > 0) {
-        // Use only the screener address (first part) for consistent list naming
-        const listName = `ScreenerList_${screenerAddress}`
-        config.addressListNames.push(listName)
-        config.addressListData[listName] = screenerData.addresses
+        // IMPORTANT: List name must be unique per (typeId + executionOrder + screenerIndex)
+        // The screenerOrder calculation already encodes this: executionOrder * 1000 + screenerIndex
+        // This ensures complete isolation: different transaction types OR different executives OR different screener positions = different lists
+        if (typeId !== undefined && executionOrder !== undefined) {
+          const screenerOrder = calculateScreenerOrder(executionOrder, screenerIndex)
+          const listName = `ScreenerList_${typeId.slice(2, 10)}_${screenerOrder}`
+          config.addressListNames.push(listName)
+          config.addressListData[listName] = screenerData.addresses
+        } else {
+          // Fallback for cases where we don't have typeId/executionOrder (shouldn't happen in normal flow)
+          config.addressListNames.push('')
+        }
       } else if (screenerDef?.name === 'Curated List' && screenerData.useBlocklist && screenerData.blocklistAddresses && screenerData.blocklistAddresses.length > 0) {
         // Curated List screeners use blocklistAddresses for exclusion list
-        // Use only the screener address (first part) for consistent list naming
-        const listName = `ScreenerBlocklist_${screenerAddress}`
-        config.addressListNames.push(listName)
-        config.addressListData[listName] = screenerData.blocklistAddresses
+        // IMPORTANT: List name must be unique per (typeId + executionOrder + screenerIndex)
+        if (typeId !== undefined && executionOrder !== undefined) {
+          const screenerOrder = calculateScreenerOrder(executionOrder, screenerIndex)
+          const listName = `ScreenerBlocklist_${typeId.slice(2, 10)}_${screenerOrder}`
+          config.addressListNames.push(listName)
+          config.addressListData[listName] = screenerData.blocklistAddresses
+        } else {
+          // Fallback for cases where we don't have typeId/executionOrder
+          config.addressListNames.push('')
+        }
       } else {
         config.addressListNames.push('')
       }

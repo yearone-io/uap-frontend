@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 
 // Testnet Screener Assistants
 export const notifierListScreenerTestnet: ScreenerAssistant = {
-  address: '0x31c7ab87662132f5901f190032d49e0abe9fabec',
+  address: '0xb5b746a75a464c83f7c1cc838ee3387486883026',
   name: 'Address List Screener',
   description: 'Screen transactions based on source',
   iconPath: '/screeners/default-list.svg',
@@ -26,7 +26,7 @@ export const notifierListScreenerTestnet: ScreenerAssistant = {
 };
 
 export const notifierCurationScreenerTestnet: ScreenerAssistant = {
-  address: '0x647360684dd6ad295d1c62bebc43c11a843a4248',
+  address: '0x442cd0098e23a541e3604296e0252de28c1c4fc6',
   name: 'Curated List',
   description: 'Screen based on curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',
@@ -61,7 +61,7 @@ export const notifierCurationScreenerTestnet: ScreenerAssistant = {
 
 // Mainnet Screener Assistants
 export const notifierListScreenerMainnet: ScreenerAssistant = {
-  address: '0x7fe2bf2ec24f94fd43f10d6911123a18450e3c5e',
+  address: '0x25b51e55f493565be327b1a17e958839121435a7',
   name: 'Address List Screener',
   description: 'Screen transactions based on notifier address - only qualified addresses pass screening',
   iconPath: '/screeners/default-list.svg',
@@ -84,7 +84,7 @@ export const notifierListScreenerMainnet: ScreenerAssistant = {
 };
 
 export const notifierCurationScreenerMainnet: ScreenerAssistant = {
-  address: '0x9ae3cdfe679935428094eea1668d30cdad8ede8c',
+  address: '0x476fef9277f55f306f75cd89300ad9c7e5e36bcb',
   name: 'Curated List',
   description: 'Screen based on curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',

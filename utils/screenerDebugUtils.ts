@@ -42,14 +42,14 @@ interface DecodedScreenerConfig {
 
 // Mock screener registry for debugging (would normally come from constants)
 const SCREENER_REGISTRY = {
-  // Address List Screener
-  '0x31c7ab87662132f5901f190032d49e0abe9fabec': {
+  // Address List Screener (testnet)
+  '0xb5b746a75a464c83f7c1cc838ee3387486883026': {
     name: 'Address List Screener',
     type: 'AddressList',
     configParams: ['returnValueWhenInList']
   },
-  // Curated List Screener  
-  '0xd2e14d15bbd13a0b71a52b57fd7e7f758e073ff1': {
+  // Curated List Screener (testnet)
+  '0x442cd0098e23a541e3604296e0252de28c1c4fc6': {
     name: 'Curated List',
     type: 'CommunityGate',
     configParams: ['curatedListAddress', 'returnValueWhenCurated']

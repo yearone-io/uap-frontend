@@ -12,6 +12,10 @@ import {
   notifierListScreenerTestnet,
   notifierCurationScreenerMainnet,
   notifierCurationScreenerTestnet,
+  notifierCreatorListScreenerMainnet,
+  notifierCreatorListScreenerTestnet,
+  notifierCreatorCurationScreenerMainnet,
+  notifierCreatorCurationScreenerTestnet,
 } from '@/constants/screenersConfig';
 
 interface ChainInfo {
@@ -50,7 +54,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
     explorer: 'https://explorer.execution.mainnet.lukso.network/',
     token: 'LYX',
-    protocolAddress: '0x289286ce00da26e723a0069d715882fab2d18ed4',
+    protocolAddress: '0x74cdf5beb4a2323fd386b87a1522d9aa0f59aeb9',
     defaultURDUP: '0x7870C5B8BC9572A8001C3f96f7ff59961B23500D',
     hasUPSupport: true,
     icon: '/lyx_icon_mainnet.svg',
@@ -65,6 +69,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     screeners: {
       [notifierListScreenerMainnet.address.toLowerCase()]: notifierListScreenerMainnet,
       [notifierCurationScreenerMainnet.address.toLowerCase()]: notifierCurationScreenerMainnet,
+      [notifierCreatorListScreenerMainnet.address.toLowerCase()]: notifierCreatorListScreenerMainnet,
+      [notifierCreatorCurationScreenerMainnet.address.toLowerCase()]: notifierCreatorCurationScreenerMainnet,
     },
   },
   '4201': {
@@ -77,7 +83,7 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     ipfsGateway: 'https://api.universalprofile.cloud/ipfs',
     explorer: 'https://explorer.execution.testnet.lukso.network/',
     token: 'LYXt',
-    protocolAddress: '0xf6fa5d9b08a9e5a7bea5c816757e6b0dd548b920',
+    protocolAddress: '0x091ebe012c1e92b8e7cc8d5acffdea2fc6052efc',
     defaultURDUP: '0x7870C5B8BC9572A8001C3f96f7ff59961B23500D',
     hasUPSupport: true,
     icon: '/lyx_icon_testnet.svg',
@@ -92,6 +98,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
     screeners: {
       [notifierListScreenerTestnet.address.toLowerCase()]: notifierListScreenerTestnet,
       [notifierCurationScreenerTestnet.address.toLowerCase()]: notifierCurationScreenerTestnet,
+      [notifierCreatorListScreenerTestnet.address.toLowerCase()]: notifierCreatorListScreenerTestnet,
+      [notifierCreatorCurationScreenerTestnet.address.toLowerCase()]: notifierCreatorCurationScreenerTestnet,
     },
   },
 };

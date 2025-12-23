@@ -468,8 +468,8 @@ async function buildExecutiveConfig(
         config.screenerConfigData.push('0x')
       }
 
-      // Handle address lists for both Address List Screeners and Curated List Screeners (blocklist)
-      if (screenerDef?.name === 'Address List Screener' && screenerData.addresses && screenerData.addresses.length > 0) {
+      // Handle address lists for Address List Screeners (including Creator variant)
+      if ((screenerDef?.name === 'Address List Screener' || screenerDef?.name === 'Creator Address List Screener') && screenerData.addresses && screenerData.addresses.length > 0) {
         // IMPORTANT: List name must be unique per (typeId + executionOrder + screenerIndex)
         // The screenerOrder calculation already encodes this: executionOrder * 1000 + screenerIndex
         // This ensures complete isolation: different transaction types OR different executives OR different screener positions = different lists
@@ -482,7 +482,7 @@ async function buildExecutiveConfig(
           // Fallback for cases where we don't have typeId/executionOrder (shouldn't happen in normal flow)
           config.addressListNames.push('')
         }
-      } else if (screenerDef?.name === 'Curated List' && screenerData.useBlocklist && screenerData.blocklistAddresses && screenerData.blocklistAddresses.length > 0) {
+      } else if ((screenerDef?.name === 'Curated List' || screenerDef?.name === 'Creator Curated List') && screenerData.useBlocklist && screenerData.blocklistAddresses && screenerData.blocklistAddresses.length > 0) {
         // Curated List screeners use blocklistAddresses for exclusion list
         // IMPORTANT: List name must be unique per (typeId + executionOrder + screenerIndex)
         if (typeId !== undefined && executionOrder !== undefined) {

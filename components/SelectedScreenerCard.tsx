@@ -16,6 +16,8 @@ import { CloseIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { ScreenerAssistant } from '@/constants/CustomTypes';
 import AddressListManager from './AddressListManager';
 import CurationScreenerConfig from './CurationScreenerConfig';
+import CreatorListScreenerConfig from './CreatorListScreenerConfig';
+import CreatorCurationScreenerConfig from './CreatorCurationScreenerConfig';
 
 interface SelectedScreenerCardProps {
   instanceId: string;
@@ -204,6 +206,57 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
                 handleConfigUpdate({
                   curatedListAddress: address
                 });
+              }}
+              behavior={config?.returnValueWhenCurated ? 'pass' : 'block'}
+              onBehaviorChange={(behavior) => {
+                handleConfigUpdate({
+                  returnValueWhenCurated: behavior === 'pass'
+                });
+              }}
+              useBlocklist={config?.useBlocklist || false}
+              onUseBlocklistChange={(useBlocklist) => {
+                handleConfigUpdate({ useBlocklist });
+              }}
+              blocklistAddresses={config?.blocklistAddresses || []}
+              onBlocklistAddressesChange={(addresses) => {
+                handleConfigUpdate({
+                  blocklistAddresses: addresses
+                });
+              }}
+              networkId={networkId}
+            />
+          )}
+
+          {screener.name === 'Creator Address List Screener' && (
+            <CreatorListScreenerConfig
+              addresses={config?.addresses || []}
+              onAddressesChange={(addresses) => {
+                handleConfigUpdate({ addresses });
+              }}
+              requireAllCreators={config?.requireAllCreators ?? false}
+              onRequireAllCreatorsChange={(requireAllCreators) => {
+                handleConfigUpdate({ requireAllCreators });
+              }}
+              behavior={config?.returnValueWhenInList ? 'pass' : 'block'}
+              onBehaviorChange={(behavior) => {
+                handleConfigUpdate({
+                  returnValueWhenInList: behavior === 'pass'
+                });
+              }}
+            />
+          )}
+
+          {screener.name === 'Creator Curated List' && (
+            <CreatorCurationScreenerConfig
+              curatedListAddress={config?.curatedListAddress || ''}
+              onCuratedListAddressChange={(address) => {
+                handleConfigUpdate({
+                  curatedListAddress: address
+                });
+              }}
+              requireAllCreators={config?.requireAllCreators ?? false}
+              onRequireAllCreatorsChange={(requireAllCreators) => {
+                handleConfigUpdate({ requireAllCreators });
               }}
               behavior={config?.returnValueWhenCurated ? 'pass' : 'block'}
               onBehaviorChange={(behavior) => {

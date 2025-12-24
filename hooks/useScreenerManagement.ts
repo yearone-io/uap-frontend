@@ -145,8 +145,8 @@ export const useScreenerManagement = (): UseScreenerManagementReturn => {
                     config.addressListName = addressListName
                   }
 
-                  // For Address List Screener, also load the addresses from the address list
-                  if (screenerDef?.name === 'Address List Screener' && addressListName) {
+                  // For Address List Screeners, also load the addresses from the address list
+                  if ((screenerDef?.name === 'Address List Screener' || screenerDef?.name === 'Creator Address List Screener') && addressListName) {
                     try {
                       const addresses = await getAddressList(erc725UAP, upContract, addressListName)
                       config.addresses = addresses
@@ -156,8 +156,8 @@ export const useScreenerManagement = (): UseScreenerManagementReturn => {
                     }
                   }
 
-                  // For Curated List screener, load the blocklist if it exists
-                  if (screenerDef?.name === 'Curated List' && addressListName) {
+                  // For Curated List screeners, load the blocklist if it exists
+                  if ((screenerDef?.name === 'Curated List' || screenerDef?.name === 'Creator Curated List') && addressListName) {
                     try {
                       const blocklistAddresses = await getAddressList(erc725UAP, upContract, addressListName)
                       config.useBlocklist = blocklistAddresses.length > 0
@@ -182,8 +182,8 @@ export const useScreenerManagement = (): UseScreenerManagementReturn => {
                   config.addressListName = addressListName
                 }
 
-                // Still check for Address List Screener even without configParams
-                if (screenerDef?.name === 'Address List Screener' && addressListName) {
+                // Still check for Address List Screeners even without configParams
+                if ((screenerDef?.name === 'Address List Screener' || screenerDef?.name === 'Creator Address List Screener') && addressListName) {
                   try {
                     const addresses = await getAddressList(erc725UAP, upContract, addressListName)
                     config.addresses = addresses
@@ -193,8 +193,8 @@ export const useScreenerManagement = (): UseScreenerManagementReturn => {
                   }
                 }
 
-                // Check for Curated List screener blocklist even without configParams
-                if (screenerDef?.name === 'Curated List' && addressListName) {
+                // Check for Curated List screeners blocklist even without configParams
+                if ((screenerDef?.name === 'Curated List' || screenerDef?.name === 'Creator Curated List') && addressListName) {
                   try {
                     const blocklistAddresses = await getAddressList(erc725UAP, upContract, addressListName)
                     config.useBlocklist = blocklistAddresses.length > 0

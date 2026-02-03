@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 
 // Testnet Screener Assistants
 export const notifierListScreenerTestnet: ScreenerAssistant = {
-  address: '0x2ef7919a6e715700b8bccfe2106bef4887f28507',
+  address: '0xbcceeabf2f555631bd481813d783d7eeb7c1799c',
   name: 'Address List Screener',
   description: 'Screen transactions based on source',
   iconPath: '/screeners/default-list.svg',
@@ -26,7 +26,7 @@ export const notifierListScreenerTestnet: ScreenerAssistant = {
 };
 
 export const notifierCurationScreenerTestnet: ScreenerAssistant = {
-  address: '0x6dd041d25b637eed30ebb8aeb44bf59bfb2a3aff',
+  address: '0xcc3d9c2b38499cdfdaf5de6e5ad3ee3efdaea39e',
   name: 'Curated List',
   description: 'Screen based on curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',
@@ -60,7 +60,7 @@ export const notifierCurationScreenerTestnet: ScreenerAssistant = {
 };
 
 export const notifierCreatorListScreenerTestnet: ScreenerAssistant = {
-  address: '0x8f6820e24d3cbd63e87fc0b791844d8b3106bb94',
+  address: '0xf922fab253f7e7c6e1d63323f42a870cd896b449',
   name: 'Creator Address List Screener',
   description: 'Screen transactions based on asset creator addresses (LSP4/LSP12)',
   iconPath: '/screeners/default-list.svg',
@@ -93,7 +93,7 @@ export const notifierCreatorListScreenerTestnet: ScreenerAssistant = {
 };
 
 export const notifierCreatorCurationScreenerTestnet: ScreenerAssistant = {
-  address: '0xaeae6c5fdbcb2e3201ceaa32edfb213534429dae',
+  address: '0xd2ecf93c3588c8da4ada3f30d434bc0cd0e1f1c4',
   name: 'Creator Curated List',
   description: 'Screen based on asset creator curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',
@@ -138,7 +138,7 @@ export const notifierCreatorCurationScreenerTestnet: ScreenerAssistant = {
 
 // Mainnet Screener Assistants
 export const notifierListScreenerMainnet: ScreenerAssistant = {
-  address: '0x2e1fc250e758651bd0ab0edc355d7986ab138edc',
+  address: '0x0b2e499f42f04b616f7b5ceb8bfc32902bbf91f8',
   name: 'Address List Screener',
   description: 'Screen transactions based on notifier address - only qualified addresses pass screening',
   iconPath: '/screeners/default-list.svg',
@@ -161,7 +161,7 @@ export const notifierListScreenerMainnet: ScreenerAssistant = {
 };
 
 export const notifierCurationScreenerMainnet: ScreenerAssistant = {
-  address: '0x56d3ef8a7bf8b04b51ff7c9f4b5d7e4e375b2664',
+  address: '0xfd1fafda3b462eebe55814ceb1e8df9388f099a8',
   name: 'Curated List',
   description: 'Screen based on curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',
@@ -195,7 +195,7 @@ export const notifierCurationScreenerMainnet: ScreenerAssistant = {
 };
 
 export const notifierCreatorListScreenerMainnet: ScreenerAssistant = {
-  address: '0x6031249b8f0427fa7ac4092706eb7a6d53141451',
+  address: '0xb2b5312111b252b4a26d987309845a533cd2e668',
   name: 'Creator Address List Screener',
   description: 'Screen transactions based on asset creator addresses (LSP4/LSP12)',
   iconPath: '/screeners/default-list.svg',
@@ -228,7 +228,7 @@ export const notifierCreatorListScreenerMainnet: ScreenerAssistant = {
 };
 
 export const notifierCreatorCurationScreenerMainnet: ScreenerAssistant = {
-  address: '0x844472b633c0911dd3fe4c335e8764e2510c180d',
+  address: '0x71c93169d2600cd98c3c9f49fc09405f49e5ef92',
   name: 'Creator Curated List',
   description: 'Screen based on asset creator curation status on third party curated list',
   iconPath: '/screeners/default-curation.svg',

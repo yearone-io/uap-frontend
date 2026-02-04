@@ -21,6 +21,7 @@ interface TransactionTypeSelectorProps {
   selectedConfigTypes: string[];
   onAddType: (typeId: string) => void;
   onRemoveType: (typeId: string) => void;
+  isReadOnly?: boolean;
 }
 
 const TransactionTypeSelector: React.FC<TransactionTypeSelectorProps> = ({
@@ -28,6 +29,7 @@ const TransactionTypeSelector: React.FC<TransactionTypeSelectorProps> = ({
   selectedConfigTypes,
   onAddType,
   onRemoveType,
+  isReadOnly = false,
 }) => {
   // Get available types that haven't been selected yet
   const availableTypes = Object.entries(transactionTypeMap)
@@ -38,6 +40,9 @@ const TransactionTypeSelector: React.FC<TransactionTypeSelectorProps> = ({
   const canAddMore = availableTypes.length > 0;
 
   const handleTypeSelect = (typeId: string) => {
+    if (isReadOnly) {
+      return;
+    }
     onAddType(typeId);
   };
 
@@ -71,6 +76,7 @@ const TransactionTypeSelector: React.FC<TransactionTypeSelectorProps> = ({
               as={Button}
               rightIcon={<ChevronDownIcon />}
               leftIcon={<AddIcon />}
+              isDisabled={isReadOnly}
               bg="white"
               color="orange.700"
               border="2px solid"

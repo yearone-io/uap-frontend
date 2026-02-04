@@ -11,6 +11,7 @@ interface CreatorListScreenerConfigProps {
   onRequireAllCreatorsChange: (value: boolean) => void;
   behavior: 'pass' | 'block';
   onBehaviorChange: (behavior: 'pass' | 'block') => void;
+  isReadOnly?: boolean;
 }
 
 const CreatorListScreenerConfig: React.FC<CreatorListScreenerConfigProps> = ({
@@ -20,12 +21,14 @@ const CreatorListScreenerConfig: React.FC<CreatorListScreenerConfigProps> = ({
   onRequireAllCreatorsChange,
   behavior,
   onBehaviorChange,
+  isReadOnly = false,
 }) => {
   return (
     <VStack spacing={4} align="stretch">
       <RequireAllCreatorsToggle
         requireAllCreators={requireAllCreators}
         onRequireAllCreatorsChange={onRequireAllCreatorsChange}
+        isReadOnly={isReadOnly}
       />
 
       <AddressListManager
@@ -35,6 +38,7 @@ const CreatorListScreenerConfig: React.FC<CreatorListScreenerConfigProps> = ({
         behavior={behavior}
         onBehaviorChange={onBehaviorChange}
         placeholder="Add creator address to screening list (0x...)"
+        isReadOnly={isReadOnly}
       />
 
       <Box p={4} bg="purple.50" border="1px solid" borderColor="purple.200" borderRadius="lg">

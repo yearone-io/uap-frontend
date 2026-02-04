@@ -15,6 +15,7 @@ interface AssistantConfigurationSectionProps {
   assistantAddress: string;
   currentNetworkId: number;
   onFieldChange: (fieldName: string, value: string) => void;
+  isReadOnly?: boolean;
 }
 
 const AssistantConfigurationSection: React.FC<AssistantConfigurationSectionProps> = ({
@@ -24,6 +25,7 @@ const AssistantConfigurationSection: React.FC<AssistantConfigurationSectionProps
   assistantAddress,
   currentNetworkId,
   onFieldChange,
+  isReadOnly = false,
 }) => {
   if (configParams.length === 0) return null;
 
@@ -58,6 +60,7 @@ const AssistantConfigurationSection: React.FC<AssistantConfigurationSectionProps
               value={fieldValues[param.name] || ''}
               onChange={e => onFieldChange(param.name, e.target.value)}
               w="70%"
+              isReadOnly={isReadOnly}
             />
           </Flex>
         ))}

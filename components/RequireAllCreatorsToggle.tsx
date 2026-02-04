@@ -11,11 +11,13 @@ import {
 interface RequireAllCreatorsToggleProps {
   requireAllCreators: boolean;
   onRequireAllCreatorsChange: (value: boolean) => void;
+  isReadOnly?: boolean;
 }
 
 const RequireAllCreatorsToggle: React.FC<RequireAllCreatorsToggleProps> = ({
   requireAllCreators,
   onRequireAllCreatorsChange,
+  isReadOnly = false,
 }) => {
   return (
     <Box mb={4}>
@@ -25,6 +27,7 @@ const RequireAllCreatorsToggle: React.FC<RequireAllCreatorsToggleProps> = ({
       <RadioGroup
         value={requireAllCreators ? 'all' : 'any'}
         onChange={(value) => onRequireAllCreatorsChange(value === 'all')}
+        isDisabled={isReadOnly}
       >
         <Stack spacing={3}>
           <Radio value="any" colorScheme="green">

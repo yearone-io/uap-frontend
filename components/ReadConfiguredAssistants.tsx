@@ -232,6 +232,12 @@ const ReadConfiguredAssistants: React.FC<UPTypeConfigDisplayProps> = ({
         if (typeConfigs[typeIdValue] && typeConfigs[typeIdValue].length > 0) {
           const option = typeIdOptionsMap[typeIdValue as keyof typeof typeIdOptionsMap];
           const assistants = typeConfigs[typeIdValue];
+          const hasExternalConfigAssistant = assistants.some(assistant =>
+            Boolean(
+              supportedNetworks[networkId]?.assistants[assistant.address.toLowerCase()]
+                ?.configExternalUrl
+            )
+          );
           
           return (
             <Box key={typeIdValue} mb={6}>
@@ -265,6 +271,12 @@ const ReadConfiguredAssistants: React.FC<UPTypeConfigDisplayProps> = ({
                     variant="outline"
                     colorScheme="orange"
                     onClick={() => handleReorderClick(typeIdValue, `${option.label} - ${option.description}`)}
+                    isDisabled={hasExternalConfigAssistant}
+                    title={
+                      hasExternalConfigAssistant
+                        ? 'Reordering is disabled for assistants managed externally.'
+                        : undefined
+                    }
                   >
                     Reorder ({assistants.length})
                   </Button>

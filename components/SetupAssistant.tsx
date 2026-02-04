@@ -47,18 +47,21 @@ import SaveActionsPanel from './SaveActionsPanel';
 const SetupAssistant: React.FC<{
   config: ExecutiveAssistant;
   networkId?: number;
-}> = ({
-  config: {
+}> = ({ config, networkId }) => {
+  const {
     address: assistantAddress,
     supportedTransactionTypes: assistantSupportedTransactionTypes,
     configParams,
-  },
-  networkId,
-}) => {
+    configExternalUrl,
+  } = config;
   const toast = useToast({ position: 'bottom-left' });
   const { profileDetailsData } = useProfile();
   const address = profileDetailsData?.upWallet;
   const currentNetworkId = networkId || (profileDetailsData as any)?.networkId;
+  const isExternalConfig = Boolean(configExternalUrl);
+  const externalConfigLabel = configExternalUrl
+    ? configExternalUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : '';
 
   // Processing state
   const [isProcessingTransaction, setIsProcessingTransaction] = useState<boolean>(false);
@@ -165,6 +168,12 @@ const SetupAssistant: React.FC<{
   // Save configuration handler
   const handleSaveAssistantConfig = useCallback(async () => {
     setError('');
+    if (isExternalConfig) {
+      setErrorWithToast(
+        `This assistant is configured on ${externalConfigLabel || 'the external site'} and is read-only here.`
+      );
+      return;
+    }
     if (!address) {
       setErrorWithToast('Please connect your wallet first.');
       return;
@@ -303,7 +312,7 @@ const SetupAssistant: React.FC<{
     } finally {
       setIsProcessingTransaction(false);
     }
-  }, [address, assistantConfig, screenerManagement, configParams, currentNetworkId, getSigner, setErrorWithToast, toast, assistantAddress]);
+  }, [address, assistantConfig, screenerManagement, configParams, currentNetworkId, getSigner, setErrorWithToast, toast, assistantAddress, isExternalConfig, externalConfigLabel]);
 
   // Handle reorder completion
   const handleReorderComplete = useCallback(async () => {
@@ -337,6 +346,15 @@ const SetupAssistant: React.FC<{
     if (!address) {
       setErrorWithToast('Please connect your wallet first.');
       return;
+    }
+
+    if (isExternalConfig) {
+      const shouldProceed = window.confirm(
+        `Deactivating this assistant will stop forwarding. You can only configure or reactivate it on ${externalConfigLabel || 'the external site'}. Do you want to continue?`
+      );
+      if (!shouldProceed) {
+        return;
+      }
     }
 
     try {
@@ -388,7 +406,7 @@ const SetupAssistant: React.FC<{
     } finally {
       setIsProcessingTransaction(false);
     }
-  }, [address, assistantConfig, getSigner, setErrorWithToast, toast, assistantAddress]);
+  }, [address, assistantConfig, getSigner, setErrorWithToast, toast, assistantAddress, isExternalConfig]);
 
   // Render main component (matching exact original structure)
   return (
@@ -430,102 +448,109 @@ const SetupAssistant: React.FC<{
         </Text>
       )}
       <Flex gap={4} flexDirection="column">
-        {/* Transaction Type Selector */}
-        <TransactionTypeSelector
-          supportedTransactionTypes={assistantSupportedTransactionTypes}
-          selectedConfigTypes={assistantConfig.selectedConfigTypes}
-          onAddType={handleAddTransactionType}
-          onRemoveType={handleRemoveTransactionType}
-        />
+        <Box
+          opacity={isExternalConfig ? 0.7 : 1}
+        >
+          {/* Transaction Type Selector */}
+          <TransactionTypeSelector
+            supportedTransactionTypes={assistantSupportedTransactionTypes}
+            selectedConfigTypes={assistantConfig.selectedConfigTypes}
+            onAddType={handleAddTransactionType}
+            onRemoveType={handleRemoveTransactionType}
+            isReadOnly={isExternalConfig}
+          />
 
-        {/* Transaction Type Groups (Type + Screeners) */}
-        {assistantConfig.selectedConfigTypes.length > 0 && (
-          <VStack align="stretch" spacing={4} position="relative" overflow="visible">
-            <Text fontSize="md" fontWeight="bold" color="orange.800">
-              Active Transaction Types
-            </Text>
-            {assistantConfig.selectedConfigTypes.map((typeId) => {
-              const typeState = screenerManagement.getScreenerState(typeId);
-              const originalTypeState = screenerManagement.originalScreenerStateByType[typeId];
-              
-              return (
-                <UnifiedTransactionTypePanel
-                  key={typeId}
-                  typeId={typeId}
-                  onRemove={handleRemoveTransactionType}
-                  onReorder={(typeId, typeName) => {
-                    setSelectedTypeForReorder({ typeId, typeName });
-                    onReorderOpen();
-                  }}
-                  executionOrder={assistantConfig.executionOrders[typeId]}
-                  predictedExecutionOrder={assistantConfig.predictedExecutionOrders[typeId]}
-                  allAssistantsCount={assistantConfig.allAssistantsForTypes[typeId]?.length}
-                  isConfigured={assistantConfig.executionOrders[typeId] !== undefined}
-                  isActive={assistantConfig.isUPSubscribedToAssistant && assistantConfig.executionOrders[typeId] !== undefined}
-                  
-                  // Screener props
-                  enableScreeners={typeState.enableScreeners}
-                  selectedScreeners={typeState.selectedScreeners}
-                  screenerConfigs={typeState.screenerConfigs}
-                  originalScreenerConfigs={originalTypeState?.screenerConfigs}
-                  useANDLogic={typeState.useANDLogic}
-                  currentNetworkId={currentNetworkId || 42}
-                  onEnableScreenersChange={(enabled) => {
-                    screenerManagement.updateScreenerForType(typeId, { 
-                      enableScreeners: enabled,
-                      ...(enabled ? {} : { selectedScreeners: [], screenerConfigs: {} })
-                    });
-                  }}
-                  onAddScreener={(instanceId, screener) => {
-                    const defaultConfig: any = {};
-                    screener.configParams.forEach((param: any) => {
-                      if (param.defaultValue) {
-                        defaultConfig[param.name] = param.defaultValue === 'true' ? true : param.defaultValue === 'false' ? false : param.defaultValue;
-                      }
-                    });
+          {/* Transaction Type Groups (Type + Screeners) */}
+          {assistantConfig.selectedConfigTypes.length > 0 && (
+            <VStack align="stretch" spacing={4} position="relative" overflow="visible">
+              <Text fontSize="md" fontWeight="bold" color="orange.800">
+                Active Transaction Types
+              </Text>
+              {assistantConfig.selectedConfigTypes.map((typeId) => {
+                const typeState = screenerManagement.getScreenerState(typeId);
+                const originalTypeState = screenerManagement.originalScreenerStateByType[typeId];
+                
+                return (
+                  <UnifiedTransactionTypePanel
+                    key={typeId}
+                    typeId={typeId}
+                    onRemove={handleRemoveTransactionType}
+                    onReorder={isExternalConfig ? undefined : (typeId, typeName) => {
+                      setSelectedTypeForReorder({ typeId, typeName });
+                      onReorderOpen();
+                    }}
+                    executionOrder={assistantConfig.executionOrders[typeId]}
+                    predictedExecutionOrder={assistantConfig.predictedExecutionOrders[typeId]}
+                    allAssistantsCount={assistantConfig.allAssistantsForTypes[typeId]?.length}
+                    isConfigured={assistantConfig.executionOrders[typeId] !== undefined}
+                    isActive={assistantConfig.isUPSubscribedToAssistant && assistantConfig.executionOrders[typeId] !== undefined}
+                    isReadOnly={isExternalConfig}
                     
-                    screenerManagement.updateScreenerForType(typeId, {
-                      selectedScreeners: [...typeState.selectedScreeners, instanceId],
-                      screenerConfigs: {
-                        ...typeState.screenerConfigs,
-                        [instanceId]: defaultConfig
-                      }
-                    });
-                  }}
-                  onRemoveScreener={(instanceId) => {
-                    const newConfigs = { ...typeState.screenerConfigs };
-                    delete newConfigs[instanceId];
-                    
-                    screenerManagement.updateScreenerForType(typeId, {
-                      selectedScreeners: typeState.selectedScreeners.filter(id => id !== instanceId),
-                      screenerConfigs: newConfigs
-                    });
-                  }}
-                  onScreenerConfigChange={(instanceId, config) => {
-                    screenerManagement.updateScreenerForType(typeId, {
-                      screenerConfigs: {
-                        ...typeState.screenerConfigs,
-                        [instanceId]: config
-                      }
-                    });
-                  }}
-                  onLogicChange={(useAND) => {
-                    screenerManagement.updateScreenerForType(typeId, { useANDLogic: useAND });
-                  }}
-                />
-              );
-            })}
-          </VStack>
-        )}
+                    // Screener props
+                    enableScreeners={typeState.enableScreeners}
+                    selectedScreeners={typeState.selectedScreeners}
+                    screenerConfigs={typeState.screenerConfigs}
+                    originalScreenerConfigs={originalTypeState?.screenerConfigs}
+                    useANDLogic={typeState.useANDLogic}
+                    currentNetworkId={currentNetworkId || 42}
+                    onEnableScreenersChange={(enabled) => {
+                      screenerManagement.updateScreenerForType(typeId, { 
+                        enableScreeners: enabled,
+                        ...(enabled ? {} : { selectedScreeners: [], screenerConfigs: {} })
+                      });
+                    }}
+                    onAddScreener={(instanceId, screener) => {
+                      const defaultConfig: any = {};
+                      screener.configParams.forEach((param: any) => {
+                        if (param.defaultValue) {
+                          defaultConfig[param.name] = param.defaultValue === 'true' ? true : param.defaultValue === 'false' ? false : param.defaultValue;
+                        }
+                      });
+                      
+                      screenerManagement.updateScreenerForType(typeId, {
+                        selectedScreeners: [...typeState.selectedScreeners, instanceId],
+                        screenerConfigs: {
+                          ...typeState.screenerConfigs,
+                          [instanceId]: defaultConfig
+                        }
+                      });
+                    }}
+                    onRemoveScreener={(instanceId) => {
+                      const newConfigs = { ...typeState.screenerConfigs };
+                      delete newConfigs[instanceId];
+                      
+                      screenerManagement.updateScreenerForType(typeId, {
+                        selectedScreeners: typeState.selectedScreeners.filter(id => id !== instanceId),
+                        screenerConfigs: newConfigs
+                      });
+                    }}
+                    onScreenerConfigChange={(instanceId, config) => {
+                      screenerManagement.updateScreenerForType(typeId, {
+                        screenerConfigs: {
+                          ...typeState.screenerConfigs,
+                          [instanceId]: config
+                        }
+                      });
+                    }}
+                    onLogicChange={(useAND) => {
+                      screenerManagement.updateScreenerForType(typeId, { useANDLogic: useAND });
+                    }}
+                  />
+                );
+              })}
+            </VStack>
+          )}
 
-        <AssistantConfigurationSection
-          selectedConfigTypes={assistantConfig.selectedConfigTypes}
-          configParams={configParams}
-          fieldValues={assistantConfig.fieldValues}
-          assistantAddress={assistantAddress}
-          currentNetworkId={currentNetworkId}
-          onFieldChange={debouncedFieldUpdate}
-        />
+          <AssistantConfigurationSection
+            selectedConfigTypes={assistantConfig.selectedConfigTypes}
+            configParams={configParams}
+            fieldValues={assistantConfig.fieldValues}
+            assistantAddress={assistantAddress}
+            currentNetworkId={currentNetworkId}
+            onFieldChange={debouncedFieldUpdate}
+            isReadOnly={isExternalConfig}
+          />
+        </Box>
 
         {/* Error message right above save buttons */}
         {error && (
@@ -562,7 +587,7 @@ const SetupAssistant: React.FC<{
             _active={{ bg: 'orange.700' }}
             onClick={handleSaveAssistantConfig}
             isLoading={isProcessingTransaction}
-            isDisabled={isProcessingTransaction || !hasPendingChanges()}
+            isDisabled={isProcessingTransaction || !hasPendingChanges() || isExternalConfig}
           >
             Save & Activate Assistant
           </Button>

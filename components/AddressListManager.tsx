@@ -28,6 +28,7 @@ interface AddressListManagerProps {
   onBehaviorChange: (behavior: 'pass' | 'block') => void;
   placeholder?: string;
   showBehaviorSelector?: boolean; // Hide behavior selector for fixed-behavior lists like blocklists
+  isReadOnly?: boolean;
 }
 
 const AddressListManager: React.FC<AddressListManagerProps> = ({
@@ -37,7 +38,8 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
   behavior,
   onBehaviorChange,
   placeholder = "Enter address (0x...)",
-  showBehaviorSelector = true
+  showBehaviorSelector = true,
+  isReadOnly = false,
 }) => {
   const [newAddress, setNewAddress] = useState('');
   const [error, setError] = useState('');
@@ -53,6 +55,9 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
   };
 
   const handleAddAddress = () => {
+    if (isReadOnly) {
+      return;
+    }
     setError('');
     
     if (!newAddress.trim()) {
@@ -87,6 +92,9 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
   };
 
   const handleRemoveAddress = (addressToRemove: string) => {
+    if (isReadOnly) {
+      return;
+    }
     const updatedAddresses = addresses.filter(
       addr => addr.toLowerCase() !== addressToRemove.toLowerCase()
     );
@@ -103,6 +111,9 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (isReadOnly) {
+      return;
+    }
     if (e.key === 'Enter') {
       handleAddAddress();
     }
@@ -116,7 +127,11 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
           <Text fontSize="sm" fontWeight="semibold" mb={3}>
             Screening Behavior:
           </Text>
-          <RadioGroup value={behavior} onChange={(value) => onBehaviorChange(value as 'pass' | 'block')}>
+          <RadioGroup
+            value={behavior}
+            onChange={(value) => onBehaviorChange(value as 'pass' | 'block')}
+            isDisabled={isReadOnly}
+          >
             <Stack direction="row" spacing={6}>
               <Radio value="pass" colorScheme="green">
                 <Text fontSize="sm">If source address is in list, screening passes</Text>
@@ -142,6 +157,7 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
             placeholder={placeholder}
             size="sm"
             isInvalid={!!error}
+            isReadOnly={isReadOnly}
           />
           <IconButton
             icon={<AddIcon />}
@@ -149,7 +165,7 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
             aria-label="Add address"
             colorScheme="blue"
             size="sm"
-            isDisabled={!newAddress.trim()}
+            isDisabled={isReadOnly || !newAddress.trim()}
           />
         </HStack>
         {error && (
@@ -179,6 +195,7 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
               aria-label="Toggle address list"
               size="xs"
               variant="ghost"
+              isDisabled={isReadOnly}
             />
           )}
         </HStack>
@@ -236,6 +253,7 @@ const AddressListManager: React.FC<AddressListManagerProps> = ({
                     variant="ghost"
                     ml={2}
                     flexShrink={0}
+                    isDisabled={isReadOnly}
                   />
                 </Flex>
               ))}

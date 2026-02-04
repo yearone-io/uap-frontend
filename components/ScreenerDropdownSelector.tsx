@@ -24,6 +24,7 @@ interface ScreenerDropdownSelectorProps {
   selectedScreeners: string[];
   onAddScreener: (screenerId: string, screener: ScreenerAssistant) => void;
   maxScreeners?: number;
+  isDisabled?: boolean;
 }
 
 const ScreenerDropdownSelector: React.FC<ScreenerDropdownSelectorProps> = ({
@@ -31,6 +32,7 @@ const ScreenerDropdownSelector: React.FC<ScreenerDropdownSelectorProps> = ({
   selectedScreeners,
   onAddScreener,
   maxScreeners = 5,
+  isDisabled = false,
 }) => {
   // Removed unused color mode variables as we now use fixed orange theme colors
 
@@ -64,6 +66,7 @@ const ScreenerDropdownSelector: React.FC<ScreenerDropdownSelectorProps> = ({
           as={Button}
           rightIcon={<ChevronDownIcon />}
           leftIcon={<AddIcon />}
+          isDisabled={isDisabled}
           bg="white"
           color="blue.700"
           border="2px solid"

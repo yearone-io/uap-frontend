@@ -16,6 +16,7 @@ interface CreatorCurationScreenerConfigProps {
   blocklistAddresses: string[];
   onBlocklistAddressesChange: (addresses: string[]) => void;
   networkId?: number;
+  isReadOnly?: boolean;
 }
 
 const CreatorCurationScreenerConfig: React.FC<CreatorCurationScreenerConfigProps> = ({
@@ -30,12 +31,14 @@ const CreatorCurationScreenerConfig: React.FC<CreatorCurationScreenerConfigProps
   blocklistAddresses,
   onBlocklistAddressesChange,
   networkId,
+  isReadOnly = false,
 }) => {
   return (
     <VStack spacing={4} align="stretch">
       <RequireAllCreatorsToggle
         requireAllCreators={requireAllCreators}
         onRequireAllCreatorsChange={onRequireAllCreatorsChange}
+        isReadOnly={isReadOnly}
       />
 
       <CurationScreenerConfig
@@ -48,6 +51,7 @@ const CreatorCurationScreenerConfig: React.FC<CreatorCurationScreenerConfigProps
         blocklistAddresses={blocklistAddresses}
         onBlocklistAddressesChange={onBlocklistAddressesChange}
         networkId={networkId}
+        isReadOnly={isReadOnly}
       />
 
       <Box p={4} bg="purple.50" border="1px solid" borderColor="purple.200" borderRadius="lg">

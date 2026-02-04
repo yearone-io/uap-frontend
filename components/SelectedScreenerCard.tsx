@@ -28,6 +28,7 @@ interface SelectedScreenerCardProps {
   networkId: number;
   isLoadedFromBlockchain?: boolean; // New prop to indicate if this was loaded vs newly added
   originalConfig?: any; // Original config for change detection
+  isReadOnly?: boolean;
 }
 
 const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
@@ -39,12 +40,16 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
   networkId,
   isLoadedFromBlockchain = false,
   originalConfig,
+  isReadOnly = false,
 }) => {
   const cardBg = useColorModeValue('white', 'gray.700');
   const borderColor = useColorModeValue('blue.200', 'blue.400');
   const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
 
   const handleConfigUpdate = (newConfig: any) => {
+    if (isReadOnly) {
+      return;
+    }
     onConfigChange(instanceId, {
       ...config,
       ...newConfig,
@@ -172,6 +177,7 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
           variant="ghost"
           colorScheme="red"
           onClick={() => onRemove(instanceId)}
+          isDisabled={isReadOnly}
         />
       </HStack>
 
@@ -196,6 +202,7 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
                 });
               }}
               placeholder="Add address to screening list (0x...)"
+              isReadOnly={isReadOnly}
             />
           )}
 
@@ -224,6 +231,7 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
                 });
               }}
               networkId={networkId}
+              isReadOnly={isReadOnly}
             />
           )}
 
@@ -243,6 +251,7 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
                   returnValueWhenInList: behavior === 'pass'
                 });
               }}
+              isReadOnly={isReadOnly}
             />
           )}
 
@@ -275,6 +284,7 @@ const SelectedScreenerCard: React.FC<SelectedScreenerCardProps> = ({
                 });
               }}
               networkId={networkId}
+              isReadOnly={isReadOnly}
             />
           )}
         </Box>

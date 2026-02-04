@@ -32,6 +32,7 @@ interface UnifiedTransactionTypePanelProps {
   // Status
   isConfigured: boolean;
   isActive: boolean;
+  isReadOnly?: boolean;
 
   // Screener props
   enableScreeners: boolean;
@@ -67,6 +68,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
   onRemoveScreener,
   onScreenerConfigChange,
   onLogicChange,
+  isReadOnly = false,
 }) => {
   // Get type info from the map
   const typeInfo = Object.values(transactionTypeMap).find(t => t.id === typeId);
@@ -118,6 +120,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
           color="gray.400"
           _hover={{ color: 'red.500', bg: 'red.50' }}
           zIndex={1}
+          isDisabled={isReadOnly}
         />
 
         {/* Transaction Type Header - Compact Design */}
@@ -193,6 +196,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                     colorScheme="orange"
                     fontSize="xs"
                     onClick={() => onReorder(typeId, `${label} ${typeName}`)}
+                    isDisabled={isReadOnly}
                   >
                     Reorder ({allAssistantsCount})
                   </Button>
@@ -267,6 +271,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                   px={3}
                   h={6}
                   onClick={() => onReorder(typeId, `${label} ${typeName}`)}
+                  isDisabled={isReadOnly}
                 >
                   Change Order
                 </Button>
@@ -297,6 +302,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                     }}
                     colorScheme="blue"
                     size="lg"
+                    isDisabled={isReadOnly}
                   />
                 </HStack>
               </VStack>
@@ -315,6 +321,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                   }}
                   colorScheme="blue"
                   size="lg"
+                  isDisabled={isReadOnly}
                 />
               </HStack>
             </Box>
@@ -327,6 +334,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                     useANDLogic={useANDLogic}
                     onLogicChange={onLogicChange}
                     screenerCount={selectedScreeners.length}
+                    isReadOnly={isReadOnly}
                   />
                 )}
 
@@ -337,6 +345,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                     selectedScreeners={selectedScreeners}
                     onAddScreener={onAddScreener}
                     maxScreeners={5}
+                    isDisabled={isReadOnly}
                   />
                 </Box>
 
@@ -365,6 +374,7 @@ const UnifiedTransactionTypePanel: React.FC<UnifiedTransactionTypePanelProps> = 
                             onRemove={onRemoveScreener}
                             networkId={currentNetworkId}
                             isLoadedFromBlockchain={instanceId.includes('_loaded_')}
+                            isReadOnly={isReadOnly}
                           />
                           
                           {/* AND/OR Logic Indicator between cards */}

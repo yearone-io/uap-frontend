@@ -29,6 +29,8 @@ export type ConfigParam = {
 export type ExecutiveAssistant = AbstractAssistant & {
   assistantType: 'Executive';
   configParams: ConfigParam[];
+  configExternalUrl?: string;
+  configExternalNotice?: string;
 };
 
 export type ScreenerAssistant = {

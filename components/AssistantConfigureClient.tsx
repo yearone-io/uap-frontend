@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Button, Flex, Spinner, Text, VStack } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Flex,
+  Link,
+  Spinner,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import AssistantInfo from '@/components/AssistantInfo';
 import URDSetup from '@/components/URDSetup';
 import SignInBox from '@/components/SignInBox';
@@ -33,6 +43,11 @@ export default function ExecutiveAssistantConfigureClient({
   }; // Fallback to avoid undefined
   const assistantInfo =
     network.assistants[assistantAddress.toLowerCase()] || null;
+  const externalConfigUrl = assistantInfo?.configExternalUrl;
+  const externalConfigLabel = externalConfigUrl
+    ? externalConfigUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    : '';
+  const externalConfigNotice = assistantInfo?.configExternalNotice;
   const networkUrlId = getChainIdByUrlName(networkName);
   const { profileDetailsData, isConnected, chainId, switchNetwork } =
     useProfile();
@@ -160,6 +175,35 @@ export default function ExecutiveAssistantConfigureClient({
   return (
     <Box p={4} w="100%">
       {breadCrumbs}
+      {externalConfigUrl && (
+        <Alert
+          status="info"
+          variant="left-accent"
+          borderRadius="md"
+          alignItems="flex-start"
+          mt={4}
+        >
+          <AlertIcon mt={1} />
+          <Box>
+            <Text fontSize="sm" fontWeight="semibold" color="gray.800">
+              External Configuration Required
+            </Text>
+            <Text fontSize="sm" color="gray.700">
+              {externalConfigNotice ? `${externalConfigNotice} ` : ''}
+              Configure this assistant on{' '}
+              <Link
+                href={externalConfigUrl}
+                isExternal
+                color="orange.600"
+                fontWeight="semibold"
+              >
+                {externalConfigLabel || 'the external site'}
+              </Link>
+              . This page is read-only.
+            </Text>
+          </Box>
+        </Alert>
+      )}
       <Flex direction="column" gap={4} mt={4} w="100%">
         <Flex w="100%">
           <AssistantInfo assistant={assistantInfo} />

@@ -42,7 +42,7 @@ export const tipAssistantTestnet: ExecutiveAssistant = {
 };
 
 export const forwarderAssistantTestnet: ExecutiveAssistant = {
-  address: '0x1296ace80af3230c961c79a9bee6a07b4a45f53f',
+  address: '0x0da9c56b34575026b5ccd15e28140da2893bc998',
   name: 'Forwarder Assistant',
   description: 'Forward incoming assets to an external address.',
   iconPath: '/assistants/forwarder.jpg',
@@ -68,6 +68,38 @@ export const forwarderAssistantTestnet: ExecutiveAssistant = {
   ],
   chainId: 4201,
 };
+
+export const graveForwarderAssistantTestnet: ExecutiveAssistant = {
+  address: '0x1296ace80af3230c961c79a9bee6a07b4a45f53f',
+  name: 'Grave Assistant',
+  description: 'Forward spam to the GRAVE.',
+  iconPath: '/assistants/graveForwarder.png',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Executive',
+  creatorAddress: '0xfE67D89DeBEC38592aB2FeD217b8bbb28851DF88',
+  configExternalUrl: 'https://universalgrave.com',
+  configExternalNotice:
+    '',
+  supportedTransactionTypes: [
+    LSP1_TYPE_IDS.LSP7Tokens_RecipientNotification,
+    LSP1_TYPE_IDS.LSP8Tokens_RecipientNotification,
+  ],
+  configParams: [
+    {
+      name: 'targetAddress',
+      type: 'address',
+      hidden: false,
+      description: 'Your grave spambox address:',
+      placeholder: 'Enter destination address',
+      validationMessage: 'Destination address cannot be your own address',
+      validate: (value: any, upAddress: string) => {
+        return value.toLowerCase() !== upAddress.toLowerCase();
+      },
+    },
+  ],
+  chainId: 4201,
+};
+
 
 export const burntPixRefinerTestnet: ExecutiveAssistant = {
   address: '0x6bec84e010fd6083509121ff7966ffc9fe35c803',
@@ -155,7 +187,7 @@ export const tipAssistantMainnet: ExecutiveAssistant = {
 };
 
 export const forwarderAssistantMainnet: ExecutiveAssistant = {
-  address: '0xc503d7f50c4d2c0649fa86e43c247eb4e2e62fec',
+  address: '0x4674899e82879f669eb66eb415d8507edb23725e',
   name: 'Forwarder Assistant',
   description: 'Forward incoming assets to an external address.',
   iconPath: '/assistants/forwarder.jpg',
@@ -172,6 +204,37 @@ export const forwarderAssistantMainnet: ExecutiveAssistant = {
       type: 'address',
       hidden: false,
       description: 'The address you want to forward assets to:',
+      placeholder: 'Enter destination address',
+      validationMessage: 'Destination address cannot be your own address',
+      validate: (value: any, upAddress: string) => {
+        return value.toLowerCase() !== upAddress.toLowerCase();
+      },
+    },
+  ],
+  chainId: 42,
+};
+
+export const graveForwarderAssistantMainnet: ExecutiveAssistant = {
+  address: '0xc503d7f50c4d2c0649fa86e43c247eb4e2e62fec',
+  name: 'Grave Assistant',
+  description: 'Forward spam to the GRAVE.',
+  iconPath: '/assistants/graveForwarder.png',
+  links: [{ name: 'X', url: 'https://x.com/yearone_io' }],
+  assistantType: 'Executive',
+  creatorAddress: '0xec1c59E78De6f840A66b6EE8E4066700Be863529',
+  configExternalUrl: 'https://universalgrave.com',
+  configExternalNotice:
+    '',
+  supportedTransactionTypes: [
+    LSP1_TYPE_IDS.LSP7Tokens_RecipientNotification,
+    LSP1_TYPE_IDS.LSP8Tokens_RecipientNotification,
+  ],
+  configParams: [
+    {
+      name: 'targetAddress',
+      type: 'address',
+      hidden: false,
+      description: 'Your grave spambox address:',
       placeholder: 'Enter destination address',
       validationMessage: 'Destination address cannot be your own address',
       validate: (value: any, upAddress: string) => {

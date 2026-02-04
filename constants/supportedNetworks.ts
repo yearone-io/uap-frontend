@@ -4,6 +4,8 @@ import {
   burntPixRefinerTestnet,
   forwarderAssistantMainnet,
   forwarderAssistantTestnet,
+  graveForwarderAssistantMainnet,
+  graveForwarderAssistantTestnet,
   tipAssistantMainnet,
   tipAssistantTestnet,
 } from '@/constants/assistantsConfig';
@@ -64,6 +66,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
       [tipAssistantMainnet.address.toLowerCase()]: tipAssistantMainnet,
       [forwarderAssistantMainnet.address.toLowerCase()]:
         forwarderAssistantMainnet,
+      [graveForwarderAssistantMainnet.address.toLowerCase()]:
+        graveForwarderAssistantMainnet,
       [burntPixRefinerMainnet.address.toLowerCase()]: burntPixRefinerMainnet,
     },
     screeners: {
@@ -93,6 +97,8 @@ export const supportedNetworks: { [key: string]: ChainInfo } = {
       [tipAssistantTestnet.address.toLowerCase()]: tipAssistantTestnet,
       [forwarderAssistantTestnet.address.toLowerCase()]:
         forwarderAssistantTestnet,
+      [graveForwarderAssistantTestnet.address.toLowerCase()]:
+        graveForwarderAssistantTestnet,
       [burntPixRefinerTestnet.address.toLowerCase()]: burntPixRefinerTestnet,
     },
     screeners: {

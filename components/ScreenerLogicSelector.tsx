@@ -11,12 +11,14 @@ interface ScreenerLogicSelectorProps {
   useANDLogic: boolean;
   onLogicChange: (useAND: boolean) => void;
   screenerCount: number;
+  isReadOnly?: boolean;
 }
 
 const ScreenerLogicSelector: React.FC<ScreenerLogicSelectorProps> = ({
   useANDLogic,
   onLogicChange,
   screenerCount,
+  isReadOnly = false,
 }) => {
   // Don't show logic selector if there's only one screener
   if (screenerCount <= 1) {
@@ -49,6 +51,7 @@ const ScreenerLogicSelector: React.FC<ScreenerLogicSelectorProps> = ({
           onChange={(e) => onLogicChange(e.target.checked)}
           colorScheme="blue"
           size="sm"
+          isDisabled={isReadOnly}
         />
         <Text fontSize="xs" color="gray.500">AND</Text>
       </HStack>

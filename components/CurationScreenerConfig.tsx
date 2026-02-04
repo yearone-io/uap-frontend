@@ -32,6 +32,7 @@ interface CurationScreenerConfigProps {
   blocklistAddresses: string[];
   onBlocklistAddressesChange: (addresses: string[]) => void;
   networkId?: number;
+  isReadOnly?: boolean;
 }
 
 const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
@@ -43,7 +44,8 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
   onUseBlocklistChange,
   blocklistAddresses,
   onBlocklistAddressesChange,
-  networkId
+  networkId,
+  isReadOnly = false,
 }) => {
   const [isValidating, setIsValidating] = useState(false);
   const [validationStatus, setValidationStatus] = useState<'valid' | 'invalid' | 'unknown'>('unknown');
@@ -53,6 +55,9 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
 
   // Validate NFT contract address
   useEffect(() => {
+    if (isReadOnly) {
+      return;
+    }
     const validateContract = async () => {
       if (!curatedListAddress || curatedListAddress.trim() === '') {
         setValidationStatus('unknown');
@@ -109,9 +114,12 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
     const timeoutId = setTimeout(validateContract, 500);
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [curatedListAddress]);
+  }, [curatedListAddress, isReadOnly]);
 
   const handleAddressChange = (value: string) => {
+    if (isReadOnly) {
+      return;
+    }
     setError('');
     setValidationStatus('unknown');
     setContractInfo(null);
@@ -119,6 +127,9 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
   };
 
   const handleAddressBlur = () => {
+    if (isReadOnly) {
+      return;
+    }
     if (!curatedListAddress || curatedListAddress.trim() === '') {
       setError('Contract address is required');
       setValidationStatus('invalid');
@@ -141,6 +152,7 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
               placeholder="Enter curated list contract address (0x...)"
               size="sm"
               isInvalid={validationStatus === 'invalid'}
+              isReadOnly={isReadOnly}
             />
             {isValidating && <Spinner size="sm" />}
             {validationStatus === 'valid' && (
@@ -180,7 +192,11 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
         <Text fontSize="sm" fontWeight="semibold" mb={3}>
           Screening Behavior:
         </Text>
-        <RadioGroup value={behavior} onChange={(value) => onBehaviorChange(value as 'pass' | 'block')}>
+        <RadioGroup
+          value={behavior}
+          onChange={(value) => onBehaviorChange(value as 'pass' | 'block')}
+          isDisabled={isReadOnly}
+        >
           <Stack spacing={3}>
             <Radio value="pass" colorScheme="green">
               <VStack align="start" spacing={1}>
@@ -208,6 +224,7 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
             onChange={(e) => onUseBlocklistChange(e.target.checked)}
             colorScheme="orange"
             size="sm"
+            isDisabled={isReadOnly}
           />
         </FormControl>
         <Text fontSize="xs" color="gray.600" mt={1}>
@@ -226,6 +243,7 @@ const CurationScreenerConfig: React.FC<CurationScreenerConfigProps> = ({
             onBehaviorChange={() => {}} // Fixed behavior for blocklist
             placeholder="Add address to exclude from curation (0x...)"
             showBehaviorSelector={false} // Hide behavior selector for blocklist
+            isReadOnly={isReadOnly}
           />
         </Box>
       )}
